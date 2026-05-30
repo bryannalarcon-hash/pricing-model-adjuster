@@ -48,3 +48,6 @@ Thumbs.db
 
 # Conversation log backups
 *.md.bak
+
+# Deliverable: submitted predictions
+!predictions/predictions.csv
