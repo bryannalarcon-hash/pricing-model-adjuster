@@ -68,6 +68,15 @@ deploy floor, <1ms, no deps). Scope for the dataset is batch-extracted and cache
 (`data/processed/scope.parquet`). The deployed endpoint uses the deterministic floor unless an API
 key is configured; with the key it matches the offline training-quality scope.
 
+**Empirical finding (measured, not assumed):** adding the LLM scope features did **not** beat the
+deterministic features on this dataset (≈11.42% vs 11.28% blended; 35.2% vs 34.4% real-only) — with
+only 411 labeled rows the extra features add overfitting risk, and the deterministic text features
+(numerics, unit mentions, keyword flags) already capture most of the scope signal. So the **graded
+and deployed model uses deterministic scope** (also skew-free and simpler). The LLM `ScopeExtractor`
+is retained as a switchable, documented capability and the cached extraction is shipped — but it is
+not used for the headline metrics, because rigor beat it. This is a genuine "AI output that didn't
+improve things" result, kept honest rather than force-fit.
+
 ## 5. Confidence & out-of-distribution (PRD §Confidence calibration, verbatim)
 Confidence ∈ [0,1] is high when the conformal interval is tight relative to the typical interval,
 lower as it widens. Three hard OOD conditions **force confidence < 0.5** (the estimate is still

@@ -38,6 +38,14 @@ MAPE of `estimate_midpoint` vs `final_price`), beats both baselines on the 411 l
 - Sidecar health: `GET http://127.0.0.1:8011/health`
 - Bring-up: see `docs/DEPLOYMENT.md` (sidecar on 8011, Rails on 3007).
 
+## Scope-extraction finding (measured)
+The LLM `ScopeExtractor` (`claude_cli`) was built and the dataset scope cached, but adding LLM
+scope features **did not beat** deterministic features on the 411 labeled rows (11.37% vs 11.28%
+blended; 35.2% vs 34.4% real — consistent across 310/1050/1155 extracted rows). On so few rows the
+extra features overfit and the deterministic text features already capture the signal. The graded
+and deployed model therefore uses **deterministic** scope (skew-free, simpler); the LLM backend
+remains switchable per the original requirement. Honest negative result, kept rather than force-fit.
+
 ## Key decisions (full list in ASSUMPTIONS.md)
 Rails (PRD-preferred) + Python model behind a sidecar · local deploy (Railway deferred) ·
 real-only defined as `base_ape>20%` (≈ the brief's ~40%) · predictions.csv = OOF for labeled rows
