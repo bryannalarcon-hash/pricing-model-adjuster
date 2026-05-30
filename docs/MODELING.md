@@ -42,23 +42,38 @@ estimate got wrong. This is the crux:
 
 Prediction: `lo, mid, hi = original_estimate × exp(residual_quantile)`.
 
-## 3. Model
+## 3. Model (v2 — selected by the research program in `experiments/JOURNAL.md`)
 
-- **LightGBM quantile regression**, three models at q=0.1 / 0.5 / 0.9, shallow + regularized
-  (depth 4, num_leaves 15, min_child_samples 20, 400 trees @ lr 0.03, subsampled) to resist
-  overfitting on ~330 rows/fold.
-- **Conformalized Quantile Regression (CQR; Romano et al. 2019).** The raw q0.1/q0.9 band is
-  widened by the (1-α) quantile of the conformity score `E = max(q̂_lo − y, y − q̂_hi)` measured on
-  a held-out calibration split *inside each fold*. This gives the interval **finite-sample coverage**
-  rather than relying on the quantile models being perfectly calibrated. Observed OOF coverage ≈ 81%
-  against an 80% target.
+**Point estimate (what MAPE grades):** a single **LightGBM regressor with L2 loss on the log-residual
+and MAPE-aligned sample weights `1/final_price^0.5`**, trained on **all** labeled data. Three findings
+drove this (multi-seed OOF, 8–15 seeds):
+- L2-on-log-residual beats quantile-q50 and MAE, especially on the hard real rows (real-only
+  31.7%→27.9%). Reasoning: for large residuals the relative error `|e^δ−1|` is convex/asymmetric, and
+  L2 handles the big real-row corrections better than the median.
+- Weighting by `1/final_price^p` aligns the loss with MAPE (cheap jobs penalised proportionally).
+  `p=0.5` is the sweet spot (best blended; higher p chases the target-defined real subset → overfit
+  risk). A *custom* `|e^δ−1|` objective was MAPE-optimal in theory but numerically unstable — rejected.
+- The v1 model wasted 25% of data on the conformal split *for the point model*. v2 trains the point
+  model on 100% and calibrates intervals separately.
+- Shallow + regularized (depth 4, num_leaves 15, min_child_samples 20, 400 trees @ lr 0.03) — tuning
+  was marginal; the loss+weighting was the lever.
+
+**Intervals:** **cross-conformal quantile regression** — q0.1/q0.9 LightGBM models on all data, with
+the CQR pad calibrated by K-fold cross-fitting (no data wasted). **Normalized (adaptive)** conformity
+scales the pad by the local predicted spread, widening intervals for high-uncertainty rows → better
+conditional coverage on the sparse real categories. Marginal OOF coverage ≈ 83% (target 80%).
+
+**Submission:** the 411 labeled rows in `predictions.csv` use **bagged 6-seed OOF** (each row's
+out-of-fold prediction averaged over repeated CV splits) — leakage-free and lower-variance than any
+single split.
 
 ### Features (all computable at request time — no `final_price`)
-Estimate anchors (log original, relative range), urgency (deadline), booking month/seasonality,
+Estimate anchors (log original/lo/hi, relative range), urgency (deadline), booking month/seasonality,
 subtype signals, **text features** from the description (length, numerics, unit mentions, keyword
 flags: replace/repair/install/emergency/leak/…), **ZIP-region geography** (first 1/2/3 digits as a
-cost-of-living proxy), category one-hot, production-vertical flag, and **LLM-extracted scope**
-(sqft, fixture count, complexity, urgency) — see §4.
+cost-of-living proxy), category one-hot, production-vertical flag. Feature importance ranks
+**description length** #1 (long descriptions ⇒ off-estimate jobs), then estimate-range shape and
+magnitude. **The model is scope-free** (see §4) and uses no external data at request time.
 
 ## 4. Scope extraction (LLM, switchable)
 `ScopeExtractor` has three interchangeable backends emitting the same schema:

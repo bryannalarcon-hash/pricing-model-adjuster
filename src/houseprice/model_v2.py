@@ -35,9 +35,14 @@ def _weights(fp, power):
 
 
 class ConformalPriceModelV2:
-    def __init__(self, weight_power=0.5, lo_q=LO_Q, hi_q=HI_Q, n_folds=5, seed=42):
+    def __init__(self, weight_power=0.5, lo_q=LO_Q, hi_q=HI_Q, n_folds=5, seed=42, normalized=True):
         self.weight_power, self.lo_q, self.hi_q = weight_power, lo_q, hi_q
-        self.n_folds, self.seed = n_folds, seed
+        self.n_folds, self.seed, self.normalized = n_folds, seed, normalized
+
+    @staticmethod
+    def _scale(qlo, qhi):
+        # local uncertainty scale = predicted central interval width (floored)
+        return np.maximum(qhi - qlo, 0.05)
 
     def fit(self, X: pd.DataFrame, final_price, original_estimate):
         X = X.reset_index(drop=True)
@@ -48,13 +53,17 @@ class ConformalPriceModelV2:
         # quantile models on ALL data
         self.m_lo = lgb.LGBMRegressor(alpha=self.lo_q, **_QUANT).fit(X, r)
         self.m_hi = lgb.LGBMRegressor(alpha=self.hi_q, **_QUANT).fit(X, r)
-        # cross-conformal pad: conformity scores from held-out folds, models refit per fold
+        # cross-conformal pad: conformity scores from held-out folds, models refit per fold.
+        # Normalized (Mondrian-free adaptive) CQR scales the score by the local predicted spread,
+        # so the pad widens for high-uncertainty rows -> better conditional coverage on the sparse,
+        # high-variance real categories (e.g. Handyman/Plumbing).
         E = []
         for tr, cal in KFold(self.n_folds, shuffle=True, random_state=self.seed).split(X):
             lo_m = lgb.LGBMRegressor(alpha=self.lo_q, **_QUANT).fit(X.iloc[tr], r[tr])
             hi_m = lgb.LGBMRegressor(alpha=self.hi_q, **_QUANT).fit(X.iloc[tr], r[tr])
             qlo, qhi = lo_m.predict(X.iloc[cal]), hi_m.predict(X.iloc[cal])
-            E.append(np.maximum(qlo - r[cal], r[cal] - qhi))
+            raw = np.maximum(qlo - r[cal], r[cal] - qhi)
+            E.append(raw / self._scale(qlo, qhi) if self.normalized else raw)
         E = np.concatenate(E)
         n = len(E)
         level = min(1.0, np.ceil((n + 1) * (self.hi_q - self.lo_q)) / n)
@@ -65,8 +74,10 @@ class ConformalPriceModelV2:
     def predict(self, X: pd.DataFrame, original_estimate):
         oe = np.clip(np.asarray(original_estimate, float), 1, None)
         r_pt = self.m_point.predict(X)
-        r_lo = np.minimum(self.m_lo.predict(X) - self.cqr_pad, r_pt)
-        r_hi = np.maximum(self.m_hi.predict(X) + self.cqr_pad, r_pt)
+        qlo, qhi = self.m_lo.predict(X), self.m_hi.predict(X)
+        pad = self.cqr_pad * (self._scale(qlo, qhi) if getattr(self, "normalized", True) else 1.0)
+        r_lo = np.minimum(qlo - pad, r_pt)
+        r_hi = np.maximum(qhi + pad, r_pt)
         return np.vstack([oe * np.exp(r_lo), oe * np.exp(r_pt), oe * np.exp(r_hi)]).T
 
 
