@@ -1,0 +1,31 @@
+{
+  "enabledMcpjsonServers": [
+    "ruflo"
+  ],
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/prompt_logger.py\" prompt",
+            "timeout": 15,
+            "statusMessage": "Logging prompt"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/prompt_logger.py\" reply",
+            "timeout": 15,
+            "statusMessage": "Logging reply"
+          }
+        ]
+      }
+    ]
+  }
+}

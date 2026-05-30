@@ -1,0 +1,50 @@
+# Secrets / environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Node / JS
+node_modules/
+dist/
+build/
+.netlify/
+*.log
+npm-debug.log*
+
+# Data artifacts (raw downloads, model binaries) — keep these out of git
+data/raw/
+data/interim/
+*.csv
+!data/sample/*.csv
+*.parquet
+*.pkl
+*.joblib
+*.h5
+*.onnx
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Claude Flow runtime state (local-only coordination data)
+.claude-flow/data/
+.claude-flow/sessions/
+
+# Conversation log backups
+*.md.bak
