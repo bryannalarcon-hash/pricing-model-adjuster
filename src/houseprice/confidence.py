@@ -18,29 +18,45 @@ OOD_INTERVAL_MULT = 3.0
 OOD_CONF_CEIL = 0.45  # forced ceiling when any OOD condition holds (< 0.5)
 
 
+SUPPORT_FULL_N = 25       # category labels at/above which support penalty = none
+SUPPORT_FLOOR = 0.70      # min support multiplier for very sparse in-production categories
+
+
 @dataclass
 class ConfidenceCalibrator:
-    median_range: float      # median (estimate_hi - estimate_lo) on training labels
-    width_ref: float         # median relative interval width (hi-lo)/mid on training OOF
+    median_range: float                     # median observed estimate range (OOD reference)
+    width_ref: float                        # median model relative interval width (base curve)
+    cat_support: dict = None                # category -> training label count (data-density)
 
     @classmethod
-    def fit(cls, lo, hi, mid, observed_ranges):
-        """median_range = median of OBSERVED estimate ranges (estimate_hi-estimate_lo) in the
-        data — the PRD's reference for the OOD 'interval > 3× median range' rule. width_ref =
-        median model relative interval width, used for the base confidence curve."""
+    def fit(cls, lo, hi, mid, observed_ranges, cat_counts=None):
+        """median_range = median OBSERVED estimate range (PRD OOD reference). width_ref = median
+        model relative interval width. cat_counts = per-category training label counts, used to
+        damp confidence for sparsely-supported (in-production) categories."""
         import numpy as np
         lo, hi, mid = map(lambda a: np.asarray(a, float), (lo, hi, mid))
         rel = (hi - lo) / np.clip(mid, 1, None)
         med_obs = float(np.median(np.asarray(observed_ranges, float)))
-        return cls(median_range=med_obs, width_ref=float(np.median(rel)) or 0.3)
+        return cls(median_range=med_obs, width_ref=float(np.median(rel)) or 0.3,
+                   cat_support=dict(cat_counts) if cat_counts else {})
 
-    def score(self, lo: float, hi: float, mid: float, in_production: bool):
+    def _support_factor(self, category) -> float:
+        """≤1 multiplier: sparse categories (few training labels) -> lower confidence. A Plumbing
+        prediction (3 labels) is genuinely less certain than a Cleaning one (66), even at equal
+        interval width — the global conformal pad can't see per-category data density."""
+        if not self.cat_support or category is None:
+            return 1.0
+        n = self.cat_support.get(category, 0)
+        frac = min(n / SUPPORT_FULL_N, 1.0)
+        return SUPPORT_FLOOR + (1.0 - SUPPORT_FLOOR) * frac
+
+    def score(self, lo: float, hi: float, mid: float, in_production: bool, category=None):
         """Return (confidence in [0,1], ood_flags dict)."""
         interval = max(hi - lo, 0.0)
         rel = interval / max(mid, 1.0)
         ratio = rel / max(self.width_ref, 1e-6)          # 1.0 == typical width
         base = 1.05 - 0.25 * ratio                       # typical -> ~0.80
-        conf = max(0.05, min(0.95, base))
+        conf = max(0.05, min(0.95, base)) * self._support_factor(category)
 
         flags = {
             "ood_midpoint": bool(mid > OOD_MIDPOINT),

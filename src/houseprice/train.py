@@ -68,7 +68,8 @@ def main(scope_backend_label: str = "deterministic"):
     full = ConformalPriceModelV2(weight_power=0.5).fit(
         X_lab, lab["final_price"].values, lab["original_estimate"].values)
     observed_ranges = (df["estimate_hi"] - df["estimate_lo"]).dropna().values  # all observed ranges
-    cal = ConfidenceCalibrator.fit(lo_oof, hi_oof, mid_oof, observed_ranges)
+    cat_counts = lab["category"].value_counts().to_dict()  # data-density for confidence
+    cal = ConfidenceCalibrator.fit(lo_oof, hi_oof, mid_oof, observed_ranges, cat_counts=cat_counts)
     # Category price anchors (full-dataset original_estimate medians) so requests WITHOUT an
     # original_estimate (optional per Appendix A) still get a sane anchor to correct from.
     cat_anchor = df.groupby("category")["original_estimate"].median().dropna().to_dict()
@@ -98,7 +99,8 @@ def main(scope_backend_label: str = "deterministic"):
 
     confs = []
     for i in range(len(df)):
-        c, _ = cal.score(all_lo[i], all_hi[i], all_mid[i], bool(df["in_production"].iloc[i]))
+        c, _ = cal.score(all_lo[i], all_hi[i], all_mid[i], bool(df["in_production"].iloc[i]),
+                         category=df["category"].iloc[i])
         confs.append(c)
     out = pd.DataFrame({
         "job_id": df["job_id"], "service_category": df["category"],

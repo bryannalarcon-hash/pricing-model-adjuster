@@ -86,4 +86,31 @@ wl2_pow0.5 10.74/26.94. Over-regularizing (mcs40, leaves31+mcs40) hurts (→10.9
 The cross-conformal intervals are well-calibrated and no data is wasted on the point model.
 **vs committed v1 (11.31 / 34.54): blended −0.57pp, real-only −7.55pp (~22% relative).**
 
-### R6 — Generalization guard: lockbox + per-category (running)
+### R6 — Generalization guards
+- **No-scope decision:** scope vs no-scope OOF is within noise (10.74/26.99 vs 10.78/26.84) →
+  **deploy scope-free** (zero train/serve skew, no LLM dependency). LLM scope = documented negative.
+- **Lockbox** (fixed 20%, n=83, 7 real — noisy): real-only generalizes (27–28% vs ~40% base);
+  blended ~flat on the small sample (the 411-row OOF 10.6% is the reliable blended estimate).
+- **Bagged OOF** (6 seeds) for predictions.csv: blended **10.62%**, real **27.07%**, coverage 83%.
+  Lower variance than any single split; this is the shipped submission.
+
+### R7 — Data-density-aware confidence
+Added a per-category support multiplier (≤1, floor 0.70) so sparse in-production categories read
+as less certain than the global conformal pad implies. Verified live: Cleaning(66 labels) 0.82,
+Plumbing(3) 0.60, Electrical(2) 0.60 — same job/interval. Out-of-production + OOD caps unchanged.
+
+### R8 — Weighting-power sweep (bagged, production model)
+Monotone tradeoff (cov 83% throughout): pow 0.3→0.8 gives blended 10.61→10.75, real 27.54→26.37.
+**Chose power=0.5** — best blended (the reliable metric), and deliberately did NOT chase higher
+power to minimize the target-defined real-only proxy (overfitting risk vs the hidden holdout).
+
+### Feature importance (weighted-L2)
+Top signals: **desc_len** (longest descriptions → off-estimate jobs), rel_range/range (estimate
+uncertainty), estimate magnitude, season (month), ZIP geography, numerics/keywords. Confirms the
+simple deterministic text features carry the signal — explaining why TF-IDF/scope were redundant.
+
+## Final architecture (deployed, gauntlet-v2.0.0)
+Residual target log(final/original) · LightGBM **L2 + MAPE-aligned weight 1/√final_price** point
+model on ALL data · **cross-conformal** quantile intervals (coverage 83%) · bagged 6-seed OOF for
+the submission · deterministic+ZIP-region features, **scope-free** · density-aware confidence + PRD
+OOD gates. **Leakage-free OOF: blended 10.62% (base 11.56), real-only 27.07% (base 36.75).**

@@ -50,6 +50,19 @@ def test_in_distribution_is_confident(cal):
     assert c >= 0.5
 
 
+def test_density_aware_confidence():
+    """Sparse in-production categories get lower confidence than well-supported ones at equal
+    interval width (data-density awareness)."""
+    import numpy as np
+    rng = np.random.RandomState(0)
+    cal = ConfidenceCalibrator.fit(
+        rng.uniform(170, 230, 100), rng.uniform(170, 230, 100), np.full(100, 200),
+        rng.uniform(150, 300, 1000), cat_counts={"Cleaning": 66, "Plumbing": 3})
+    dense, _ = cal.score(180, 220, 200, in_production=True, category="Cleaning")
+    sparse, _ = cal.score(180, 220, 200, in_production=True, category="Plumbing")
+    assert sparse < dense
+
+
 # ---- inference contract (needs a trained bundle) ----
 BUNDLE = os.path.join(os.path.dirname(__file__), "..", "model", "bundle.pkl")
 

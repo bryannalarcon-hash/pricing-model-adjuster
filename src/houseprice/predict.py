@@ -82,7 +82,7 @@ def predict_one(bundle: dict, booking: dict, scope_backend: str | None = None) -
     lo, hi = min(lo, mid), max(hi, mid)
     cal: ConfidenceCalibrator = bundle["calibrator"]
     in_prod = bool(df["in_production"].iloc[0])
-    conf, flags = cal.score(lo, hi, mid, in_prod)
+    conf, flags = cal.score(lo, hi, mid, in_prod, category=df["category"].iloc[0])
     rel_width = (hi - lo) / max(mid, 1.0)
     return {
         "estimate_lo": round(lo, 2), "estimate_hi": round(hi, 2),
