@@ -6,9 +6,9 @@ An AI-powered pricing engine for home-service bookings. Given a booking request 
 
 | Metric | Model | Baseline | Status |
 |---|---|---|---|
-| Blended MAPE (all 411 labeled rows) | 11.31% | 11.56% | Pass |
-| Real-only MAPE (n=49, rows where base APE > 20%) | 34.54% | 36.75% | Pass |
-| Interval coverage (target 80%) | 81.5% | — | Pass |
+| Blended MAPE (all 411 labeled rows) | 10.62% | 11.56% | Pass |
+| Real-only MAPE (n=49, rows where base APE > 20%) | 27.07% | 36.75% | Pass |
+| Interval coverage (target 80%) | 82% | — | Pass |
 
 Evaluation is leakage-free: every labeled row is scored by a model trained without it (5-fold OOF). Conformal calibration is nested inside each fold.
 
@@ -24,10 +24,12 @@ Rails API (port 3007)          -- bearer auth, input validation, Appendix A resp
 FastAPI sidecar (port 8011)    -- loads model/bundle.pkl, runs inference
         |
         v
-LightGBM quantile regression + CQR
+LightGBM L2 loss on log-residual + normalized cross-conformal intervals
   target: log(final_price / original_estimate)
-  interval: Conformalized Quantile Regression (80% coverage)
-  confidence: calibrated OOD-aware score in [0,1]
+  point model: L2 loss, MAPE-aligned weights 1/final_price^0.5, trained on all labeled data
+  interval: normalized (adaptive) cross-conformal quantile regression (~82% coverage)
+  confidence: data-density-aware + OOD-gated score in [0,1]
+  scope: deterministic + ZIP-region features only (scope-free deployment)
 ```
 
 Three clean layers with no cross-layer coupling:
@@ -104,7 +106,7 @@ Response:
   "estimate_hi": 2187.30,
   "estimate_midpoint": 1780.40,
   "confidence": 0.78,
-  "model_version": "gauntlet-v1.0.0"
+  "model_version": "gauntlet-v2.0.0"
 }
 ```
 
@@ -161,19 +163,21 @@ The same endpoint is aliased at `POST /.netlify/functions/pricing-estimate`.
 
 ## Confidence and OOD detection
 
-The confidence score reflects how tightly the model's conformal interval constrains the price relative to the typical interval width seen during training. A score near 1.0 indicates a well-constrained, in-distribution booking; near 0.0 indicates high uncertainty.
+The confidence score reflects how tightly the model's conformal interval constrains the price relative to the typical interval width seen during training, adjusted for how densely the booking's category is represented in training data. A score near 1.0 indicates a well-constrained, in-distribution booking from a well-covered category; near 0.0 indicates high uncertainty.
 
-Three hard out-of-distribution (OOD) conditions force `confidence` below 0.5 regardless of interval width:
+Confidence is **data-density-aware**: sparse in-production categories receive a lower confidence multiplier (floor 0.70) proportional to their label count. For example, a Plumbing booking (3 training labels) scores approximately 0.60 at the same interval width where a Cleaning booking (66 labels) scores approximately 0.82.
+
+Three hard out-of-distribution (OOD) conditions force `confidence` below 0.5 regardless of interval width or density:
 
 1. `estimate_midpoint` exceeds $5,000 (large job outside typical training range)
 2. Prediction interval (`estimate_hi - estimate_lo`) exceeds 3x the median observed range in training data
-3. `service_category` does not map to one of the 10 production verticals (electrical, exterior-cleaning, handyman, hvac, indoor-cleaning, irrigation, landscaping-lawn, pest-control, plumbing, tick-mosquito-treatment)
+3. `service_category` does not map to one of the 10 production verticals (electrical, exterior-cleaning, handyman, hvac, indoor-cleaning, irrigation, landscaping-lawn, pest-control, plumbing, tick-mosquito-treatment); unknown categories are correctly treated as out-of-production
 
 The estimate itself is always returned; only the confidence score changes.
 
 ## Testing
 
-Run Python tests (15 tests covering model logic, OOF eval, and confidence/OOD):
+Run Python tests (16 tests covering model logic, OOF eval, and confidence/OOD):
 
 ```bash
 python3 -m pytest tests/ -q

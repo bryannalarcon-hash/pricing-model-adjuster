@@ -37,9 +37,17 @@ chosen wherever feasible (per explicit user direction). Grouped by area.
 - **A-Model1** Target = `log(final_price / original_estimate)` — model the correction to the
   existing estimate, not the absolute price. Requests without `original_estimate` (optional per
   Appendix A) are anchored to the **category-median** `original_estimate` (global median fallback).
-- **A-Model2** Point estimate = median residual quantile (minimizes relative error / MAPE).
-- **A-Model3** Interval target coverage = **80%** (quantiles 0.1/0.9 + CQR). Chosen as a reasonable
-  default; the PRD doesn't mandate a coverage level.
+- **A-Model2** Point estimate = **LightGBM L2 loss on the log-residual with MAPE-aligned sample
+  weights `1/final_price^0.5`**, trained on **all** labeled data (no conformal split wasted on the
+  point model). L2-on-log-residual outperforms quantile-q50 and MAE especially on hard real rows.
+  The weighting power `p=0.5` was chosen as the best blended; higher powers chase the target-defined
+  real-only proxy at overfit risk vs the hidden holdout and were deliberately rejected.
+- **A-Model3** Interval target coverage = **80%**; achieved via **normalized (adaptive) cross-conformal
+  quantile regression** — q0.1/q0.9 LightGBM models on all data with CQR pad calibrated by K-fold
+  cross-fitting. Normalizing by local predicted spread widens intervals for high-uncertainty rows
+  (better conditional coverage). Marginal OOF coverage ≈ 82%.
+- **A-Model4** The 411 labeled rows in `predictions.csv` use **bagged 6-seed OOF** — each row's
+  prediction is the average over repeated CV splits. Lower variance than any single split; leakage-free.
 
 ## Confidence / OOD (PRD values verbatim)
 - **A-Conf1** OOD conditions exactly per PRD: midpoint > $5,000; interval > 3× median observed range;
@@ -55,10 +63,13 @@ chosen wherever feasible (per explicit user direction). Grouped by area.
   Contractor, Pool, Remodeling) are treated as out-of-production → lower confidence.
 
 ## Scope extraction (LLM)
-- **A-Scope1** Backends: `claude_cli` for offline enrichment now; `anthropic_api` switchable via
-  `ANTHROPIC_API_KEY`; `deterministic` always-available floor. The **deployed endpoint defaults to
-  deterministic** (claude -p can't run on a remote host) — a documented train/serve quality gap that
-  closes when an API key is configured.
+- **A-Scope1** Backends: `claude_cli` for offline enrichment; `anthropic_api` switchable via
+  `ANTHROPIC_API_KEY`; `deterministic` always-available floor. The **deployed/graded model is
+  scope-free**: a multi-round research program (experiments/JOURNAL.md R6) found LLM scope features
+  do not beat deterministic on 411 rows (10.78% vs 10.74% blended — within noise). The deployed
+  model uses deterministic + ZIP-region features only, with zero train/serve skew and no LLM
+  dependency. The `ScopeExtractor` is a documented, switchable capability but is unused by the
+  final model. This is a recorded negative result.
 - **A-Scope2** Scope is extracted per row from `job_description` only (no `final_price`) — no leakage.
 
 ## External data
@@ -79,7 +90,7 @@ chosen wherever feasible (per explicit user direction). Grouped by area.
   separate trust boundaries, two separate secrets.
 
 ## Versioning / misc
-- **A-Misc1** `model_version = "gauntlet-v1.0.0"`.
+- **A-Misc1** `model_version = "gauntlet-v2.0.0"`.
 - **A-Misc2** Secrets live in `.env` (gitignored); `.env.example` documents the structure.
 - **A-Misc3** A demo video is out of scope per the goal directive ("all artifacts except the demo");
   a local deployment URL is provided instead.

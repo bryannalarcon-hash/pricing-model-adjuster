@@ -87,3 +87,13 @@ conflict and the missing-estimate 500 that unit tests alone missed). Acquire a C
 for the demographic join (likely the biggest untapped lever on real-only MAPE). And add a
 category-data-density term to confidence so sparse in-production categories read as appropriately
 uncertain.
+
+**Multi-round research program (v2 upgrade).** After the initial v1 build, a structured 8-round
+research program (loss-function sweep, MAPE-aligned sample weighting, target-encoding, TF-IDF, and
+ensembling all tested under multi-seed OOF discipline) cut real-only MAPE from 34.5% to 27.1%. The
+single biggest lever was switching the point-model loss from quantile-q50 to L2-on-log-residual with
+`1/√final_price` weighting — a theoretically grounded change that held across seeds and a lockbox
+hold-out. Several approaches produced honest negative results: LLM scope features, target encoding,
+TF-IDF text features, and multi-model ensembling all failed to beat the best single deterministic
+model on 411 rows, and were rejected rather than force-fit. The research log is in
+`experiments/JOURNAL.md`.

@@ -109,6 +109,26 @@ Top signals: **desc_len** (longest descriptions → off-estimate jobs), rel_rang
 uncertainty), estimate magnitude, season (month), ZIP geography, numerics/keywords. Confirms the
 simple deterministic text features carry the signal — explaining why TF-IDF/scope were redundant.
 
+### R9 — Bias check + per-category breakdown
+Optimal global scalar c*=0.998 (model is unbiased — reject bias correction). Per-category: big wins
+on hard real cats (Handyman 48.4→33.8, Plumbing 35.8→25.8, Flooring 29.4→19.7), neutral on synthetic
+cats (HVAC slightly worse 9.7→10.1). Sparse cats are *under*-covered (Handyman 64%, Plumbing 33%).
+
+### R10 — Normalized (adaptive) cross-conformal
+Scale the conformity score by local predicted spread so the pad widens for uncertain rows. Improves
+conditional coverage (Plumbing 39→44%, Flooring 62→71%, Cleaning over-coverage 86→83%) with marginal
+coverage unchanged (~82%). **Adopted** (default normalized=True) — point MAPE unchanged.
+
+### R11 — Robustness: leave-one-category-out + model family
+- **LOCO** (train without a category, predict it — unseen-category generalization): the model still
+  **beats baseline on the hard categories even unseen** (Plumbing 35.8→26.0, Flooring 29.4→19.9,
+  Handyman 48.4→40.4) and only slightly trails on already-easy ones. Confirms it generalizes via the
+  residual anchoring + features, not category memorization — supports the "estimate any category" req.
+- **Model family** (6-seed OOF): lgbm_wl2 **10.71/27.06** (best balance); random_forest 10.67/28.77
+  (better blended, worse real); extra_trees 10.78/27.72; hist_gb 10.97/26.85; ens_l2_huber_fair
+  10.71/28.24 (ensemble ≠ better); MLP diverged (needs scaling, not worth it on 411 rows).
+  **LightGBM weighted-L2 confirmed — no family beats it on the blended+real balance.**
+
 ## Final architecture (deployed, gauntlet-v2.0.0)
 Residual target log(final/original) · LightGBM **L2 + MAPE-aligned weight 1/√final_price** point
 model on ALL data · **cross-conformal** quantile intervals (coverage 83%) · bagged 6-seed OOF for

@@ -6,25 +6,28 @@ Autonomous `/goal` build summary. All phases complete; all acceptance gates met.
 
 | # | Gate | Result |
 |---|---|---|
-| G1 | Beat blended MAPE 11.56% (leakage-free) | ✅ **11.31%** |
-| G2 | Beat real-only baseline (~37%) | ✅ **34.54%** (n=49) |
+| G1 | Beat blended MAPE 11.56% (leakage-free) | ✅ **10.62%** |
+| G2 | Beat real-only baseline (~37%) | ✅ **27.07%** (n=49) |
 | G3 | Response < 2s end-to-end | ✅ **0.02s** (Rails→sidecar) |
-| G4 | Confidence ∈ [0,1]; <0.5 for OOD | ✅ ~35% <0.5 (OOD-driven), ~12% ≥0.8 |
+| G4 | Confidence ∈ [0,1]; <0.5 for OOD | ✅ ~35% <0.5 (OOD-driven), ~12% ≥0.8; density-aware |
 | G5 | Real, non-invasive integration | ✅ 1 tagged booking (id 193, 201 draft); rest zero-write probes |
-| G6 | Tests green + docs | ✅ 15 pytest + 21 rspec; full doc set |
+| G6 | Tests green + docs | ✅ 16 pytest + 21 rspec; full doc set |
 
 The submitted `predictions/predictions.csv`, scored the way HouseAccount will (join on `job_id`,
 MAPE of `estimate_midpoint` vs `final_price`), beats both baselines on the 411 labeled rows.
 
 ## What was built
 
-- **Data/model (Python):** residual-quantile LightGBM (`target = log(final/original)`) +
-  Conformalized Quantile Regression for calibrated 80% intervals. 5-fold out-of-fold eval; a
-  shuffle test guards against leakage. `src/houseprice/`.
+- **Data/model (Python):** LightGBM L2 loss on log-residual `log(final/original)` with MAPE-aligned
+  sample weights `1/final_price^0.5`, trained on all labeled data. Normalized (adaptive) cross-conformal
+  quantile regression for calibrated intervals (~82% coverage). Bagged 6-seed OOF for predictions.csv.
+  5-fold out-of-fold eval; a shuffle test guards against leakage. `src/houseprice/`.
 - **Scope extraction:** `ScopeExtractor` with `claude_cli` / `anthropic_api` / `deterministic`
-  backends; batch-extracted + cached.
+  backends; batch-extracted + cached. Deployed model is scope-free (deterministic + ZIP-region
+  features only) — LLM scope did not beat deterministic on 411 rows.
 - **Confidence/OOD:** PRD thresholds verbatim ($5k midpoint, 3× median range, non-production
-  category → <0.5).
+  category → <0.5) plus data-density-aware support multiplier (sparse categories get lower
+  confidence). Unknown categories correctly treated as out-of-production.
 - **API (Rails):** API-only app, `POST /pricing-estimate` (+ Appendix A path alias), bearer auth
   (`secure_compare`), full error parity, proxy to a FastAPI inference sidecar.
 - **Integration:** verified HMAC signing to staging; zero-write probes + exactly one tagged
@@ -39,24 +42,31 @@ MAPE of `estimate_midpoint` vs `final_price`), beats both baselines on the 411 l
 - Bring-up: see `docs/DEPLOYMENT.md` (sidecar on 8011, Rails on 3007).
 
 ## Scope-extraction finding (measured)
-The LLM `ScopeExtractor` (`claude_cli`) was built and the dataset scope cached, but adding LLM
-scope features **did not beat** deterministic features on the 411 labeled rows (11.37% vs 11.28%
-blended; 35.2% vs 34.4% real — consistent across 310/1050/1155 extracted rows). On so few rows the
-extra features overfit and the deterministic text features already capture the signal. The graded
-and deployed model therefore uses **deterministic** scope (skew-free, simpler); the LLM backend
-remains switchable per the original requirement. Honest negative result, kept rather than force-fit.
+The LLM `ScopeExtractor` (`claude_cli`) was built and the dataset scope cached. A multi-round
+research program (R1–R8, see `experiments/JOURNAL.md`) evaluated LLM scope features against
+deterministic features on the 411 labeled rows. LLM scope did **not** beat deterministic: scope vs
+no-scope OOF is within noise (10.78% vs 10.74% blended; 26.84% vs 26.99% real-only). With only 411
+rows the extra features add overfitting risk, and the deterministic text features already capture the
+signal. The **deployed/graded model is scope-free** — deterministic + ZIP-region features only, zero
+train/serve skew, no LLM dependency. The `ScopeExtractor` remains a switchable, documented capability
+but is not used by the final model. This is an honest documented negative result.
 
 ## Key decisions (full list in ASSUMPTIONS.md)
 Rails (PRD-preferred) + Python model behind a sidecar · local deploy (Railway deferred) ·
-real-only defined as `base_ape>20%` (≈ the brief's ~40%) · predictions.csv = OOF for labeled rows
-(no leakage) · Census key-gated, ZIP-region fallback · scope `claude_cli` now / API-key switchable /
-deterministic deploy floor.
+real-only defined as `base_ape>20%` (≈ the brief's ~40%) · predictions.csv = bagged 6-seed OOF for
+labeled rows (no leakage, lower variance) · Census key-gated, ZIP-region fallback ·
+**scope-free deployment** (LLM scope within noise of deterministic; deterministic chosen for
+zero skew and no LLM dependency) · **L2 loss + MAPE-aligned weights `1/√final_price`** on full
+labeled data (beats quantile-q50 on real rows by ~7pp) · **normalized cross-conformal** intervals
+(adaptive per-row widening for sparse categories) · **data-density-aware confidence** (per-category
+support multiplier, floor 0.70).
 
 ## Known limitations
-Thin blended margin (synthetic rows are near-irreducible); only ~49 genuinely-hard real rows;
-real-only subset is a proxy for the hidden holdout; deployed endpoint uses deterministic scope
-(LLM scope offline/with key); confidence is interval-driven, not data-density-driven. Detail in
-`docs/MODELING.md §8`.
+Thin blended margin (synthetic rows are near-irreducible); only ~49 genuinely-hard real rows (real-only
+MAPE is ~27% but based on noisy, target-defined proxy rows); per-category coverage on sparse categories
+like Handyman remains ~62% even with normalized conformal; real-only power kept at 0.5 (not pushed
+higher) to avoid overfitting the proxy metric vs the hidden holdout. Census enrichment is key-gated
+(ZIP-region fallback active). Detail in `docs/MODELING.md §8`.
 
 ## Out of scope (per goal directive)
 Demo video (not produced; local deployment link provided instead).

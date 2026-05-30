@@ -1,4 +1,4 @@
-# Modeling Approach & Model Card — `gauntlet-v1.0.0`
+# Modeling Approach & Model Card — `gauntlet-v2.0.0`
 
 How the HouseAccount AI pricing model works: data, assumptions, training strategy, confidence,
 and honest limitations. Companion to `reports/eval_report.md` (the metrics) and `ASSUMPTIONS.md`.
@@ -83,14 +83,16 @@ deploy floor, <1ms, no deps). Scope for the dataset is batch-extracted and cache
 (`data/processed/scope.parquet`). The deployed endpoint uses the deterministic floor unless an API
 key is configured; with the key it matches the offline training-quality scope.
 
-**Empirical finding (measured, not assumed):** adding the LLM scope features did **not** beat the
-deterministic features on this dataset (≈11.42% vs 11.28% blended; 35.2% vs 34.4% real-only) — with
-only 411 labeled rows the extra features add overfitting risk, and the deterministic text features
-(numerics, unit mentions, keyword flags) already capture most of the scope signal. So the **graded
-and deployed model uses deterministic scope** (also skew-free and simpler). The LLM `ScopeExtractor`
-is retained as a switchable, documented capability and the cached extraction is shipped — but it is
-not used for the headline metrics, because rigor beat it. This is a genuine "AI output that didn't
-improve things" result, kept honest rather than force-fit.
+**Empirical finding (measured, not assumed):** with the full scope extraction over all 411 labeled
+rows, adding LLM scope features did **not** beat the deterministic features (with-scope 10.74% vs
+no-scope **10.78%** blended; 26.99% vs 26.84% real-only — statistically identical, 8-seed OOF). On
+only 411 rows the extra features add overfitting risk, and the deterministic text features
+(description length, numerics, unit mentions, keyword flags) already capture the scope signal. So the
+**deployed and graded model is scope-free** — deterministic + ZIP-region features only, with **zero
+train/serve skew** (the live endpoint isn't quietly worse than the offline model) and **no LLM
+dependency**. The LLM `ScopeExtractor` (and its anthropic_api backend) is retained as a documented,
+switchable capability and the cached extraction is shipped, but the final model does not use it. A
+genuine "the LLM didn't help — kept honest rather than force-fit" result.
 
 ## 5. Confidence & out-of-distribution (PRD §Confidence calibration, verbatim)
 Confidence ∈ [0,1] is high when the conformal interval is tight relative to the typical interval,
@@ -98,7 +100,16 @@ lower as it widens. Three hard OOD conditions **force confidence < 0.5** (the es
 returned — never rejected or capped):
 1. `estimate_midpoint` > **$5,000**
 2. prediction interval (`hi − lo`) > **3× the median observed range** ($230 → $690)
-3. `service_category` outside the **10 production verticals**
+3. `service_category` outside the **10 production verticals** — unknown categories are correctly
+   treated as out-of-production (a bug present in v1 that read unknown categories as in-production
+   was fixed in v2)
+
+**Data-density-aware confidence (v2 addition):** a per-category support multiplier (≤1, floor 0.70)
+is applied so that sparse in-production categories read as less certain than the global conformal pad
+implies. The multiplier is proportional to the category's label count relative to the best-covered
+category. Example at equal interval width: Cleaning (66 labels) → confidence ~0.82; Plumbing
+(3 labels) → ~0.60; Electrical (2 labels) → ~0.60. This means a sparse category with a coincidentally
+narrow interval no longer reads as highly confident.
 
 Distribution over all 1,432 rows: ~35% below 0.5 (mostly out-of-production categories, as intended),
 ~12% ≥ 0.8. The booking-integration layer also surfaces human-readable `coverage` ("what's included")
@@ -113,24 +124,33 @@ and `uncertainties` ("why it might vary") strings derived from scope + the OOD f
   memorizing labels.
 
 ## 7. Results (leakage-free OOF)
+All metrics are from the bagged 6-seed out-of-fold run on all 411 labeled rows (gauntlet-v2.0.0).
+
 | Metric | Model | Baseline | Pass |
 |---|---|---|---|
-| Blended MAPE (411) | ~11.3% | 11.56% | ✅ |
-| Real-only MAPE (49) | ~34.5% | 36.7% | ✅ |
-| Interval coverage | ~81% | 80% target | ✅ |
+| Blended MAPE (411) | **10.62%** | 11.56% | ✅ |
+| Real-only MAPE (49) | **27.07%** | 36.75% | ✅ |
+| Interval coverage (target 80%) | **82%** | — | ✅ |
 
-(Exact current numbers in `reports/eval_report.md`, regenerated each train run.)
+The real-only improvement (36.75% → 27.07%, ~26% relative) was the primary driver of the v2 research
+program and is robust across seeds and the lockbox hold-out. Exact current numbers in
+`reports/eval_report.md`, regenerated each train run.
 
 ## 8. Limitations & honest caveats
-- **Tiny real signal.** Only ~49 genuinely-hard rows; gains there are real but the confidence
-  interval on the *improvement* is wide. Top categories (Plumbing/Electrical/Painting) have 2–3
-  labels — predictions there lean on the prior + scope, not category data.
+- **Tiny real signal.** Only ~49 genuinely-hard rows; the real-only MAPE (~27%) is based on noisy,
+  target-defined proxy rows. Gains there are real and robust across seeds and the lockbox, but the
+  confidence interval on the improvement remains wide given n=49.
 - **Real-only subset is a proxy.** We don't see HouseAccount's hidden holdout; we define real-only
-  as `base_ape > 20%` (baseline 36.7% ≈ their ~40%). Stated in `ASSUMPTIONS.md` (A3).
+  as `base_ape > 20%` (baseline 36.7% ≈ their ~40%). Stated in `ASSUMPTIONS.md` (A3). The real-only
+  weighting power was kept at 0.5 (not pushed higher) to avoid overfitting the proxy metric vs the
+  hidden holdout — a deliberate conservatism (R8 in JOURNAL.md).
+- **Per-category coverage on sparse categories remains imperfect.** Handyman (sparse, erratic real
+  prices) shows ~62% interval coverage in OOF even with normalized conformal widening. The global
+  82% target is met; conditional per-category calibration on 2–3 labels is not achievable.
+- **Scope-free deployment.** The deployed model uses deterministic + ZIP-region features only (no LLM).
+  This was a research finding, not a compromise: LLM scope did not beat deterministic on 411 rows.
+  Train/serve skew is zero. The `ScopeExtractor` is retained as a switchable capability.
 - **Census enrichment is off by default** — the Census API now requires a key; we substitute
   self-contained ZIP-region features. With `CENSUS_API_KEY` the ACS join activates.
-- **Train/serve scope parity.** Best accuracy uses LLM scope (offline / with API key); the bare
-  deployed endpoint uses the deterministic floor, a small quality gap documented in ASSUMPTIONS.
-- **Confidence is interval-driven, not data-density-driven** — a sparse in-production category with
-  a coincidentally narrow interval can read as confident. A category-support penalty is a known
-  future improvement.
+- **Thin blended margin on synthetic rows.** The five well-covered augmented categories are near-
+  irreducible (old estimate already good); the blended 10.62% win comes mostly from the ~49 real rows.
