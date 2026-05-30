@@ -51,3 +51,12 @@ Thumbs.db
 
 # Deliverable: submitted predictions
 !predictions/predictions.csv
+
+# Rails app (api/) — runtime, caches, and SECRETS
+api/tmp/
+api/log/
+api/storage/
+api/.bundle/
+api/config/master.key
+api/config/credentials.yml.enc
+api/public/assets/
