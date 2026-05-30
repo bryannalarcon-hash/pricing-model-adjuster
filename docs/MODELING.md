@@ -70,10 +70,12 @@ single split.
 ### Features (all computable at request time — no `final_price`)
 Estimate anchors (log original/lo/hi, relative range), urgency (deadline), booking month/seasonality,
 subtype signals, **text features** from the description (length, numerics, unit mentions, keyword
-flags: replace/repair/install/emergency/leak/…), **ZIP-region geography** (first 1/2/3 digits as a
-cost-of-living proxy), category one-hot, production-vertical flag. Feature importance ranks
-**description length** #1 (long descriptions ⇒ off-estimate jobs), then estimate-range shape and
-magnitude. **The model is scope-free** (see §4) and uses no external data at request time.
+flags: replace/repair/install/emergency/leak/…), category one-hot, production-vertical flag. Feature
+importance ranks **description length** #1 (long descriptions ⇒ off-estimate jobs), then estimate-range
+shape and magnitude. **The model is scope-free AND geography-free** at request time: ablation showed
+raw ZIP-region features overfit on 411 rows / ~1033 ZIPs and were removed (JOURNAL R12; blended
+10.78→10.61 at 10 seeds). A *keyed* Census ACS join (income/home-value by ZCTA) remains the principled
+way to add geography and is wired but off by default (the Census API now requires a key).
 
 ## 4. Scope extraction (LLM, switchable)
 `ScopeExtractor` has three interchangeable backends emitting the same schema:
@@ -88,7 +90,7 @@ rows, adding LLM scope features did **not** beat the deterministic features (wit
 no-scope **10.78%** blended; 26.99% vs 26.84% real-only — statistically identical, 8-seed OOF). On
 only 411 rows the extra features add overfitting risk, and the deterministic text features
 (description length, numerics, unit mentions, keyword flags) already capture the scope signal. So the
-**deployed and graded model is scope-free** — deterministic + ZIP-region features only, with **zero
+**deployed and graded model is scope-free** — deterministic features only (ZIP-region features removed per ablation), with **zero
 train/serve skew** (the live endpoint isn't quietly worse than the offline model) and **no LLM
 dependency**. The LLM `ScopeExtractor` (and its anthropic_api backend) is retained as a documented,
 switchable capability and the cached extraction is shipped, but the final model does not use it. A
@@ -128,11 +130,11 @@ All metrics are from the bagged 6-seed out-of-fold run on all 411 labeled rows (
 
 | Metric | Model | Baseline | Pass |
 |---|---|---|---|
-| Blended MAPE (411) | **10.62%** | 11.56% | ✅ |
-| Real-only MAPE (49) | **27.07%** | 36.75% | ✅ |
+| Blended MAPE (411) | **10.47%** | 11.56% | ✅ |
+| Real-only MAPE (49) | **26.58%** | 36.75% | ✅ |
 | Interval coverage (target 80%) | **82%** | — | ✅ |
 
-The real-only improvement (36.75% → 27.07%, ~26% relative) was the primary driver of the v2 research
+The real-only improvement (36.75% → 26.58%, ~26% relative) was the primary driver of the v2 research
 program and is robust across seeds and the lockbox hold-out. Exact current numbers in
 `reports/eval_report.md`, regenerated each train run.
 
@@ -147,10 +149,10 @@ program and is robust across seeds and the lockbox hold-out. Exact current numbe
 - **Per-category coverage on sparse categories remains imperfect.** Handyman (sparse, erratic real
   prices) shows ~62% interval coverage in OOF even with normalized conformal widening. The global
   82% target is met; conditional per-category calibration on 2–3 labels is not achievable.
-- **Scope-free deployment.** The deployed model uses deterministic + ZIP-region features only (no LLM).
+- **Scope-free deployment.** The deployed model uses deterministic features only (ZIP-region features removed per ablation) (no LLM).
   This was a research finding, not a compromise: LLM scope did not beat deterministic on 411 rows.
   Train/serve skew is zero. The `ScopeExtractor` is retained as a switchable capability.
 - **Census enrichment is off by default** — the Census API now requires a key; we substitute
   self-contained ZIP-region features. With `CENSUS_API_KEY` the ACS join activates.
 - **Thin blended margin on synthetic rows.** The five well-covered augmented categories are near-
-  irreducible (old estimate already good); the blended 10.62% win comes mostly from the ~49 real rows.
+  irreducible (old estimate already good); the blended 10.47% win comes mostly from the ~49 real rows.

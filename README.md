@@ -6,8 +6,8 @@ An AI-powered pricing engine for home-service bookings. Given a booking request 
 
 | Metric | Model | Baseline | Status |
 |---|---|---|---|
-| Blended MAPE (all 411 labeled rows) | 10.62% | 11.56% | Pass |
-| Real-only MAPE (n=49, rows where base APE > 20%) | 27.07% | 36.75% | Pass |
+| Blended MAPE (all 411 labeled rows) | 10.47% | 11.56% | Pass |
+| Real-only MAPE (n=49, rows where base APE > 20%) | 26.58% | 36.75% | Pass |
 | Interval coverage (target 80%) | 82% | — | Pass |
 
 Evaluation is leakage-free: every labeled row is scored by a model trained without it (5-fold OOF). Conformal calibration is nested inside each fold.
@@ -29,7 +29,7 @@ LightGBM L2 loss on log-residual + normalized cross-conformal intervals
   point model: L2 loss, MAPE-aligned weights 1/final_price^0.5, trained on all labeled data
   interval: normalized (adaptive) cross-conformal quantile regression (~82% coverage)
   confidence: data-density-aware + OOD-gated score in [0,1]
-  scope: deterministic + ZIP-region features only (scope-free deployment)
+  scope: deterministic features only (ZIP removed per ablation) (scope-free deployment)
 ```
 
 Three clean layers with no cross-layer coupling:

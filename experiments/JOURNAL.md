@@ -129,6 +129,20 @@ coverage unchanged (~82%). **Adopted** (default normalized=True) — point MAPE 
   10.71/28.24 (ensemble ≠ better); MLP diverged (needs scaling, not worth it on 411 rows).
   **LightGBM weighted-L2 confirmed — no family beats it on the blended+real balance.**
 
+### R12 — Feature ablation, confidence reliability, error analysis, shrinkage
+- **Ablation** (drop a feature group, 5-seed OOF; FULL = 10.72/27.00): drop text +0.26/+0.69 (keep),
+  drop subtype +0.17/+1.04 (keep), drop time +0.02/+0.44 (keep), drop category-onehot +0.03/+0.07
+  (≈neutral), **drop ZIP-geography −0.16/−0.51 (BETTER without!)**. ZIP features overfit on 411 rows
+  / ~1033 ZIPs → confirmed at 10 seeds (below) and **removed**.
+- **Confidence reliability:** mean OOF APE decreases monotonically by confidence bin
+  (<0.5 → 12.4%, 0.7–0.85 → 9.2%, ≥0.85 → 8.9%) — the confidence score is genuinely informative.
+- **Error analysis:** worst misses are "we-supply-materials" Handyman jobs (price drops far below
+  estimate; only a few training examples). 72/411 rows the model does worse than baseline are the
+  already-good synthetic categories (cost of helping the real rows).
+- **Residual shrinkage** (adaptive/uniform/soft-threshold to dampen small corrections): **negative
+  result** — trades the real-only win for a noise-level blended gain (a=0.02: 10.58 but real 28.0).
+  Rejected — the model is already at a sound operating point.
+
 ## Final architecture (deployed, gauntlet-v2.0.0)
 Residual target log(final/original) · LightGBM **L2 + MAPE-aligned weight 1/√final_price** point
 model on ALL data · **cross-conformal** quantile intervals (coverage 83%) · bagged 6-seed OOF for

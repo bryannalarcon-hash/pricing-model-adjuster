@@ -67,7 +67,7 @@ chosen wherever feasible (per explicit user direction). Grouped by area.
   `ANTHROPIC_API_KEY`; `deterministic` always-available floor. The **deployed/graded model is
   scope-free**: a multi-round research program (experiments/JOURNAL.md R6) found LLM scope features
   do not beat deterministic on 411 rows (10.78% vs 10.74% blended — within noise). The deployed
-  model uses deterministic + ZIP-region features only, with zero train/serve skew and no LLM
+  model uses deterministic features only (ZIP removed per ablation), with zero train/serve skew and no LLM
   dependency. The `ScopeExtractor` is a documented, switchable capability but is unused by the
   final model. This is a recorded negative result.
 - **A-Scope2** Scope is extracted per row from `job_description` only (no `final_price`) — no leakage.

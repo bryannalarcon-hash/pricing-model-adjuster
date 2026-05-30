@@ -82,11 +82,10 @@ def build_features(
     tf = df["job_description"].map(_text_feats).apply(pd.Series)
     f = pd.concat([f, tf], axis=1)
 
-    # ZIP-region geography (self-contained; coarse cost-of-living proxy, no external dep).
-    z = df["zip_code"].fillna("00000").astype(str).str.zfill(5)
-    f["zip1"] = pd.to_numeric(z.str[0], errors="coerce").fillna(0).astype(int)  # USPS region
-    f["zip2"] = pd.to_numeric(z.str[:2], errors="coerce").fillna(0).astype(int)
-    f["zip3"] = pd.to_numeric(z.str[:3], errors="coerce").fillna(0).astype(int)
+    # NOTE: raw ZIP-region features (zip1/2/3) were tested and REMOVED — ablation showed they
+    # overfit on 411 rows / ~1033 ZIPs and hurt OOF MAPE (experiments/JOURNAL.md R12: removing
+    # them improved blended 10.78→10.61, real 26.85→26.37 at 10 seeds). A keyed Census ACS join
+    # (median income/home value by ZCTA) remains the principled way to use geography if available.
 
     # category one-hot (few categories; avoids target-encoding leakage)
     cats = pd.get_dummies(df["category"], prefix="cat")

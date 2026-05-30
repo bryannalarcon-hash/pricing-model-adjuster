@@ -60,3 +60,7 @@ api/.bundle/
 api/config/master.key
 api/config/credentials.yml.enc
 api/public/assets/
+
+# CatBoost training artifacts / experiment results
+catboost_info/
+experiments/results.csv

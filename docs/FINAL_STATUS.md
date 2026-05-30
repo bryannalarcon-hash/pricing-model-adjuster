@@ -6,8 +6,8 @@ Autonomous `/goal` build summary. All phases complete; all acceptance gates met.
 
 | # | Gate | Result |
 |---|---|---|
-| G1 | Beat blended MAPE 11.56% (leakage-free) | ✅ **10.62%** |
-| G2 | Beat real-only baseline (~37%) | ✅ **27.07%** (n=49) |
+| G1 | Beat blended MAPE 11.56% (leakage-free) | ✅ **10.47%** |
+| G2 | Beat real-only baseline (~37%) | ✅ **26.58%** (n=49) |
 | G3 | Response < 2s end-to-end | ✅ **0.02s** (Rails→sidecar) |
 | G4 | Confidence ∈ [0,1]; <0.5 for OOD | ✅ ~35% <0.5 (OOD-driven), ~12% ≥0.8; density-aware |
 | G5 | Real, non-invasive integration | ✅ 1 tagged booking (id 193, 201 draft); rest zero-write probes |
@@ -47,7 +47,7 @@ research program (R1–R8, see `experiments/JOURNAL.md`) evaluated LLM scope fea
 deterministic features on the 411 labeled rows. LLM scope did **not** beat deterministic: scope vs
 no-scope OOF is within noise (10.78% vs 10.74% blended; 26.84% vs 26.99% real-only). With only 411
 rows the extra features add overfitting risk, and the deterministic text features already capture the
-signal. The **deployed/graded model is scope-free** — deterministic + ZIP-region features only, zero
+signal. The **deployed/graded model is scope-free** — deterministic features only (ZIP removed per ablation), zero
 train/serve skew, no LLM dependency. The `ScopeExtractor` remains a switchable, documented capability
 but is not used by the final model. This is an honest documented negative result.
 
