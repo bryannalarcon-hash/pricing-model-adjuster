@@ -143,8 +143,24 @@ coverage unchanged (~82%). **Adopted** (default normalized=True) — point MAPE 
   result** — trades the real-only win for a noise-level blended gain (a=0.02: 10.58 but real 28.0).
   Rejected — the model is already at a sound operating point.
 
+### R13 — Final tuning on the no-ZIP model (8-seed)
+Power re-sweep: 0.4→0.7 gives blended 10.59→10.66, real 26.58→25.92 (same monotone tradeoff within
+noise) → **keep power=0.5**. Dropping category one-hot is neutral (10.62/26.32 vs 10.60/26.38) → keep
+for interpretability. No further robust gains — model is at the data's ceiling (411 rows / 49 real).
+
 ## Final architecture (deployed, gauntlet-v2.0.0)
 Residual target log(final/original) · LightGBM **L2 + MAPE-aligned weight 1/√final_price** point
-model on ALL data · **cross-conformal** quantile intervals (coverage 83%) · bagged 6-seed OOF for
-the submission · deterministic+ZIP-region features, **scope-free** · density-aware confidence + PRD
-OOD gates. **Leakage-free OOF: blended 10.62% (base 11.56), real-only 27.07% (base 36.75).**
+model on ALL data · **normalized cross-conformal** quantile intervals (coverage ~82%) · bagged 6-seed
+OOF for the submission · **deterministic features only** (scope-free AND ZIP-free — both removed as
+overfitting/no-gain) · density-aware confidence + PRD OOD gates.
+**Leakage-free bagged OOF: blended 10.47% (base 11.56), real-only 26.58% (base 36.75), coverage 82%.**
+
+## Journey
+| Stage | Blended | Real-only |
+|---|---|---|
+| Baseline (old estimate) | 11.56% | 36.75% |
+| v1 (quantile-q50 + CQR) | 11.31% | 34.54% |
+| v2 (L2 + weight + cross-conformal + bagging) | 10.62% | 27.07% |
+| **v2 + no-ZIP (final)** | **10.47%** | **26.58%** |
+
+Real-only: **−28% relative** vs baseline. Blended: **−9.4% relative** vs baseline.
