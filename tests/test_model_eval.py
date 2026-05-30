@@ -5,7 +5,7 @@ import pytest
 from houseprice.data_load import load_dataset, labeled, normalize_category, is_production_category
 from houseprice.eval import ape, mape, baseline_blended
 from houseprice.features import build_features
-from houseprice.model import oof_predict
+from houseprice.model_v2 import oof_predict  # deployed v2 architecture
 
 
 @pytest.fixture(scope="module")
@@ -30,6 +30,9 @@ def test_production_mapping():
     assert is_production_category("HVAC") is True
     assert is_production_category("Moving") is False   # outside the 10 production verticals
     assert is_production_category("Roofing") is False
+    # Unknown/unmapped categories must be treated as out-of-production (OOD -> low confidence).
+    assert is_production_category("Underwater Basket Weaving") is False
+    assert is_production_category("") is False
 
 
 def test_mape_helpers():

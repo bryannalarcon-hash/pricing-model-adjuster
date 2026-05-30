@@ -66,8 +66,10 @@ def normalize_category(raw: str) -> str:
 
 
 def is_production_category(cat_title: str) -> bool:
-    """True if the (title-case) category maps to one of the 10 production verticals."""
-    return CATEGORY_TO_PRODUCTION.get(normalize_category(cat_title), "____") is not None
+    """True ONLY if the category maps to one of the 10 production verticals. Categories that are
+    unmapped/unknown (not in the training catalog) are treated as out-of-production -> low
+    confidence, per the PRD OOD rule ('service_category outside the current production set')."""
+    return CATEGORY_TO_PRODUCTION.get(normalize_category(cat_title)) is not None
 
 
 def load_dataset(path: str | None = None) -> pd.DataFrame:

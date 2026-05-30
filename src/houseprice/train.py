@@ -15,7 +15,7 @@ import pandas as pd
 from . import MODEL_VERSION
 from .data_load import load_dataset, labeled
 from .features import build_features
-from .model import ConformalPriceModel, oof_predict, LO_Q, HI_Q
+from .model_v2 import ConformalPriceModelV2, oof_predict_bagged, LO_Q, HI_Q
 from .confidence import ConfidenceCalibrator
 from .eval import ape, mape, baseline_blended
 
@@ -44,14 +44,17 @@ def main(scope_backend_label: str = "deterministic"):
     os.makedirs(os.path.dirname(REPORT_PATH), exist_ok=True)
 
     df = load_dataset()
-    scope_all = _scope()
+    # v2: LLM scope adds nothing over deterministic features (JOURNAL R3/R5: 10.78 vs 10.74,
+    # within noise) — train scope-free for zero train/serve skew and no LLM dependency.
+    scope_all = None
     census = _census()
     lab = labeled(df).reset_index(drop=True)
     lab_idx = df.index[df["is_labeled"]].tolist()
     scope_lab = scope_all.reindex(lab_idx).reset_index(drop=True) if scope_all is not None else None
 
-    # ---- OOF predictions for the labeled rows (honest, leakage-free) ----
-    lo_oof, mid_oof, hi_oof = oof_predict(lab, build_features, scope_df=scope_lab, census_df=census)
+    # ---- Bagged OOF predictions for the labeled rows (honest, leakage-free, low-variance) ----
+    lo_oof, mid_oof, hi_oof = oof_predict_bagged(lab, build_features, scope_df=scope_lab,
+                                                 census_df=census, seeds=range(6))
     base = ape(lab["original_estimate"], lab["final_price"])
     real_mask = base > REAL_THR
     blended = mape(mid_oof, lab["final_price"])
@@ -62,7 +65,8 @@ def main(scope_backend_label: str = "deterministic"):
 
     # ---- Full model on all labeled (deployed) ----
     X_lab, names = build_features(lab, scope_df=scope_lab, census_df=census)
-    full = ConformalPriceModel().fit(X_lab, lab["final_price"].values, lab["original_estimate"].values)
+    full = ConformalPriceModelV2(weight_power=0.5).fit(
+        X_lab, lab["final_price"].values, lab["original_estimate"].values)
     observed_ranges = (df["estimate_hi"] - df["estimate_lo"]).dropna().values  # all observed ranges
     cal = ConfidenceCalibrator.fit(lo_oof, hi_oof, mid_oof, observed_ranges)
     # Category price anchors (full-dataset original_estimate medians) so requests WITHOUT an
