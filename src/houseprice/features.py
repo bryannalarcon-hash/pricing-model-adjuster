@@ -108,3 +108,9 @@ def build_features(
 
     f = f.replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return f, list(f.columns)
+
+
+def align_to(X: pd.DataFrame, feature_names: list[str]) -> pd.DataFrame:
+    """Reindex columns to a trained schema: add missing (e.g. unseen category dummies) as 0,
+    drop extras, preserve order. Lets a single inference row match the training matrix."""
+    return X.reindex(columns=feature_names, fill_value=0).fillna(0.0)
