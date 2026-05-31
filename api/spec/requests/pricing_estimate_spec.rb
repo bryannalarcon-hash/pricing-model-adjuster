@@ -25,6 +25,9 @@ RSpec.describe "POST /pricing-estimate", type: :request do
   end
 
   before do
+    # Reset the in-memory rate-limit store so request counts don't leak across examples
+    Throttled.reset!
+
     # Set the secret so auth passes
     allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with("GAUNTLET_PRICING_SECRET", "").and_return(secret)
@@ -179,6 +182,31 @@ RSpec.describe "POST /pricing-estimate", type: :request do
 
       expect(response).to have_http_status(:method_not_allowed)
       expect(JSON.parse(response.body)).to eq("error" => "Method not allowed")
+    end
+  end
+
+  # -----------------------------------------------------------------------
+  # Rate limiting (429, Appendix A optional)
+  # -----------------------------------------------------------------------
+  describe "rate limiting" do
+    before do
+      allow(ENV).to receive(:fetch).with("RATE_LIMIT_MAX", "60").and_return("2")
+    end
+
+    it "returns 429 with the Appendix A body and Retry-After header once over the limit" do
+      3.times { post "/pricing-estimate", params: valid_payload.to_json, headers: headers }
+
+      expect(response).to have_http_status(:too_many_requests)
+      expect(JSON.parse(response.body)).to eq(
+        "error" => "Rate limit exceeded", "retry_after" => 60
+      )
+      expect(response.headers["Retry-After"]).to eq("60")
+    end
+
+    it "allows requests up to the limit" do
+      2.times { post "/pricing-estimate", params: valid_payload.to_json, headers: headers }
+
+      expect(response).to have_http_status(:ok)
     end
   end
 

@@ -3,6 +3,8 @@
 # Auth: Bearer token via constant-time compare (ActiveSupport::SecurityUtils.secure_compare).
 # Proxies validated payload to the Python inference sidecar and returns the Appendix A response shape.
 class PricingEstimateController < ApplicationController
+  include Throttled
+
   REQUIRED_FIELDS = %w[job_id service_category zip_code job_description].freeze
 
   before_action :enforce_post_method
@@ -19,7 +21,7 @@ class PricingEstimateController < ApplicationController
       estimate_hi: result[:estimate_hi],
       estimate_midpoint: result[:estimate_midpoint],
       confidence: result[:confidence],
-      model_version: result.fetch(:model_version, "gauntlet-v1.0.0")
+      model_version: result.fetch(:model_version, "gauntlet-v2.1.0")
     }, status: :ok
   rescue SidecarClient::UnavailableError
     render json: { error: "inference unavailable" }, status: :internal_server_error
