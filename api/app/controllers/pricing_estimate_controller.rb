@@ -16,7 +16,9 @@ class PricingEstimateController < ApplicationController
       estimate_hi: result[:estimate_hi],
       estimate_midpoint: result[:estimate_midpoint],
       confidence: result[:confidence],
-      model_version: result.fetch(:model_version, "gauntlet-v2.1.0")
+      model_version: result.fetch(:model_version, "gauntlet-v2.1.0"),
+      uncertainties: result[:uncertainties],
+      coverage: result[:coverage]
     }, status: :ok
   rescue SidecarClient::UnavailableError
     render json: { error: "inference unavailable" }, status: :internal_server_error

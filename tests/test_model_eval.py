@@ -6,6 +6,7 @@ from houseprice.data_load import load_dataset, labeled, normalize_category, is_p
 from houseprice.eval import ape, mape, baseline_blended
 from houseprice.features import build_features
 from houseprice.model_v2 import oof_predict  # deployed v2 architecture
+from houseprice.train import metrics_payload
 
 
 @pytest.fixture(scope="module")
@@ -62,6 +63,39 @@ def test_model_beats_both_baselines(df):
     # interval coverage near the 80% target (CQR)
     cov = ((lab["final_price"].values >= lo) & (lab["final_price"].values <= hi)).mean()
     assert 0.72 <= cov <= 0.92, f"coverage {cov:.2f} off target"
+
+
+def test_metrics_payload_keys_and_types():
+    """metrics_payload is a pure helper: verify schema and numeric contract."""
+    payload = metrics_payload(
+        blended=10.47, real=26.58, cov=0.832,
+        base_blended=11.56, base_real=37.20, n_real=183,
+    )
+    expected_keys = {
+        "model_version", "blended", "real_only", "coverage",
+        "baseline_blended", "baseline_real", "n_real", "generated_for",
+    }
+    assert expected_keys == set(payload.keys()), "unexpected or missing keys"
+
+    # numeric fields are Python scalars (JSON-serialisable), not numpy types
+    for key in ("blended", "real_only", "coverage", "baseline_blended", "baseline_real"):
+        assert isinstance(payload[key], float), f"{key} must be float, got {type(payload[key])}"
+    assert isinstance(payload["n_real"], int), "n_real must be int"
+
+    # rounding contract
+    assert payload["blended"] == round(10.47, 2)
+    assert payload["real_only"] == round(26.58, 2)
+    assert payload["coverage"] == round(0.832 * 100, 1)
+    assert payload["n_real"] == 183
+    assert payload["generated_for"] == "labeled-oof"
+
+    # model must beat baseline (the regression gate in numeric form)
+    assert payload["blended"] < payload["baseline_blended"], (
+        f"blended {payload['blended']} must be < baseline {payload['baseline_blended']}"
+    )
+    assert payload["real_only"] < payload["baseline_real"], (
+        f"real_only {payload['real_only']} must be < baseline_real {payload['baseline_real']}"
+    )
 
 
 def test_no_leakage_in_oof(df):

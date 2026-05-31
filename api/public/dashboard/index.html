@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HouseAccount Pricing</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ===================== STICKY HEADER ===================== -->
+  <header class="site-header" id="site-header">
+    <div class="header-left">
+      <span class="logo-mark">&#9670;</span>
+      <span class="product-name">HouseAccount Pricing</span>
+    </div>
+    <div class="header-center">
+      <nav class="tab-nav" role="tablist">
+        <button class="tab-btn active" data-panel="predict" role="tab" aria-selected="true">Predict</button>
+        <button class="tab-btn" data-panel="batch" role="tab" aria-selected="false">Batch</button>
+        <button class="tab-btn" data-panel="results" role="tab" aria-selected="false">Results</button>
+      </nav>
+    </div>
+    <div class="header-right">
+      <span class="status-dot" id="status-dot" title="Checking API…"></span>
+      <span class="status-label" id="status-label">Checking…</span>
+      <span class="model-badge" id="model-badge">—</span>
+    </div>
+  </header>
+
+  <!-- ===================== TOAST CONTAINER ===================== -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main-content">
+
+    <!-- ======== PREDICT PANEL ======== -->
+    <section class="panel" id="panel-predict" role="tabpanel">
+      <div class="panel-inner">
+        <h2 class="panel-title">Single Prediction</h2>
+        <p class="panel-desc">Paste a booking JSON and get an AI price estimate with confidence interval.</p>
+
+        <div class="field-group">
+          <label class="field-label" for="booking-input">Booking JSON</label>
+          <div class="editor-wrap">
+            <textarea
+              id="booking-input"
+              class="json-editor"
+              rows="10"
+              spellcheck="false"
+              placeholder='Paste booking JSON here, or click "Load sample" below…'
+            ></textarea>
+          </div>
+          <div class="field-error hidden" id="json-error"></div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-secondary" id="load-sample-btn">Load sample</button>
+          <button class="btn btn-primary" id="predict-btn">
+            <span class="btn-text">Predict</span>
+            <span class="spinner hidden" id="predict-spinner"></span>
+          </button>
+        </div>
+
+        <!-- Result Card -->
+        <div class="result-card hidden" id="result-card">
+          <div class="result-header">
+            <span class="result-label">Price Estimate</span>
+            <span class="result-version" id="result-version"></span>
+          </div>
+
+          <!-- Low-confidence banner -->
+          <div class="ood-banner hidden" id="ood-banner">
+            Low confidence — this booking may be outside the model's training distribution. Treat the estimate as a rough guide.
+          </div>
+
+          <!-- Interval bar -->
+          <div class="interval-section">
+            <div class="interval-labels">
+              <span id="label-lo"></span>
+              <span id="label-mid"></span>
+              <span id="label-hi"></span>
+            </div>
+            <div class="interval-bar-wrap">
+              <div class="interval-bar" id="interval-bar">
+                <div class="interval-fill" id="interval-fill"></div>
+                <div class="midpoint-tick" id="midpoint-tick"></div>
+              </div>
+            </div>
+            <div class="interval-legend">
+              <span class="legend-item"><span class="legend-dot lo"></span>Low</span>
+              <span class="legend-item"><span class="legend-dot mid"></span>Midpoint</span>
+              <span class="legend-item"><span class="legend-dot hi"></span>High</span>
+            </div>
+          </div>
+
+          <!-- Confidence meter -->
+          <div class="confidence-section">
+            <div class="confidence-label-row">
+              <span class="confidence-title">Confidence</span>
+              <span class="confidence-value" id="confidence-value"></span>
+            </div>
+            <div class="confidence-track">
+              <div class="confidence-fill" id="confidence-fill"></div>
+            </div>
+            <div class="confidence-bands">
+              <span class="band-label">Low &lt;50%</span>
+              <span class="band-label">Mid 50–79%</span>
+              <span class="band-label">High ≥80%</span>
+            </div>
+          </div>
+
+          <!-- Uncertainties -->
+          <div class="uncertainties-section" id="uncertainties-section">
+            <div class="uncertainties-title">Why it might vary</div>
+            <ul class="uncertainties-list" id="uncertainties-list"></ul>
+          </div>
+        </div><!-- /result-card -->
+
+      </div>
+    </section>
+
+    <!-- ======== BATCH PANEL ======== -->
+    <section class="panel hidden" id="panel-batch" role="tabpanel">
+      <div class="panel-inner">
+        <h2 class="panel-title">Batch Scoring</h2>
+        <p class="panel-desc">Upload a CSV of bookings. Required columns: <code>job_id</code>, <code>service_category</code>, <code>zip_code</code>, <code>job_description</code>. Optional: <code>original_estimate</code>.</p>
+
+        <!-- Dropzone -->
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone-inner">
+            <span class="dropzone-icon">&#8679;</span>
+            <span class="dropzone-label">Drop a CSV file here, or</span>
+            <label class="btn btn-secondary btn-sm" for="csv-file-input">Choose file</label>
+            <input type="file" id="csv-file-input" accept=".csv,text/csv" class="visually-hidden" />
+          </div>
+          <div class="dropzone-filename hidden" id="dropzone-filename"></div>
+        </div>
+        <div class="field-error hidden" id="csv-error"></div>
+
+        <!-- JSON preview -->
+        <div class="json-preview-section hidden" id="json-preview-section">
+          <div class="section-sub-title">Converted JSON <span class="row-count" id="json-row-count"></span></div>
+          <pre class="json-preview" id="json-preview"></pre>
+        </div>
+
+        <!-- Run batch -->
+        <div class="action-row" id="batch-action-row">
+          <button class="btn btn-primary" id="batch-run-btn" disabled>Run batch</button>
+          <span class="progress-label hidden" id="batch-progress"></span>
+        </div>
+
+        <!-- Batch summary -->
+        <div class="batch-summary hidden" id="batch-summary"></div>
+
+        <!-- Batch results table -->
+        <div class="table-wrap hidden" id="batch-table-wrap">
+          <table class="results-table" id="batch-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>ZIP</th>
+                <th>Description</th>
+                <th>Low</th>
+                <th>Midpoint</th>
+                <th>High</th>
+                <th>Confidence</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="batch-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Row detail drawer -->
+      <div class="drawer-overlay hidden" id="drawer-overlay"></div>
+      <aside class="detail-drawer hidden" id="detail-drawer">
+        <div class="drawer-header">
+          <span class="drawer-title">Prediction Detail</span>
+          <button class="drawer-close" id="drawer-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="drawer-body" id="drawer-body"></div>
+      </aside>
+    </section>
+
+    <!-- ======== RESULTS PANEL ======== -->
+    <section class="panel hidden" id="panel-results" role="tabpanel">
+      <div class="panel-inner">
+        <h2 class="panel-title">Model Results</h2>
+        <p class="panel-desc">Leakage-free out-of-fold metrics — model vs baseline on held-out data.</p>
+
+        <!-- Skeleton / unavailable state -->
+        <div class="metrics-unavailable hidden" id="metrics-unavailable">
+          <div class="unavailable-icon">&#9888;</div>
+          <div class="unavailable-msg">Metrics not generated yet — run training to produce <code>reports/eval_metrics.json</code>.</div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="stat-cards" id="stat-cards">
+          <div class="stat-card skeleton" id="card-blended">
+            <div class="stat-card-title">Blended MAPE</div>
+            <div class="stat-card-value" id="sc-blended-val">—</div>
+            <div class="stat-card-baseline" id="sc-blended-base"></div>
+            <div class="stat-card-delta" id="sc-blended-delta"></div>
+            <div class="stat-card-check" id="sc-blended-check"></div>
+          </div>
+          <div class="stat-card skeleton" id="card-real">
+            <div class="stat-card-title">Real-only MAPE</div>
+            <div class="stat-card-value" id="sc-real-val">—</div>
+            <div class="stat-card-baseline" id="sc-real-base"></div>
+            <div class="stat-card-delta" id="sc-real-delta"></div>
+            <div class="stat-card-check" id="sc-real-check"></div>
+          </div>
+          <div class="stat-card skeleton" id="card-cov">
+            <div class="stat-card-title">Interval Coverage</div>
+            <div class="stat-card-value" id="sc-cov-val">—</div>
+            <div class="stat-card-baseline" id="sc-cov-base"></div>
+            <div class="stat-card-delta" id="sc-cov-delta"></div>
+            <div class="stat-card-check" id="sc-cov-check"></div>
+          </div>
+        </div>
+
+        <!-- Comparison chart -->
+        <div class="chart-section hidden" id="chart-section">
+          <div class="section-sub-title">MAPE Comparison — lower is better</div>
+          <div class="chart-bars" id="chart-bars"></div>
+        </div>
+
+        <!-- Predictions table -->
+        <div class="predictions-section hidden" id="predictions-section">
+          <div class="section-sub-title">
+            Out-of-fold predictions
+            <span class="oof-caption">leakage-free out-of-fold</span>
+          </div>
+          <div class="table-wrap">
+            <table class="results-table" id="predictions-table">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Category</th>
+                  <th>Low</th>
+                  <th>Midpoint</th>
+                  <th>High</th>
+                  <th>Confidence</th>
+                  <th>Labeled</th>
+                </tr>
+              </thead>
+              <tbody id="predictions-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <span id="footer-version">HouseAccount Pricing</span>
+    &nbsp;&middot;&nbsp;
+    <span>Leakage-free out-of-fold metrics</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

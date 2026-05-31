@@ -11,4 +11,13 @@ Rails.application.routes.draw do
   match "/.netlify/functions/pricing-estimate",
         to: "pricing_estimate#create",
         via: :all
+
+  # Dashboard SPA shell (U3)
+  get "/" => "dashboard#index"
+  get "/dashboard" => "dashboard#index"
+
+  # Dashboard JSON routes (U4)
+  post "/dashboard/predict"     => "dashboard#predict"
+  get  "/dashboard/metrics"     => "dashboard#metrics"
+  get  "/dashboard/predictions" => "dashboard#predictions"
 end

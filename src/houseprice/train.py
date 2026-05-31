@@ -7,6 +7,7 @@ Leakage discipline:
 """
 from __future__ import annotations
 
+import json
 import os
 import pickle
 import numpy as np
@@ -23,8 +24,24 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 MODEL_DIR = os.path.join(ROOT, "model")
 PRED_PATH = os.path.join(ROOT, "predictions", "predictions.csv")
 REPORT_PATH = os.path.join(ROOT, "reports", "eval_report.md")
+METRICS_PATH = os.path.join(ROOT, "reports", "eval_metrics.json")
 SCOPE_CACHE = os.path.join(ROOT, "data", "processed", "scope.parquet")
 REAL_THR = 0.20
+
+
+def metrics_payload(blended: float, real: float, cov: float,
+                    base_blended: float, base_real: float, n_real: int) -> dict:
+    """Build the structured eval metrics dict (pure helper, no I/O)."""
+    return {
+        "model_version": MODEL_VERSION,
+        "blended": round(blended, 2),
+        "real_only": round(real, 2),
+        "coverage": round(cov * 100, 1),
+        "baseline_blended": round(base_blended, 2),
+        "baseline_real": round(base_real, 2),
+        "n_real": int(n_real),
+        "generated_for": "labeled-oof",
+    }
 
 
 def _scope():
@@ -170,8 +187,11 @@ predictions.csv: {len(lab)} labeled rows are OOF (leakage-free); {len(df)-len(la
 """
     with open(REPORT_PATH, "w") as fh:
         fh.write(report)
+    metrics = metrics_payload(blended, real, cov, base_blended, base_real, int(real_mask.sum()))
+    with open(METRICS_PATH, "w") as fh:
+        json.dump(metrics, fh, indent=2)
     print(report)
-    print(f"saved model/bundle.pkl, {PRED_PATH}, {REPORT_PATH}")
+    print(f"saved model/bundle.pkl, {PRED_PATH}, {REPORT_PATH}, {METRICS_PATH}")
     return dict(blended=blended, real=real, base_blended=base_blended, base_real=base_real, coverage=cov)
 
 
