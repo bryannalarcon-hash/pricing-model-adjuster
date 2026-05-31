@@ -2,11 +2,7 @@ require "net/http"
 require "json"
 require "uri"
 
-# Proxies inference requests to the Python sidecar service.
-#
-# The sidecar is expected at SIDECAR_URL (default: http://127.0.0.1:8011/infer).
-# Uses a 5-second read/open timeout. If the sidecar is unreachable or returns
-# a non-200 response, raises the appropriate error.
+# Proxies inference requests to the Python pricing sidecar over HTTP.
 module SidecarClient
   SIDECAR_URL = ENV.fetch("SIDECAR_URL", "http://127.0.0.1:8011/infer")
   TIMEOUT_SECONDS = 5
@@ -17,11 +13,14 @@ module SidecarClient
   # Raised when the sidecar returns a non-200 response or unreadable body.
   class InferenceError < StandardError; end
 
-  # Posts booking_params JSON to the sidecar and returns a symbolized result hash.
-  # Keys returned: :estimate_lo, :estimate_hi, :estimate_midpoint, :confidence,
-  #                :model_version (and optionally :coverage, :uncertainties)
+  # Posts booking_params as JSON to the sidecar and returns a symbolized hash.
+  # @param booking_params [Hash] raw booking attributes to send for inference
+  # @return [Hash] keys: :estimate_lo, :estimate_hi, :estimate_midpoint,
+  #   :confidence, :model_version, :coverage, :uncertainties
+  # @raise [UnavailableError] if the sidecar is unreachable or times out
+  # @raise [InferenceError] if the response is non-200 or not valid JSON
   def self.infer(booking_params)
-    uri  = URI.parse(SIDECAR_URL)
+    uri = URI.parse(SIDECAR_URL)
     http = Net::HTTP.new(uri.host, uri.port)
     http.open_timeout = TIMEOUT_SECONDS
     http.read_timeout = TIMEOUT_SECONDS
@@ -30,21 +29,17 @@ module SidecarClient
     request.body = booking_params.to_json
 
     response = http.request(request)
-
-    unless response.is_a?(Net::HTTPSuccess)
-      raise InferenceError, "sidecar returned #{response.code}"
-    end
+    raise InferenceError, "sidecar returned #{response.code}" unless response.is_a? Net::HTTPSuccess
 
     body = JSON.parse(response.body, symbolize_names: true)
-
     {
-      estimate_lo:       body[:estimate_lo],
-      estimate_hi:       body[:estimate_hi],
+      estimate_lo: body[:estimate_lo],
+      estimate_hi: body[:estimate_hi],
       estimate_midpoint: body[:estimate_midpoint],
-      confidence:        body[:confidence],
-      model_version:     body.fetch(:model_version, "gauntlet-v1.0.0"),
-      coverage:          body[:coverage],
-      uncertainties:     body[:uncertainties]
+      confidence: body[:confidence],
+      model_version: body.fetch(:model_version, "gauntlet-v2.1.0"),
+      coverage: body[:coverage],
+      uncertainties: body[:uncertainties]
     }
   rescue Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH,
          Net::OpenTimeout, Net::ReadTimeout, SocketError
