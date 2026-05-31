@@ -45,6 +45,7 @@ Thumbs.db
 # Claude Flow runtime state (local-only coordination data)
 .claude-flow/data/
 .claude-flow/sessions/
+.claude/scheduled_tasks.lock
 
 # Conversation log backups
 *.md.bak
@@ -64,3 +65,6 @@ api/public/assets/
 # CatBoost training artifacts / experiment results
 catboost_info/
 experiments/results.csv
+
+# Handoff docs (context-management, local-only)
+handoff/
