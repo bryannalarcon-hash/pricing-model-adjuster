@@ -4,11 +4,13 @@ An AI-powered pricing engine for home-service bookings. Given a booking request 
 
 ## Model performance
 
+Model version: `gauntlet-v2.1.0`.
+
 | Metric | Model | Baseline | Status |
 |---|---|---|---|
-| Blended MAPE (all 411 labeled rows) | 10.47% | 11.56% | Pass |
-| Real-only MAPE (n=49, rows where base APE > 20%) | 26.58% | 36.75% | Pass |
-| Interval coverage (target 80%) | 82% | — | Pass |
+| Blended MAPE (all 411 labeled rows) | 10.49% | 11.56% | Pass |
+| Real-only MAPE (n=49, rows where base APE > 20%) | 26.22% | 36.75% | Pass |
+| Interval coverage (target 80%) | 82.7% | — | Pass |
 
 Evaluation is leakage-free: every labeled row is scored by a model trained without it (5-fold OOF). Conformal calibration is nested inside each fold.
 
@@ -48,13 +50,16 @@ These five steps take a freshly cloned repository to a working local endpoint.
 pip install -r requirements.txt
 ```
 
-**2. Train the model**
+**2. Train the model — _optional_**
+
+The trained artifact `model/bundle.pkl` **is committed to this repo**, so you can skip straight to step 3 and run inference immediately — no dataset required. Retrain only if you have the dataset and want to reproduce the result:
 
 ```bash
-PYTHONPATH=src python3 -m houseprice.train
+# requires data/raw/houseaccount_pricing_sample.csv (the proprietary dataset, not committed)
+PYTHONPATH=src python3 -m houseprice.train deterministic
 ```
 
-Writes `model/bundle.pkl`, `predictions/predictions.csv`, and `reports/eval_report.md`. Takes ~30 seconds on a laptop CPU.
+Retraining rewrites `model/bundle.pkl`, `predictions/predictions.csv`, `reports/eval_report.md`, and `reports/eval_metrics.json`. Takes under a minute on a laptop CPU.
 
 **3. Start the Python inference sidecar (terminal 1)**
 
@@ -62,11 +67,12 @@ Writes `model/bundle.pkl`, `predictions/predictions.csv`, and `reports/eval_repo
 PYTHONPATH=src python3 -m uvicorn houseprice.infer_service:app --host 127.0.0.1 --port 8011
 ```
 
-**4. Copy `.env.example` to `.env` and fill in your secret**
+**4. Copy `.env.example` to `.env` and fill in the secrets** (see [Environment variables](#environment-variables))
 
 ```bash
 cp .env.example .env
-# edit .env: set GAUNTLET_PRICING_SECRET to any non-empty string for local use
+# edit .env: set GAUNTLET_PRICING_SECRET to any non-empty string for local use.
+# For the staging booking integration you also need HOUSEACCOUNT_SIGNING_KEY (below).
 ```
 
 **5. Start the Rails API (terminal 2)**
@@ -77,7 +83,30 @@ export PATH="$HOME/.gem/bin:$PATH"
 cd api && bundle install && bin/rails server -p 3007 -b 127.0.0.1
 ```
 
-The endpoint is now live at `http://127.0.0.1:3007/pricing-estimate`.
+The endpoint is now live at `http://127.0.0.1:3007/pricing-estimate`, and the **demo dashboard** at **`http://127.0.0.1:3007/`** (see [Dashboard](#dashboard)).
+
+## Environment variables
+
+Copy `.env.example` → `.env`. Two of these are **issued by HouseAccount** and must be supplied to exercise the live staging integration:
+
+| Variable | Who sets it | Purpose |
+|---|---|---|
+| `GAUNTLET_PRICING_SECRET` | You (any non-empty string locally) | Bearer token for `POST /pricing-estimate` (Appendix A auth). The same value is also injected server-side by the dashboard proxy. |
+| `HOUSEACCOUNT_SIGNING_KEY` | **HouseAccount-issued** | HMAC key for signing requests to the staging booking API (`App-Signature = HMAC-SHA256(timestamp + "." + body)`). Required by `integration/sign_and_post.py`. **Not committed — request it from HouseAccount.** |
+| `HOUSEACCOUNT_APP_NAME` | Pre-set to `gauntlet` | Partner identity sent as the `App-Name` header to staging. Change only if HouseAccount issues a different name. |
+| `VAST_API_KEY` | Optional | Unused at runtime; present for optional GPU experiments. |
+
+The pricing model + dashboard run with only `GAUNTLET_PRICING_SECRET`. `HOUSEACCOUNT_SIGNING_KEY` + `HOUSEACCOUNT_APP_NAME` are needed **only** to post bookings to the HouseAccount staging endpoint via `integration/sign_and_post.py`.
+
+## Dashboard
+
+A single-page demo dashboard is served same-origin by the Rails app at **`http://127.0.0.1:3007/`**:
+
+- **Predict** — paste a booking as JSON (or load the sample) and see the estimate interval, confidence, and out-of-distribution flags. Sample payloads: `examples/sample_payloads.md`.
+- **Batch** — upload a CSV of bookings; it converts to the API's JSON shape and scores each row. Sample: `examples/sample_bookings.csv`.
+- **Results** — the model-vs-baseline MAPE/coverage metrics and the per-row predictions.
+
+Every prediction is forwarded server-side to the real `POST /pricing-estimate` (with the bearer injected by the proxy, so no secret reaches the browser). The Results panel reads the committed `reports/eval_metrics.json` and `predictions/predictions.csv`, so it works even without the dataset.
 
 ## Example request and response
 
@@ -106,7 +135,7 @@ Response:
   "estimate_hi": 2187.30,
   "estimate_midpoint": 1780.40,
   "confidence": 0.78,
-  "model_version": "gauntlet-v2.0.0"
+  "model_version": "gauntlet-v2.1.0"
 }
 ```
 
@@ -177,16 +206,22 @@ The estimate itself is always returned; only the confidence score changes.
 
 ## Testing
 
-Run Python tests (16 tests covering model logic, OOF eval, and confidence/OOD):
+Python tests (model logic, OOF eval, confidence/OOD, metrics emit):
 
 ```bash
 python3 -m pytest tests/ -q
 ```
 
-Run Rails request specs (21 specs; the sidecar is stubbed via WebMock — no running sidecar needed):
+Rails request specs (API contract, auth, errors, rate limiting, dashboard proxy/metrics/predictions; the sidecar is stubbed via WebMock — no running sidecar needed):
 
 ```bash
-cd api && bundle exec rspec
+cd api && bundle exec rspec      # 31 examples
+```
+
+End-to-end browser tests (Playwright; cover every dashboard path — predict, batch, results, error handling). Requires the stack running locally:
+
+```bash
+python3 -m pytest tests/e2e/ -q  # 8 examples
 ```
 
 ## Further reading

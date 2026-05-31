@@ -34,6 +34,9 @@ data/interim/
 *.joblib
 *.h5
 *.onnx
+# ...except the deployed model bundle, shipped so the company can run inference
+# without the (proprietary, un-committed) training dataset.
+!model/bundle.pkl
 
 # OS / editor
 .DS_Store
