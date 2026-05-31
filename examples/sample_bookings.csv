@@ -1,0 +1,8 @@
+job_id,service_category,zip_code,job_description,original_estimate
+demo-csv-1,Plumbing,33484,"Replace kitchen faucet, customer supplies the faucet",180
+demo-csv-2,HVAC,33324,"AC not cooling; suspect low refrigerant and a dirty coil",350
+demo-csv-3,Cleaning,75062,"Deep clean for a 3BR apartment move-out",
+demo-csv-4,Roofing,33463,"Small roof leak repair near the chimney flashing",800
+demo-csv-bad,,33484,"This row has no service_category and should be flagged",120
+demo-csv-5,Electrical,33324,"Install two ceiling fans in existing boxes",260
+demo-csv-6,Landscaping,75062,"Mow, edge, and mulch front and back yard, quarter-acre lot",

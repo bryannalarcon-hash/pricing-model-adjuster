@@ -29,6 +29,7 @@ data/raw/
 data/interim/
 *.csv
 !data/sample/*.csv
+!examples/*.csv
 *.parquet
 *.pkl
 *.joblib
