@@ -148,12 +148,131 @@ Power re-sweep: 0.4→0.7 gives blended 10.59→10.66, real 26.58→25.92 (same 
 noise) → **keep power=0.5**. Dropping category one-hot is neutral (10.62/26.32 vs 10.60/26.38) → keep
 for interpretability. No further robust gains — model is at the data's ceiling (411 rows / 49 real).
 
-## Final architecture (deployed, gauntlet-v2.0.0)
+### R14 — External Census ACS geography (income + home value by ZCTA) — REJECTED
+Sourced keyless ACS 2019–2023 by ZCTA (michaelminn.net repackaging of public-domain Census; **98.7%**
+of our 955 ZIPs matched, 12 fall back to national median). Joined `median_household_income` +
+`median_home_value` as 2 features. **8-seed paired OOF: blended 10.60→10.73 (−0.13pp, ~5σ WORSE),
+real-only 26.38→26.98 (−0.60pp, ~7σ WORSE).** Robust degradation across every seed, not noise. Same
+failure family as raw ZIP (R12): geography **overfits on 411 rows AND is redundant with
+`original_estimate`**, which already encodes the local price level (confirmed empirically: varying the
+category label barely moves the point estimate; the estimate anchor sets the scale). **Rejected.** CSV
+retained as `data/external/zip_acs.rejected.csv` (auto-load disabled by the `.rejected` rename). Reinforces
+that the remaining lever is more ROWS (taller), not more features (wider) — see the learning curve in
+`experiments/learning_curve.py`. **Replicated with the OFFICIAL Census API (key obtained; 2022 ACS5,
+99.1% ZIP coverage): blended 10.60→10.80 (−0.20pp/6.6σ), real 26.38→26.89 (−0.51pp/5.8σ) — same verdict
+across two independent ACS vintages and three geography attempts total (raw ZIP R12 + both ACS pulls).**
+The `census.py` live-API path is validated and retained as a switchable capability (like the LLM scope
+extractor) — built, measured, rejected, kept switchable + documented.
+
+### R15 — Hand-crafted price-CHANGE features (hedge / scope-discrepancy / round-estimate) — REJECTED
+Motivated by the residual framing (model the *change*, not the *level* — the same lens that explained
+R14's Census failure: setting-features are redundant with `original_estimate`). 8-seed paired OOF scan
+(singles, pairs, triple). **hedge +0.00/0.0σ — DEAD** (only 2/411 descriptions contain any hedge cue;
+signal absent in this terse/templated text). **scope-discrepancy (Σnumbers/estimate) +0.04pp blended/2.9σ
+but real-only −0.03 (noise)** — trivial and redundant with existing `max_number`+`orig`+`rel_range`.
+**round-estimate −0.13pp real/1.7σ WORSE** (only 7.5% of estimates are round — premise false + noise).
+**Reject all.** The existing change features (`desc_len` #1, `rel_range`/`range` ~21%) already capture the
+available change signal. **Sixth feature attempt to fail** (3 setting: ZIP R12 + 2× ACS R14; 3 change here)
+— confirms the point estimate is at the data's feature ceiling on 411 rows; the lever is ROWS (taller),
+not FEATURES (wider). Scan: `experiments/change_features.py`.
+
+### R16 — Feature-space novelty → CONFIDENCE layer (option 2) — ADOPTED
+The first change-signal with positive evidence (after R15 killed hand-crafted change features): a
+k-NN distance-to-training **novelty** score correlates with upstream error (Spearman ρ=0.18, p=2e-4;
+real rows novelty 4.75 vs easy 2.92). Wired into `ConfidenceCalibrator`: a **soft penalty** (down-weight
+as novelty exceeds the training median, floor 0.5) + a **4th OOD gate** firing beyond the 95th pct of
+training novelty (**5.1%** of rows — principled; an earlier 2.5×median over-fired at 8.5%). **Fixes the
+known gap**: a gibberish description in a known category at a normal price drops from ~0.72 to **0.26**
+(flagged); a normal description stays 0.72; sparse/atypical real jobs (e.g. $1850 Plumbing, 3 labels)
+read ~0.30. **MAPE UNCHANGED (10.47/26.58)** — novelty touches only confidence. Confidence stays
+informative (low-conf bin 12.6% OOF APE vs high-conf 8.2%). Stored `scaler`+`NearestNeighbors` in the
+bundle; leakage-safe (feature geometry, no `final_price`). 20/20 tests green (+4 regression tests).
+**NOTE:** novelty as a POINT-ESTIMATE feature (option 1) was a separate tradeoff — **ADOPTED, see R17.**
+
+### R17 — Feature-space novelty as a POINT-ESTIMATE feature (option 1) — ADOPTED (gauntlet-v2.1.0)
+Scan (`experiments/novelty_knn.py`, 6-seed paired OOF): **novelty** improves real-only **26.58→26.12
+(+0.46pp, 5.2σ)** at a small blended cost (−0.07pp, 2.1σ); `knn_ref` (sparse neighbors' mean residual)
+and `cat_unc` (category-relative rel_range z-score) both REJECTED (hurt or neutral). Adopted novelty
+because it is a genuine atypicality mechanism (not proxy-fitting — leakage-safe feature geometry), and
+real-only is the upstream-error subset / hidden-holdout proxy that matters most; both metrics still beat
+baseline. Integrated leakage-safely: a **per-fold** novelty index for the OOF metrics (refit on each
+train split — `train._oof_bagged_with_novelty`) and a full-data index for serving (`predict._novelty`,
+appended before `align_to`). Deployed bagged OOF: **blended 10.49% (was 10.47), real-only 26.22% (was
+26.58, −0.36pp), coverage 82.7%** — bagging shrank the blended cost to noise (+0.02pp) while keeping the
+real-only gain. No leakage (OOF matches the scan; a leak would have collapsed real-only). 20/20 tests
+green. The novelty feature is shared with the confidence layer (R16).
+
+### R18 — External scraped FINALS (Reddit "what I paid", browser-control) — REJECTED
+Built a browser-control scraping pipeline (Playwright + headless Chromium; WebFetch's blocks were
+*tool-level* — a real browser reaches old.reddit + trade forums, only Yelp-class sites stay 403).
+Six parallel sharded waves across ~60 home-service subreddits with payment-oriented queries
+("i paid" / "total was" / "out the door" / "they charged" / …) → **331 unique REAL finals** matched to
+our job descriptions (TF-IDF), all in our $46–7266 range, including **64 real estimate→final pairs**.
+Median $600 (vs our $302 — Reddit self-selects bigger/notable jobs). **Augmentation OOF eval
+(leakage-safe: scraped rows train-only, scored on the 411): both arms WORSE** — +PAIRS blended
+10.59→11.88 (−1.28pp), real 26.58→28.57 (−1.99pp); +ALL-finals (synthesized estimate) blended →13.44
+(−2.85pp), real →33.60 (−7.02pp). **Rejected.** Even real "what I paid" data hurts: distribution shift
+(2× our median) + extraction noise + (for ALL) the circular synthesized-estimate problem. Confirms the
+data ceiling — HouseAccount's marketplace-distribution labels are irreplaceable; *every* external
+final source (cost guides, permits, AHS, now scraped community finals) fails the gate. Pipeline:
+`experiments/scrape_finals.py` + `augment_eval.py`; data `data/external/scraped_pilot.csv` (gitignored).
+**Deployed model unchanged (v2.1.0, 10.49/26.22).**
+
+### R19 — Well-reviewed marketplace prices (Thumbtack) + combined augmentation eval — REJECTED
+Per the "mimic HouseAccount / well-reviewed contractors" hypothesis, scraped Thumbtack (browser control,
+15 cities × 18 categories, well-reviewed pros, avg rating 4.87) → 76 marketplace prices. Distribution-
+*closer* than Reddit but **low-skewed (median $100 — advertised "starting prices", not job finals)** and
+**narrow** (Cleaning/Handyman only; other trades show "contact for quote", not a price). Final combined
+scraped dataset: **407 real prices** (331 Reddit finals incl. 64 estimate→final pairs + 76 Thumbtack).
+**Full augmentation OOF eval (leakage-safe, scored on the 411):** every arm WORSE — +Thumbtack
+10.59→10.85 / 26.58→28.65 (−0.26/−2.07); +Reddit →13.44/33.60 (−2.85/−7.02); +both →13.43/34.21. The
+marketplace arm was *least* harmful on blended (the distribution instinct was directionally right) but
+still hurts. **Definitive close: no scrapeable external source helps.** What mimics HouseAccount IS
+proprietary marketplace transaction data; public sources are estimates (cost guides, advertised minimums)
+or distribution-skewed discussion (Reddit high). Data ceiling confirmed from every angle tried (cost
+guides, Census, permits/AHS, Reddit finals, marketplace pros). Deployed model unchanged (**v2.1.0,
+10.49/26.22**). Pipeline: `experiments/scrape_thumbtack.py`, `augment_eval2.py`; data
+`data/external/scraped_pilot.csv` (407 rows, gitignored).
+
+### R20 — HomeStars (CA) "approximate cost" field — REJECTED (premise disproven, no crawl run)
+The last open augmentation lead (HANDOFF_2): HomeStars was believed to expose a structured *"Approximate
+cost of services: $X"* field on customer reviews — real paid finals with a HouseAccount-like marketplace
+distribution, robots-permissive (robots.txt for `*` only disallows /login, /_next, /*.json$). Built a
+compliant crawler (`experiments/scrape_homestars.py`, normal browser, FX CAD→USD) and **verified the
+premise on the live site before crawling.** It is **false today**: HomeStars migrated to a Next.js layout
+where reviews render as *job-type tag + star rating + date + prose* with **no price**. Measured across
+**30 fully-rendered reviews / 5 profiles / 3 categories (plumbing, heating, roofing) / 2 cities**:
+**0 "approximate cost" fields and 0 dollar amounts of any kind.** The PoC's earlier "$700" was a fluke
+(portfolio/About text, not a review price field). **No crawl was launched** — there is nothing to extract,
+and running parallel crawls would only hammer the site for ~0 priced rows (ToS politeness). This closes
+the last external lead: HomeStars joins cost guides, Census, permits/AHS, Reddit, and Thumbtack as a
+documented negative. **Data ceiling fully confirmed; deployed model unchanged (v2.1.0, 10.49/26.22).**
+
+### R21 — TabPFN (small-data tabular foundation model) vs LightGBM — REJECTED
+The only untried *architecture* lever (not new data). Ran TabPFN v2 (ungated, downloaded from the public
+GCS bucket — **fully local inference, no data egress**; the v8 cloud client requiring `TABPFN_TOKEN` was
+**not** used, as it would ship the proprietary 411 rows off-machine) under the project's exact OOF gate:
+same 411 rows, same 41 deterministic features, same residual target log(final/original), same 5-fold
+stratified folds, midpoint MAPE, 5 seeds. Three arms to separate architecture from the MAPE-weighting trick:
+| Arm | Blended | Real-only |
+|---|---|---|
+| A. LightGBM v2 weighted (deployed) | 10.56% | 26.50% |
+| B. LightGBM v2 unweighted (control) | 10.58% | 27.59% |
+| **C. TabPFN residual** | **10.82%** | **29.42%** |
+TabPFN loses to BOTH LightGBM arms — vs deployed −0.26 bl / −2.92 real; **vs the unweighted control −0.23
+bl / −1.82 real**, so the loss is *architectural*, not just the missing weighting (TabPFN takes no sample
+weights). Also ~34× slower (432s vs 12s, CPU). 411×41 is squarely in GBDT's wheelhouse; TabPFN's
+general-purpose in-context prior can't exploit the residual-on-estimate structure or MAPE weighting that
+LightGBM is tuned for. **LightGBM v2 stays.** Pipeline: `experiments/tabpfn_eval.py`.
+**This closes the last open lever (data AND architecture). v2.1.0 is final.**
+
+## Final architecture (deployed, gauntlet-v2.1.0)
 Residual target log(final/original) · LightGBM **L2 + MAPE-aligned weight 1/√final_price** point
-model on ALL data · **normalized cross-conformal** quantile intervals (coverage ~82%) · bagged 6-seed
-OOF for the submission · **deterministic features only** (scope-free AND ZIP-free — both removed as
-overfitting/no-gain) · density-aware confidence + PRD OOD gates.
-**Leakage-free bagged OOF: blended 10.47% (base 11.56), real-only 26.58% (base 36.75), coverage 82%.**
+model on ALL data · **normalized cross-conformal** quantile intervals (coverage ~83%) · bagged 6-seed
+OOF for the submission · **deterministic features only** (scope-free AND ZIP-free) **+ a leakage-safe
+feature-space novelty feature** (R17) · density-aware confidence + PRD OOD gates **+ a novelty OOD
+gate/penalty** (R16).
+**Leakage-free bagged OOF: blended 10.49% (base 11.56), real-only 26.22% (base 36.75), coverage 82.7%.**
 
 ## Journey
 | Stage | Blended | Real-only |
@@ -161,6 +280,7 @@ overfitting/no-gain) · density-aware confidence + PRD OOD gates.
 | Baseline (old estimate) | 11.56% | 36.75% |
 | v1 (quantile-q50 + CQR) | 11.31% | 34.54% |
 | v2 (L2 + weight + cross-conformal + bagging) | 10.62% | 27.07% |
-| **v2 + no-ZIP (final)** | **10.47%** | **26.58%** |
+| v2 + no-ZIP | 10.47% | 26.58% |
+| **v2.1 + novelty feature + novelty-aware confidence (final)** | **10.49%** | **26.22%** |
 
-Real-only: **−28% relative** vs baseline. Blended: **−9.4% relative** vs baseline.
+Real-only: **−29% relative** vs baseline. Blended: **−9.3% relative** vs baseline.
