@@ -8,12 +8,6 @@ class DashboardController < ApplicationController
   PREDICTIONS_CAP = 500
 
   # @return [void]
-  def index
-    send_file Rails.root.join("public", "dashboard", "index.html"),
-              type: "text/html"
-  end
-
-  # @return [void]
   def predict
     payload = JSON.parse(request.raw_post)
     result  = PricingProxy.forward(payload, base: request.base_url)

@@ -12,9 +12,10 @@ Rails.application.routes.draw do
         to: "pricing_estimate#create",
         via: :all
 
-  # Dashboard SPA shell (U3)
-  get "/" => "dashboard#index"
-  get "/dashboard" => "dashboard#index"
+  # Dashboard SPA shell (U3) — redirect to the trailing-slash static path so the
+  # browser renders index.html (and relative assets resolve) instead of downloading it
+  get "/" => redirect("/dashboard/")
+  get "/dashboard" => redirect("/dashboard/")
 
   # Dashboard JSON routes (U4)
   post "/dashboard/predict"     => "dashboard#predict"

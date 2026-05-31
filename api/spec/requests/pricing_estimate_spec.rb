@@ -21,8 +21,7 @@ RSpec.describe "POST /pricing-estimate", type: :request do
       estimate_midpoint: 160.0,
       confidence:        0.82,
       model_version:     "gauntlet-v1.0.0",
-      uncertainties:     "high distance from training distribution",
-      coverage:          0.83
+      uncertainties:     "high distance from training distribution"
     }
   end
 
@@ -60,7 +59,6 @@ RSpec.describe "POST /pricing-estimate", type: :request do
       expect(body["confidence"]).to eq(0.82)
       expect(body["model_version"]).to eq("gauntlet-v1.0.0")
       expect(body["uncertainties"]).to eq("high distance from training distribution")
-      expect(body["coverage"]).to eq(0.83)
     end
 
     it "forwards optional fields to the sidecar" do

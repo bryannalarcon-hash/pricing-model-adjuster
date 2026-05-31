@@ -771,40 +771,40 @@ function renderMetricCards(data) {
     c.classList.remove("skeleton");
   });
 
-  // Blended MAPE
+  // Blended MAPE — API returns value already as a percentage (e.g. 10.49 means 10.49%)
   var blended = Number(data.blended);
   var baseBlended = Number(data.baseline_blended);
-  var blendedDelta = baseBlended - blended; // positive = improvement
-  el("sc-blended-val").textContent = (blended * 100).toFixed(1) + "%";
-  el("sc-blended-base").textContent = "Baseline: " + (baseBlended * 100).toFixed(1) + "%";
+  var blendedDelta = baseBlended - blended; // positive = improvement, in percentage points
+  el("sc-blended-val").textContent = blended.toFixed(1) + "%";
+  el("sc-blended-base").textContent = "Baseline: " + baseBlended.toFixed(1) + "%";
   el("sc-blended-delta").textContent = blendedDelta >= 0
-    ? "▼ " + (blendedDelta * 100).toFixed(1) + "% improvement"
-    : "▲ " + (Math.abs(blendedDelta) * 100).toFixed(1) + "% worse";
+    ? "▼ " + blendedDelta.toFixed(1) + "pp improvement"
+    : "▲ " + Math.abs(blendedDelta).toFixed(1) + "pp worse";
   el("sc-blended-delta").className = "stat-card-delta " + (blendedDelta >= 0 ? "delta-good" : "delta-bad");
   el("sc-blended-check").textContent = blended < baseBlended ? "✓ Pass" : "✗ Fail";
   el("sc-blended-check").className = "stat-card-check " + (blended < baseBlended ? "check-pass" : "check-fail");
 
-  // Real-only MAPE
+  // Real-only MAPE — API returns value already as a percentage (e.g. 26.22 means 26.22%)
   var real = Number(data.real_only);
   var baseReal = Number(data.baseline_real);
   var realDelta = baseReal - real;
-  el("sc-real-val").textContent = (real * 100).toFixed(1) + "%";
-  el("sc-real-base").textContent = "Baseline: " + (baseReal * 100).toFixed(1) + "%";
+  el("sc-real-val").textContent = real.toFixed(1) + "%";
+  el("sc-real-base").textContent = "Baseline: " + baseReal.toFixed(1) + "%";
   el("sc-real-delta").textContent = realDelta >= 0
-    ? "▼ " + (realDelta * 100).toFixed(1) + "% improvement"
-    : "▲ " + (Math.abs(realDelta) * 100).toFixed(1) + "% worse";
+    ? "▼ " + realDelta.toFixed(1) + "pp improvement"
+    : "▲ " + Math.abs(realDelta).toFixed(1) + "pp worse";
   el("sc-real-delta").className = "stat-card-delta " + (realDelta >= 0 ? "delta-good" : "delta-bad");
   el("sc-real-check").textContent = real < baseReal ? "✓ Pass" : "✗ Fail";
   el("sc-real-check").className = "stat-card-check " + (real < baseReal ? "check-pass" : "check-fail");
 
-  // Coverage
+  // Coverage — API returns value already as a percentage (e.g. 82.7 means 82.7%)
   var cov = Number(data.coverage);
-  var targetCov = 0.80; // target >= 80%
-  el("sc-cov-val").textContent = (cov * 100).toFixed(1) + "%";
+  var targetCov = 80; // target >= 80%
+  el("sc-cov-val").textContent = cov.toFixed(1) + "%";
   el("sc-cov-base").textContent = "Target: ≥80%";
   el("sc-cov-delta").textContent = cov >= targetCov
-    ? "+" + ((cov - targetCov) * 100).toFixed(1) + "% above target"
-    : ((cov - targetCov) * 100).toFixed(1) + "% below target";
+    ? "+" + (cov - targetCov).toFixed(1) + "pp above target"
+    : (cov - targetCov).toFixed(1) + "pp below target";
   el("sc-cov-delta").className = "stat-card-delta " + (cov >= targetCov ? "delta-good" : "delta-bad");
   el("sc-cov-check").textContent = cov >= targetCov ? "✓ Pass" : "✗ Fail";
   el("sc-cov-check").className = "stat-card-check " + (cov >= targetCov ? "check-pass" : "check-fail");
@@ -813,10 +813,11 @@ function renderMetricCards(data) {
 }
 
 function renderComparisonChart(data) {
-  var blended = Number(data.blended) * 100;
-  var baseBlended = Number(data.baseline_blended) * 100;
-  var real = Number(data.real_only) * 100;
-  var baseReal = Number(data.baseline_real) * 100;
+  // Values are already percentages — use them directly (e.g. 10.49 means 10.49%)
+  var blended = Number(data.blended);
+  var baseBlended = Number(data.baseline_blended);
+  var real = Number(data.real_only);
+  var baseReal = Number(data.baseline_real);
 
   // Max value for scaling bars (cap at reasonable max)
   var maxVal = Math.max(blended, baseBlended, real, baseReal, 1);

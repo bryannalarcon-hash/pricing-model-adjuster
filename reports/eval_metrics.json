@@ -1,0 +1,10 @@
+{
+  "model_version": "gauntlet-v2.1.0",
+  "blended": 10.49,
+  "real_only": 26.22,
+  "coverage": 82.7,
+  "baseline_blended": 11.56,
+  "baseline_real": 36.75,
+  "n_real": 49,
+  "generated_for": "labeled-oof"
+}
