@@ -17,6 +17,12 @@ OOD_MIDPOINT = 5000.0
 OOD_INTERVAL_MULT = 3.0
 OOD_CONF_CEIL = 0.45  # forced ceiling when any OOD condition holds (< 0.5)
 
+# Feature-space novelty (atypical bookings correlate with upstream-estimate error, JOURNAL R16):
+NOVELTY_SLOPE = 0.25      # confidence down-weight per unit of (novelty/median - 1)
+NOVELTY_FLOOR = 0.5       # most a novel booking can lose to the soft penalty
+# The hard OOD gate fires only beyond the 95th pct of TRAINING novelty (genuinely out-of-distribution,
+# e.g. gibberish) — legitimate sparse-category jobs get the soft penalty, not a forced OOD flag.
+
 
 SUPPORT_FULL_N = 25       # category labels at/above which support penalty = none
 SUPPORT_FLOOR = 0.70      # min support multiplier for very sparse in-production categories
@@ -27,6 +33,8 @@ class ConfidenceCalibrator:
     median_range: float                     # median observed estimate range (OOD reference)
     width_ref: float                        # median model relative interval width (base curve)
     cat_support: dict = None                # category -> training label count (data-density)
+    novelty_ref: float = None               # median training feature-space novelty (k-NN distance)
+    novelty_p95: float = None               # 95th pct of training novelty (diagnostic)
 
     @classmethod
     def fit(cls, lo, hi, mid, observed_ranges, cat_counts=None):
@@ -50,8 +58,12 @@ class ConfidenceCalibrator:
         frac = min(n / SUPPORT_FULL_N, 1.0)
         return SUPPORT_FLOOR + (1.0 - SUPPORT_FLOOR) * frac
 
-    def score(self, lo: float, hi: float, mid: float, in_production: bool, category=None):
-        """Return (confidence in [0,1], ood_flags dict)."""
+    def score(self, lo: float, hi: float, mid: float, in_production: bool, category=None,
+              novelty: float = None):
+        """Return (confidence in [0,1], ood_flags dict). `novelty` = the booking's feature-space
+        k-NN distance (atypicality); higher -> lower confidence, since novel bookings correlate
+        with upstream-estimate error (a tight interval no longer implies certainty for a job
+        unlike anything in training). Extreme novelty raises a 4th OOD gate."""
         interval = max(hi - lo, 0.0)
         rel = interval / max(mid, 1.0)
         ratio = rel / max(self.width_ref, 1e-6)          # 1.0 == typical width
@@ -62,7 +74,14 @@ class ConfidenceCalibrator:
             "ood_midpoint": bool(mid > OOD_MIDPOINT),
             "ood_interval": bool(interval > OOD_INTERVAL_MULT * self.median_range),
             "ood_category": bool(not in_production),
+            "ood_novelty": False,
         }
+        nref = getattr(self, "novelty_ref", None)
+        if novelty is not None and nref:
+            nratio = float(novelty) / nref
+            conf *= max(NOVELTY_FLOOR, 1.0 - NOVELTY_SLOPE * max(0.0, nratio - 1.0))
+            p95 = getattr(self, "novelty_p95", None)
+            flags["ood_novelty"] = bool(p95 and float(novelty) > p95)
         if any(flags.values()):
             conf = min(conf, OOD_CONF_CEIL)
         return round(float(max(0.0, min(1.0, conf))), 3), flags
@@ -77,6 +96,8 @@ def uncertainties_text(flags: dict, rel_width: float) -> str:
         msgs.append("wide price range — scope is ambiguous from the description")
     if flags.get("ood_category"):
         msgs.append("service category outside the current production set")
+    if flags.get("ood_novelty"):
+        msgs.append("job is unlike anything in the training data (atypical scope/details)")
     if not msgs:
         if rel_width > 0.4:
             msgs.append("moderate scope uncertainty from the description")

@@ -1,4 +1,4 @@
-# Modeling Approach & Model Card — `gauntlet-v2.0.0`
+# Modeling Approach & Model Card — `gauntlet-v2.1.0`
 
 How the HouseAccount AI pricing model works: data, assumptions, training strategy, confidence,
 and honest limitations. Companion to `reports/eval_report.md` (the metrics) and `ASSUMPTIONS.md`.
@@ -75,7 +75,15 @@ importance ranks **description length** #1 (long descriptions ⇒ off-estimate j
 shape and magnitude. **The model is scope-free AND geography-free** at request time: ablation showed
 raw ZIP-region features overfit on 411 rows / ~1033 ZIPs and were removed (JOURNAL R12; blended
 10.78→10.61 at 10 seeds). A *keyed* Census ACS join (income/home-value by ZCTA) remains the principled
-way to add geography and is wired but off by default (the Census API now requires a key).
+way to add geography but was **tested and rejected** — the keyed ACS join (median income/home value by
+ZCTA, 99.1% coverage) made OOF MAPE *worse* (blended +0.20pp, real +0.51pp, 6σ; JOURNAL R14), confirming
+geography is redundant with `original_estimate`. `census.py` is retained as a switchable capability.
+
+**One feature is not request-local: `novelty` (v2.1, R17)** — a feature-space k-NN distance to the
+training set (atypicality). It is computed leakage-safely (per-fold index for OOF; full-data index for
+serving) and is the only feature that improved real-only MAPE on 411 rows (26.58→26.22), because it
+flags jobs the upstream estimate is likely to have gotten wrong. The same value drives the confidence
+novelty gate (§5).
 
 ## 4. Scope extraction (LLM, switchable)
 `ScopeExtractor` has three interchangeable backends emitting the same schema:
@@ -98,13 +106,16 @@ genuine "the LLM didn't help — kept honest rather than force-fit" result.
 
 ## 5. Confidence & out-of-distribution (PRD §Confidence calibration, verbatim)
 Confidence ∈ [0,1] is high when the conformal interval is tight relative to the typical interval,
-lower as it widens. Three hard OOD conditions **force confidence < 0.5** (the estimate is still
+lower as it widens. Four hard OOD conditions **force confidence < 0.5** (the estimate is still
 returned — never rejected or capped):
 1. `estimate_midpoint` > **$5,000**
 2. prediction interval (`hi − lo`) > **3× the median observed range** ($230 → $690)
 3. `service_category` outside the **10 production verticals** — unknown categories are correctly
    treated as out-of-production (a bug present in v1 that read unknown categories as in-production
    was fixed in v2)
+4. **feature-space novelty** beyond the 95th percentile of training (v2.1, R16) — a booking unlike
+   anything in training (e.g. a bizarre description in a known category at a normal price) reads as
+   out-of-distribution even when the other three gates pass
 
 **Data-density-aware confidence (v2 addition):** a per-category support multiplier (≤1, floor 0.70)
 is applied so that sparse in-production categories read as less certain than the global conformal pad
@@ -112,6 +123,13 @@ implies. The multiplier is proportional to the category's label count relative t
 category. Example at equal interval width: Cleaning (66 labels) → confidence ~0.82; Plumbing
 (3 labels) → ~0.60; Electrical (2 labels) → ~0.60. This means a sparse category with a coincidentally
 narrow interval no longer reads as highly confident.
+
+**Novelty-aware confidence (v2.1 addition, R16):** a feature-space k-NN distance ("how unlike the
+training data is this booking?") down-weights confidence as it exceeds the typical training distance
+(soft penalty, floor 0.5) plus the 4th OOD gate above. This closes a gap where a *gibberish* description
+in a known category at a normal price (no price/interval/category flag) previously read ~0.72 — it now
+drops to ~0.26. Novelty correlates with upstream-estimate error (Spearman ρ=0.18), so it is a principled
+"trust the estimate less here" signal; the same value is also a point-model feature (§3, R17).
 
 Distribution over all 1,432 rows: ~35% below 0.5 (mostly out-of-production categories, as intended),
 ~12% ≥ 0.8. The booking-integration layer also surfaces human-readable `coverage` ("what's included")
@@ -126,15 +144,15 @@ and `uncertainties` ("why it might vary") strings derived from scope + the OOD f
   memorizing labels.
 
 ## 7. Results (leakage-free OOF)
-All metrics are from the bagged 6-seed out-of-fold run on all 411 labeled rows (gauntlet-v2.0.0).
+All metrics are from the bagged 6-seed out-of-fold run on all 411 labeled rows (gauntlet-v2.1.0).
 
 | Metric | Model | Baseline | Pass |
 |---|---|---|---|
-| Blended MAPE (411) | **10.47%** | 11.56% | ✅ |
-| Real-only MAPE (49) | **26.58%** | 36.75% | ✅ |
-| Interval coverage (target 80%) | **82%** | — | ✅ |
+| Blended MAPE (411) | **10.49%** | 11.56% | ✅ |
+| Real-only MAPE (49) | **26.22%** | 36.75% | ✅ |
+| Interval coverage (target 80%) | **82.7%** | — | ✅ |
 
-The real-only improvement (36.75% → 26.58%, ~26% relative) was the primary driver of the v2 research
+The real-only improvement (36.75% → 26.22%, ~29% relative) was the primary driver of the v2 research
 program and is robust across seeds and the lockbox hold-out. Exact current numbers in
 `reports/eval_report.md`, regenerated each train run.
 
@@ -152,7 +170,12 @@ program and is robust across seeds and the lockbox hold-out. Exact current numbe
 - **Scope-free deployment.** The deployed model uses deterministic features only (ZIP-region features removed per ablation) (no LLM).
   This was a research finding, not a compromise: LLM scope did not beat deterministic on 411 rows.
   Train/serve skew is zero. The `ScopeExtractor` is retained as a switchable capability.
-- **Census enrichment is off by default** — the Census API now requires a key; we substitute
-  self-contained ZIP-region features. With `CENSUS_API_KEY` the ACS join activates.
+- **Geography was tested and rejected** — the keyed Census ACS join (income/home value by ZCTA) made
+  OOF MAPE worse (JOURNAL R14, two vintages, 6σ); it is redundant with `original_estimate`. `census.py`
+  is retained as a switchable capability, off by default.
+- **Novelty is a partial, not complete, OOD detector.** It catches feature-space atypicality (unseen
+  descriptions/scope), which fixed the prior "gibberish reads confident" gap, but it is a k-NN distance
+  on 411 rows — coarse for the sparsest categories. It correlates with error (ρ=0.18) rather than
+  predicting it precisely.
 - **Thin blended margin on synthetic rows.** The five well-covered augmented categories are near-
-  irreducible (old estimate already good); the blended 10.47% win comes mostly from the ~49 real rows.
+  irreducible (old estimate already good); the blended 10.49% win comes mostly from the ~49 real rows.

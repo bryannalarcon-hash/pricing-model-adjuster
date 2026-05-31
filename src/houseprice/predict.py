@@ -27,6 +27,17 @@ def load_bundle(path: str | None = None) -> dict:
         return pickle.load(fh)
 
 
+def _novelty(Z, nn, k: int = 10):
+    """Mean distance to the k nearest TRAINING rows in standardized feature space (atypicality).
+    Drops a zero-distance self-match when Z rows are themselves training rows."""
+    d, _ = nn.kneighbors(Z, n_neighbors=k + 1)
+    out = np.empty(len(d))
+    for r in range(len(d)):
+        row = d[r]
+        out[r] = row[1:k + 1].mean() if row[0] < 1e-9 else row[:k].mean()
+    return out
+
+
 def _row_df(booking: dict, anchor: float | None = None) -> pd.DataFrame:
     """Normalize a single booking dict into the load_dataset() schema (1-row frame).
 
@@ -76,13 +87,22 @@ def predict_one(bundle: dict, booking: dict, scope_backend: str | None = None) -
     backend = scope_backend or os.environ.get("SCOPE_BACKEND", "deterministic")
     scope_df = _scope_df_for(df, backend)
     X, _ = build_features(df, scope_df=scope_df, census_df=bundle.get("census"))
-    X = align_to(X, bundle["feature_names"])
+    names = bundle["feature_names"]
+    nov = None
+    _sc, _nn = bundle.get("scaler"), bundle.get("novelty_nn")
+    if _sc is not None and _nn is not None:
+        base_names = [c for c in names if c != "novelty"]
+        Xb = align_to(X, base_names)
+        nov = float(_novelty(_sc.transform(Xb.values), _nn, bundle.get("novelty_k", 10))[0])
+        X = Xb.copy()
+        X["novelty"] = nov
+    X = align_to(X, names)
     lo, mid, hi = bundle["model"].predict(X, df["original_estimate"].values)[0]
     lo, mid, hi = float(lo), float(mid), float(hi)
     lo, hi = min(lo, mid), max(hi, mid)
     cal: ConfidenceCalibrator = bundle["calibrator"]
     in_prod = bool(df["in_production"].iloc[0])
-    conf, flags = cal.score(lo, hi, mid, in_prod, category=df["category"].iloc[0])
+    conf, flags = cal.score(lo, hi, mid, in_prod, category=df["category"].iloc[0], novelty=nov)
     rel_width = (hi - lo) / max(mid, 1.0)
     return {
         "estimate_lo": round(lo, 2), "estimate_hi": round(hi, 2),

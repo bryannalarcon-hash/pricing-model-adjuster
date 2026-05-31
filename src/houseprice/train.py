@@ -38,6 +38,30 @@ def _census():
     return pd.read_csv(p, dtype={"zip_code": str}) if os.path.exists(p) else None
 
 
+def _oof_bagged_with_novelty(lab, X_base, fp, oe, seeds=range(6), k=10, weight_power=0.5):
+    """Leakage-safe bagged OOF with a per-fold novelty feature: the novelty index is refit on each
+    train split only, so a held-out row's novelty never sees other held-out rows (JOURNAL R17)."""
+    from .eval import make_folds
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.neighbors import NearestNeighbors
+    from .predict import _novelty
+    acc = np.zeros((len(lab), 3))
+    seeds = list(seeds)
+    for s in seeds:
+        out = np.full((len(lab), 3), np.nan)
+        for tr, te in make_folds(lab, k=5, seed=s):
+            sc = StandardScaler().fit(X_base.iloc[tr].values)
+            nn = NearestNeighbors(n_neighbors=k + 1).fit(sc.transform(X_base.iloc[tr].values))
+            Xtr, Xte = X_base.iloc[tr].copy(), X_base.iloc[te].copy()
+            Xtr["novelty"] = _novelty(sc.transform(X_base.iloc[tr].values), nn, k)
+            Xte["novelty"] = _novelty(sc.transform(X_base.iloc[te].values), nn, k)
+            m = ConformalPriceModelV2(weight_power=weight_power, seed=s).fit(Xtr, fp[tr], oe[tr])
+            out[te] = m.predict(Xte, oe[te])
+        acc += out
+    acc /= len(seeds)
+    return acc[:, 0], acc[:, 1], acc[:, 2]
+
+
 def main(scope_backend_label: str = "deterministic"):
     os.makedirs(MODEL_DIR, exist_ok=True)
     os.makedirs(os.path.dirname(PRED_PATH), exist_ok=True)
@@ -52,24 +76,39 @@ def main(scope_backend_label: str = "deterministic"):
     lab_idx = df.index[df["is_labeled"]].tolist()
     scope_lab = scope_all.reindex(lab_idx).reset_index(drop=True) if scope_all is not None else None
 
-    # ---- Bagged OOF predictions for the labeled rows (honest, leakage-free, low-variance) ----
-    lo_oof, mid_oof, hi_oof = oof_predict_bagged(lab, build_features, scope_df=scope_lab,
-                                                 census_df=census, seeds=range(6))
+    # ---- base features; novelty is added leakage-safely (per fold for OOF, full index for serving) ----
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.neighbors import NearestNeighbors
+    from .predict import _novelty
+    NOVELTY_K = 10
+    X_base, base_names = build_features(lab, scope_df=scope_lab, census_df=census)
+    fp_lab = lab["final_price"].values
+    oe_lab = lab["original_estimate"].values
+
+    # ---- Bagged OOF (leakage-free) WITH a per-fold novelty feature (JOURNAL R16/R17) ----
+    lo_oof, mid_oof, hi_oof = _oof_bagged_with_novelty(lab, X_base, fp_lab, oe_lab,
+                                                       seeds=range(6), k=NOVELTY_K)
     base = ape(lab["original_estimate"], lab["final_price"])
     real_mask = base > REAL_THR
     blended = mape(mid_oof, lab["final_price"])
     real = mape(mid_oof[real_mask], lab["final_price"].values[real_mask])
     base_blended = baseline_blended(lab)
     base_real = 100 * base[real_mask].mean()
-    cov = float(((lab["final_price"].values >= lo_oof) & (lab["final_price"].values <= hi_oof)).mean())
+    cov = float(((fp_lab >= lo_oof) & (fp_lab <= hi_oof)).mean())
 
-    # ---- Full model on all labeled (deployed) ----
-    X_lab, names = build_features(lab, scope_df=scope_lab, census_df=census)
-    full = ConformalPriceModelV2(weight_power=0.5).fit(
-        X_lab, lab["final_price"].values, lab["original_estimate"].values)
+    # ---- Novelty index (fit on BASE features of all labeled) + full model trained WITH novelty ----
+    nov_scaler = StandardScaler().fit(X_base.values)
+    nov_nn = NearestNeighbors(n_neighbors=NOVELTY_K + 1).fit(nov_scaler.transform(X_base.values))
+    train_nov = _novelty(nov_scaler.transform(X_base.values), nov_nn, NOVELTY_K)
+    X_lab = X_base.copy()
+    X_lab["novelty"] = train_nov
+    names = list(X_lab.columns)
+    full = ConformalPriceModelV2(weight_power=0.5).fit(X_lab, fp_lab, oe_lab)
     observed_ranges = (df["estimate_hi"] - df["estimate_lo"]).dropna().values  # all observed ranges
     cat_counts = lab["category"].value_counts().to_dict()  # data-density for confidence
     cal = ConfidenceCalibrator.fit(lo_oof, hi_oof, mid_oof, observed_ranges, cat_counts=cat_counts)
+    cal.novelty_ref = float(np.median(train_nov))
+    cal.novelty_p95 = float(np.quantile(train_nov, 0.95))
     # Category price anchors (full-dataset original_estimate medians) so requests WITHOUT an
     # original_estimate (optional per Appendix A) still get a sane anchor to correct from.
     cat_anchor = df.groupby("category")["original_estimate"].median().dropna().to_dict()
@@ -79,6 +118,7 @@ def main(scope_backend_label: str = "deterministic"):
         "model_version": MODEL_VERSION, "scope_backend": scope_backend_label,
         "median_range": cal.median_range, "trained_rows": int(len(lab)),
         "cat_anchor": {k: float(v) for k, v in cat_anchor.items()}, "global_anchor": global_anchor,
+        "scaler": nov_scaler, "novelty_nn": nov_nn, "novelty_k": NOVELTY_K,
     }
     with open(os.path.join(MODEL_DIR, "bundle.pkl"), "wb") as fh:
         pickle.dump(bundle, fh)
@@ -88,19 +128,25 @@ def main(scope_backend_label: str = "deterministic"):
     for j, i in enumerate(lab_idx):
         all_lo[i], all_mid[i], all_hi[i] = lo_oof[j], mid_oof[j], hi_oof[j]
     unlab_idx = df.index[~df["is_labeled"]].tolist()
+    nov_all = np.full(len(df), np.nan)
+    for j, i in enumerate(lab_idx):
+        nov_all[i] = train_nov[j]
     if unlab_idx:
+        from .features import align_to
         sub = df.loc[unlab_idx].reset_index(drop=True)
         scope_un = scope_all.reindex(unlab_idx).reset_index(drop=True) if scope_all is not None else None
-        Xu, _ = build_features(sub, scope_df=scope_un, census_df=census)
-        from .features import align_to
+        Xu_base = align_to(build_features(sub, scope_df=scope_un, census_df=census)[0], base_names)
+        nov_u = _novelty(nov_scaler.transform(Xu_base.values), nov_nn, NOVELTY_K)
+        Xu = Xu_base.copy()
+        Xu["novelty"] = nov_u
         pu = full.predict(align_to(Xu, names), sub["original_estimate"].values)
         for k, i in enumerate(unlab_idx):
             all_lo[i], all_mid[i], all_hi[i] = pu[k, 0], pu[k, 1], pu[k, 2]
-
+            nov_all[i] = nov_u[k]
     confs = []
     for i in range(len(df)):
         c, _ = cal.score(all_lo[i], all_hi[i], all_mid[i], bool(df["in_production"].iloc[i]),
-                         category=df["category"].iloc[i])
+                         category=df["category"].iloc[i], novelty=nov_all[i])
         confs.append(c)
     out = pd.DataFrame({
         "job_id": df["job_id"], "service_category": df["category"],
