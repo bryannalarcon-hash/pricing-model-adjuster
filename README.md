@@ -56,7 +56,7 @@ Brings up the entire local stack with a single command. **It will:**
 
 **Safety:** `BOOKING_LIVE` is force-unset, so bookings are **simulated** — nothing is posted to the real staging endpoint. **Press Ctrl-C to stop both services.** The first run installs dependencies (~a minute); later runs start in seconds.
 
-> Prerequisites: Python 3.10+, and Ruby 3.0.2 with bundler. If `bundle` isn't on your `PATH`, the script falls back to the `~/.gem` convention used in the manual steps below.
+> Prerequisites: Python 3.10+, and Ruby 3.0.2 with **Bundler 2.5.23** (`gem install bundler -v 2.5.23` — it matches `Gemfile.lock`; the older Bundler that ships with Ruby 3.0's default RubyGems mis-resolves the `tsort` gem and breaks `bundle exec`). If `bundle` isn't on your `PATH`, the script falls back to the `~/.gem` convention used in the manual steps below.
 
 ### Manual / step-by-step
 
