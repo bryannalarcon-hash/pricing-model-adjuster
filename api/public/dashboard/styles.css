@@ -169,11 +169,12 @@ body {
 .ha-header-inner {
   max-width: 1180px;
   margin: 0 auto;
-  height: 62px;
+  min-height: 62px;
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 0 24px;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 9px 24px;
 }
 
 /* Logo */

@@ -22,6 +22,15 @@ Rails.application.configure do
   # Disable serving static files from `public/`, relying on NGINX/Apache to do so instead.
   # config.public_file_server.enabled = false
 
+  # The dashboard SPA assets (public/dashboard/*.js/.css/.html) change on every deploy
+  # but have no content-hash in their filenames (no build step). Without an explicit
+  # Cache-Control, browsers heuristically cache them and keep serving a stale app.js/
+  # styles.css after a deploy. Force a Last-Modified revalidation on every request so
+  # new deploys are picked up immediately (304 when unchanged — cheap).
+  config.public_file_server.headers = {
+    "Cache-Control" => "public, max-age=0, must-revalidate"
+  }
+
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
