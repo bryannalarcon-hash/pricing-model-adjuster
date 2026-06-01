@@ -15,4 +15,5 @@ end
 
 group :development do
   gem "dotenv-rails", "~> 3.1"
+  gem "rubocop", "~> 1.50", require: false # enforces the HouseAccount STYLE.md limits
 end

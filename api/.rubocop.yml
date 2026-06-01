@@ -1,0 +1,45 @@
+# HouseAccount Rails style enforcement (guidelines/STYLE.md).
+# The guide's measurable rules: files <= 50 lines and <= 100 chars/line,
+# "including blank lines and comments", enforced by RuboCop. We run with all cops
+# disabled by default and enable only those rules, so the report stays focused on
+# the style guide rather than RuboCop's full opinionated default set.
+#
+# RuboCop has no whole-file length cop; since we keep one class/module per file,
+# Metrics/ClassLength + ModuleLength (CountComments: true) are the faithful proxy
+# for the 50-line file limit. Generated/boilerplate scaffolding (Rails env config,
+# initializers, RSpec helpers, bin/) is excluded — it isn't hand-authored app code.
+# Request specs (spec/requests) are block-structured, so the file-length cops don't
+# apply to them; they are still held to the 100-char line limit.
+
+AllCops:
+  TargetRubyVersion: 3.0
+  DisabledByDefault: true
+  SuggestExtensions: false
+  Exclude:
+    - "bin/**/*"
+    - "config/boot.rb"
+    - "config/environment.rb"
+    - "config/environments/*.rb"
+    - "config/initializers/**/*"
+    - "config/puma.rb"
+    - "db/**/*"
+    - "spec/spec_helper.rb"
+    - "spec/rails_helper.rb"
+    - "vendor/**/*"
+    - "tmp/**/*"
+
+# <= 100 characters per line (comments + blanks included).
+Layout/LineLength:
+  Enabled: true
+  Max: 100
+
+# <= 50-line files, expressed as class/module body length including comments.
+Metrics/ClassLength:
+  Enabled: true
+  Max: 50
+  CountComments: true
+
+Metrics/ModuleLength:
+  Enabled: true
+  Max: 50
+  CountComments: true
