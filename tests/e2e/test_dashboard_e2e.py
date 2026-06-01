@@ -523,3 +523,197 @@ def test_ae4_contract_fidelity_ui_matches_api(page: Page):
     assert abs(rendered_mid - api_data["estimate_midpoint"]) < 1, (
         f"Rendered midpoint {rendered_mid} != API {api_data['estimate_midpoint']}"
     )
+
+
+# ===========================================================================
+# TEST 9: #website-autosend-toggle is present and visible on all panels
+# ===========================================================================
+
+def test_website_autosend_toggle_visible_all_panels(page: Page):
+    """#website-autosend-toggle is present and visible on Predict, Batch, Results, Conversions."""
+    for panel in ["predict", "batch", "results", "conversions"]:
+        page.click(f".tab-btn[data-panel='{panel}']")
+        page.wait_for_selector(f"#panel-{panel}:not(.hidden)", timeout=5000)
+        toggle = page.locator("#website-autosend-toggle")
+        assert toggle.count() == 1, f"#website-autosend-toggle not found on panel '{panel}'"
+        assert toggle.is_visible(), (
+            f"#website-autosend-toggle should be visible on panel '{panel}'"
+        )
+
+
+# ===========================================================================
+# TEST 10: Toggle OFF → Predict → send-booking-btn → Conversions row + SIMULATED badge
+# ===========================================================================
+
+def test_predict_manual_send_to_booking_and_conversions(page: Page):
+    """Toggle OFF + Predict → #send-booking-btn visible → click → 'Sent' state →
+    Conversions tab has >=1 row with a SIMULATED badge."""
+    # Ensure toggle is OFF (default)
+    toggle = page.locator("#website-autosend-toggle")
+    if toggle.get_attribute("aria-checked") == "true":
+        toggle.click()
+        page.wait_for_timeout(200)
+
+    assert toggle.get_attribute("aria-checked") == "false", (
+        "Website autosend toggle should be OFF"
+    )
+
+    # Navigate to Predict panel
+    page.click(".tab-btn[data-panel='predict']")
+    page.wait_for_selector("#panel-predict:not(.hidden)", timeout=3000)
+
+    # Load a sample booking
+    page.click("#load-sample-btn")
+    page.click(".ha-sample-item[data-sample='cleaning']")
+
+    # Run predict
+    with page.expect_response(lambda r: "/dashboard/predict" in r.url) as resp_info:
+        page.click("#predict-btn")
+
+    resp = resp_info.value
+    assert resp.status == 200, f"Predict returned {resp.status}"
+
+    page.wait_for_selector("#result-card:not(.hidden)", timeout=8000)
+
+    # Send button should be visible (toggle is OFF)
+    send_btn = page.locator("#send-booking-btn")
+    assert send_btn.is_visible(), "#send-booking-btn should be visible when toggle is OFF"
+
+    # Click the send button
+    with page.expect_response(lambda r: "/dashboard/booking" in r.url) as booking_resp_info:
+        send_btn.click()
+
+    booking_resp = booking_resp_info.value
+    assert booking_resp.status == 200, f"Booking send returned {booking_resp.status}"
+    booking_data = booking_resp.json()
+    assert booking_data.get("ok") is True, f"Booking response ok=False: {booking_data}"
+
+    # Button state should show "Sent"
+    page.wait_for_function(
+        "() => { const s = document.getElementById('send-booking-status'); "
+        "return s && !s.classList.contains('hidden') && s.textContent.includes('Sent'); }",
+        timeout=5000,
+    )
+    status_text = page.locator("#send-booking-status").inner_text()
+    assert "Sent" in status_text, f"Expected 'Sent' in status text, got: {status_text!r}"
+    # Always simulated (BOOKING_LIVE is off)
+    assert "simulated" in status_text.lower(), (
+        f"Expected 'simulated' in status text, got: {status_text!r}"
+    )
+
+    # Open Conversions tab
+    page.click(".tab-btn[data-panel='conversions']")
+    page.wait_for_selector("#panel-conversions:not(.hidden)", timeout=3000)
+
+    # Wait for conversions to load (table or empty state)
+    page.wait_for_function(
+        "() => { "
+        "  const tb = document.getElementById('conversions-tbody'); "
+        "  const em = document.getElementById('conversions-empty'); "
+        "  return (tb && tb.querySelectorAll('tr').length > 0) "
+        "      || (em && !em.classList.contains('hidden')); "
+        "}",
+        timeout=8000,
+    )
+
+    rows = page.locator("#conversions-tbody tr")
+    assert rows.count() >= 1, (
+        f"Expected >=1 conversion row, got {rows.count()}"
+    )
+
+    # At least one SIMULATED badge must be present
+    simulated_badges = page.locator(".ha-conv-badge--sim")
+    assert simulated_badges.count() >= 1, (
+        "Expected at least one SIMULATED badge in conversions table"
+    )
+
+
+# ===========================================================================
+# TEST 11: #settings-btn opens popover with #api-autosend-toggle; toggle persists
+# ===========================================================================
+
+def test_settings_popover_and_api_autosend_toggle(page: Page):
+    """#settings-btn opens #settings-popover containing #api-autosend-toggle.
+    Toggling it sends POST /dashboard/config; subsequent GET /dashboard/config reflects new value."""
+    settings_btn = page.locator("#settings-btn")
+    assert settings_btn.is_visible(), "#settings-btn should be visible"
+
+    # Popover should be hidden initially
+    popover = page.locator("#settings-popover")
+    assert "hidden" in (popover.get_attribute("class") or ""), (
+        "#settings-popover should start hidden"
+    )
+
+    # Click gear to open
+    settings_btn.click()
+    page.wait_for_timeout(200)
+    assert "hidden" not in (popover.get_attribute("class") or ""), (
+        "#settings-popover should be visible after clicking #settings-btn"
+    )
+
+    api_toggle = page.locator("#api-autosend-toggle")
+    assert api_toggle.is_visible(), "#api-autosend-toggle should be visible in popover"
+
+    # Get current state
+    current_state = api_toggle.get_attribute("aria-checked") == "true"
+    next_state = not current_state
+
+    # Toggle
+    with page.expect_response(lambda r: "/dashboard/config" in r.url and r.request.method == "POST") as config_resp_info:
+        api_toggle.click()
+
+    config_resp = config_resp_info.value
+    assert config_resp.status == 200, f"Config POST returned {config_resp.status}"
+    config_data = config_resp.json()
+    assert "api_auto_send" in config_data, f"Config response missing api_auto_send: {config_data}"
+    assert config_data["api_auto_send"] == next_state, (
+        f"Expected api_auto_send={next_state}, got {config_data['api_auto_send']}"
+    )
+
+    # Verify GET /dashboard/config reflects the new value
+    get_resp = requests.get(f"{BASE_URL}/dashboard/config")
+    assert get_resp.status_code == 200, f"GET /dashboard/config returned {get_resp.status_code}"
+    get_data = get_resp.json()
+    assert get_data.get("api_auto_send") == next_state, (
+        f"GET /dashboard/config should show api_auto_send={next_state}, got {get_data}"
+    )
+
+    # Restore original state to not pollute other tests
+    if next_state != current_state:
+        api_toggle.click()
+        page.wait_for_timeout(300)
+
+
+# ===========================================================================
+# TEST 12: Conversions tab renders the table (at least after a prior send)
+# ===========================================================================
+
+def test_conversions_tab_renders_table(page: Page):
+    """Conversions tab opens; #conversions-tbody renders (>=1 row or empty state shown)."""
+    page.click(".tab-btn[data-panel='conversions']")
+    page.wait_for_selector("#panel-conversions:not(.hidden)", timeout=3000)
+
+    # Wait for loading to complete
+    page.wait_for_function(
+        "() => document.getElementById('conversions-loading').classList.contains('hidden')",
+        timeout=8000,
+    )
+
+    # Either the table has rows or the empty state is shown
+    tbody = page.locator("#conversions-tbody")
+    empty = page.locator("#conversions-empty")
+
+    rows_count = tbody.locator("tr").count()
+    empty_visible = not ("hidden" in (empty.get_attribute("class") or ""))
+
+    assert rows_count >= 1 or empty_visible, (
+        "Conversions tab should show either rows or the empty state"
+    )
+
+    # If rows exist, verify each has 6 cells (time / source / category / midpoint / conf / mode)
+    if rows_count >= 1:
+        first_row = tbody.locator("tr").first
+        cells = first_row.locator("td")
+        assert cells.count() == 6, (
+            f"Expected 6 columns in conversions row, got {cells.count()}"
+        )

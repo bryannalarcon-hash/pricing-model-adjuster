@@ -1,6 +1,8 @@
 /* HouseAccount Pricing Dashboard — styles.css
    Design-token–driven stylesheet matching the hi-fi handoff spec exactly.
-   Collaborates with: index.html structure, app.js behavior. */
+   Collaborates with: index.html structure, app.js behavior.
+   New components: ha-switch (toggle), ha-autosend-wrap, ha-settings-wrap/popover,
+   ha-send-booking-wrap, ha-conv-badge, #panel-conversions table rows. */
 
 /* ============================================================
    DESIGN TOKENS
@@ -1491,6 +1493,199 @@ body {
 .ha-footer-link:hover { text-decoration: underline; }
 
 /* ============================================================
+   TOGGLE SWITCH (ha-switch)
+   ============================================================ */
+.ha-switch {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: 99px;
+  background: #ffffff22;
+  border: 1.5px solid #ffffff33;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .2s, border-color .2s;
+  padding: 0;
+}
+.ha-switch.on {
+  background: var(--amber);
+  border-color: var(--amber-deep);
+}
+.ha-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px #0003;
+  transition: left .2s cubic-bezier(.2,.8,.3,1);
+}
+.ha-switch.on .ha-switch-thumb { left: 18px; }
+
+/* Smaller variant for the settings popover */
+.ha-switch--sm { width: 34px; height: 20px; }
+.ha-switch--sm .ha-switch-thumb { width: 12px; height: 12px; }
+.ha-switch--sm.on .ha-switch-thumb { left: 16px; }
+
+/* ============================================================
+   WEBSITE AUTOSEND CONTROL (header, Control 1)
+   ============================================================ */
+.ha-autosend-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: #ffffff10;
+  border: 1px solid #ffffff18;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.ha-autosend-label-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.ha-autosend-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #c8d8e0;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+/* ============================================================
+   SETTINGS BUTTON + POPOVER (header, Control 2)
+   ============================================================ */
+.ha-settings-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ha-settings-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: #a8bcc7;
+  border-color: #ffffff22;
+}
+.ha-settings-btn:hover:not(:disabled) {
+  color: #fff;
+  background: #ffffff18;
+}
+
+.ha-settings-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 80;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+  padding: 16px;
+  width: 310px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ha-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ha-settings-label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ha-settings-label {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.ha-settings-sublabel {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.ha-settings-note {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.ha-settings-note code {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  background: var(--bg-soft);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   SEND TO BOOKING FLOW (predict result card)
+   ============================================================ */
+.ha-send-booking-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.ha-send-status {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ok);
+}
+
+/* ============================================================
+   CONVERSIONS TABLE BADGES
+   ============================================================ */
+.ha-conv-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.ha-conv-badge--live {
+  color: #1a7a55;
+  background: var(--ok-tint);
+  border: 1px solid #b3dece;
+}
+
+.ha-conv-badge--sim {
+  color: var(--muted);
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+}
+
+.ha-conv-source {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--amber-tint);
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: capitalize;
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 900px) {
@@ -1501,9 +1696,11 @@ body {
 }
 
 @media (max-width: 640px) {
-  .ha-header-inner { gap: 10px; padding: 0 14px; }
-  .ha-logo-word    { display: none; }
-  .ha-main         { padding: 16px 14px 10px; }
-  .ha-tabnav       { margin-left: 4px; }
-  .ha-drawer       { width: 100%; }
+  .ha-header-inner   { gap: 10px; padding: 0 14px; }
+  .ha-logo-word      { display: none; }
+  .ha-main           { padding: 16px 14px 10px; }
+  .ha-tabnav         { margin-left: 4px; }
+  .ha-drawer         { width: 100%; }
+  .ha-autosend-label { display: none; }
+  .ha-autosend-wrap  { padding: 5px 7px; }
 }

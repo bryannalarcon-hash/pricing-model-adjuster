@@ -75,3 +75,7 @@ handoff/
 
 # Design export drops (raw Claude Design zips)
 *.zip
+
+# Booking feature runtime state (local-only)
+data/conversions.jsonl
+data/booking_config.json

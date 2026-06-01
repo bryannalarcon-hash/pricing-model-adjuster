@@ -94,6 +94,7 @@ Copy `.env.example` → `.env`. Two of these are **issued by HouseAccount** and 
 | `GAUNTLET_PRICING_SECRET` | You (any non-empty string locally) | Bearer token for `POST /pricing-estimate` (Appendix A auth). The same value is also injected server-side by the dashboard proxy. |
 | `HOUSEACCOUNT_SIGNING_KEY` | **HouseAccount-issued** | HMAC key for signing requests to the staging booking API (`App-Signature = HMAC-SHA256(timestamp + "." + body)`). Required by `integration/sign_and_post.py`. **Not committed — request it from HouseAccount.** |
 | `HOUSEACCOUNT_APP_NAME` | Pre-set to `gauntlet` | Partner identity sent as the `App-Name` header to staging. Change only if HouseAccount issues a different name. |
+| `BOOKING_LIVE` | You (demo only) | Gates the dashboard's "send to booking flow". When `1`, sends are **real** HMAC-signed tagged bookings POSTed to HouseAccount staging. **Default off → every send is simulated and recorded locally only** (no staging writes), so tests and casual runs never create bookings. Set `1` only for a live demo. |
 | `VAST_API_KEY` | Optional | Unused at runtime; present for optional GPU experiments. |
 
 The pricing model + dashboard run with only `GAUNTLET_PRICING_SECRET`. `HOUSEACCOUNT_SIGNING_KEY` + `HOUSEACCOUNT_APP_NAME` are needed **only** to post bookings to the HouseAccount staging endpoint via `integration/sign_and_post.py`.

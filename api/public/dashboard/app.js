@@ -2,6 +2,9 @@
 // Vanilla JS SPA: wires the design-token UI to the real same-origin API.
 // No framework, no build step, no secrets in client code (proxy injects auth).
 // Collaborators: index.html (structure), styles.css (tokens/components).
+// Features: Predict / Batch / Results / Conversions panels.
+// Booking flow: Control 1 (#website-autosend-toggle) for dashboard sends;
+//               Control 2 (#api-autosend-toggle in #settings-popover) for API calls.
 
 'use strict';
 
@@ -279,9 +282,10 @@ function renderFlagChips(container, flags, tone) {
    ============================================================ */
 
 const PANEL_TITLES = {
-  predict: ['Predict', 'Paste or compose one booking, get one estimate with a confidence interval.'],
-  batch:   ['Batch',   'Upload a CSV of bookings, convert to the API shape, and score them in bulk.'],
-  results: ['Results', 'How the model performs against the previous pricing baseline.']
+  predict:     ['Predict',     'Paste or compose one booking, get one estimate with a confidence interval.'],
+  batch:       ['Batch',       'Upload a CSV of bookings, convert to the API shape, and score them in bulk.'],
+  results:     ['Results',     'How the model performs against the previous pricing baseline.'],
+  conversions: ['Conversions', 'Booking flow sends from this dashboard and programmatic API calls.']
 };
 
 let activeTab = 'predict';
@@ -311,6 +315,9 @@ function initTabs() {
 
       if (target === 'results') {
         loadResults();
+      }
+      if (target === 'conversions') {
+        loadConversions();
       }
     });
   });
@@ -541,6 +548,10 @@ function runPredict() {
         showPredictState('empty');
       } else {
         renderResultCard(resp.body, payload);
+        // Control 1: if website auto-send is ON, automatically POST to booking flow
+        if (websiteAutosendOn) {
+          sendToBookingFlow({ source: 'website', payload: payload, result: resp.body });
+        }
       }
     })
     .catch(function(err) {
@@ -640,6 +651,43 @@ function renderResultCard(data, submittedPayload) {
   // Footer
   el('result-model-version').textContent = data.model_version || modelVersion;
   el('result-job-id').textContent = data.job_id || '';
+
+  // Send button: show when website auto-send is OFF (manual mode)
+  var sendWrap = el('send-booking-wrap');
+  var sendBtn  = el('send-booking-btn');
+  var sendStatus = el('send-booking-status');
+
+  if (!websiteAutosendOn) {
+    sendBtn.disabled = false;
+    sendBtn.textContent = '';
+    sendBtn.innerHTML = 'Send to booking flow <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+    hide(sendStatus);
+    show(sendWrap);
+
+    // Wire up send button for this prediction
+    var capturedPayload = submittedPayload;
+    var capturedResult  = data;
+    sendBtn.onclick = function() {
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sending…';
+      sendToBookingFlow({ source: 'manual', payload: capturedPayload, result: capturedResult })
+        .then(function(resp) {
+          var msg = resp.live
+            ? 'Sent ✓ — live (HTTP ' + resp.status + ')'
+            : 'Sent ✓ — simulated';
+          sendStatus.textContent = msg;
+          show(sendStatus);
+          sendBtn.style.display = 'none';
+          loadConversionsIfActive();
+        })
+        .catch(function() {
+          sendBtn.disabled = false;
+          sendBtn.textContent = 'Retry send';
+        });
+    };
+  } else {
+    hide(sendWrap);
+  }
 
   predictPhase = 'done';
   showPredictState('done');
@@ -837,6 +885,13 @@ function runBatch() {
     show(el('batch-replace-btn'));
     if (scored > 0) show(el('batch-export-btn'));
 
+    // Show "Send all scored" when website auto-send is OFF and there are scored rows
+    if (!websiteAutosendOn && scored > 0) {
+      var sendAllBtn = el('batch-send-all-btn');
+      sendAllBtn.textContent = 'Send all scored (' + scored + ')';
+      show(sendAllBtn);
+    }
+
     pushToast({
       tone: skipped > 0 ? 'amber' : 'ok',
       title: 'Batch complete',
@@ -882,6 +937,10 @@ function runBatch() {
           b.estimate_hi        = Number(b.estimate_hi);
           b.confidence         = Number(b.confidence);
           entry = { row: row, result: b };
+          // Control 1: auto-send each scored row when website auto-send is ON
+          if (websiteAutosendOn) {
+            sendToBookingFlow({ source: 'website', payload: rowToPayload(row), result: b });
+          }
         }
         accum[i] = entry;
         appendRow(entry, i);
@@ -1444,6 +1503,267 @@ function renderPredictionsTable(rows) {
 }
 
 /* ============================================================
+   BOOKING FLOW — Control 1: Website → Booking
+   ============================================================ */
+
+/** Global state: whether website auto-send is currently enabled. */
+var websiteAutosendOn = false;
+
+/**
+ * sendToBookingFlow — POST to /dashboard/booking.
+ * Returns a Promise resolving to the server response JSON.
+ * source: "website" | "manual"
+ */
+function sendToBookingFlow(opts) {
+  return fetch('/dashboard/booking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      source:  opts.source  || 'manual',
+      payload: opts.payload || {},
+      result:  opts.result  || {}
+    })
+  }).then(function(res) {
+    return res.json();
+  });
+}
+
+/** Reload conversions only when the tab is active. */
+function loadConversionsIfActive() {
+  if (activeTab === 'conversions') loadConversions();
+}
+
+function initWebsiteAutosend() {
+  var toggle = el('website-autosend-toggle');
+  if (!toggle) return;
+
+  toggle.addEventListener('click', function() {
+    websiteAutosendOn = !websiteAutosendOn;
+    toggle.setAttribute('aria-checked', String(websiteAutosendOn));
+    if (websiteAutosendOn) {
+      toggle.classList.add('on');
+    } else {
+      toggle.classList.remove('on');
+    }
+
+    // When toggling off → show send button if result card is visible; hide send-all
+    // When toggling on  → hide manual send buttons
+    var resultCard  = el('result-card');
+    var sendWrap    = el('send-booking-wrap');
+    var sendAllBtn  = el('batch-send-all-btn');
+
+    if (websiteAutosendOn) {
+      hide(sendWrap);
+      hide(sendAllBtn);
+    } else {
+      // Only show if result card is visible (prediction exists)
+      if (resultCard && !resultCard.classList.contains('hidden')) {
+        show(sendWrap);
+      }
+    }
+  });
+}
+
+/* ============================================================
+   SETTINGS POPOVER — Control 2: API → Booking
+   ============================================================ */
+
+function initSettings() {
+  var settingsBtn   = el('settings-btn');
+  var popover       = el('settings-popover');
+  var apiToggle     = el('api-autosend-toggle');
+
+  if (!settingsBtn || !popover) return;
+
+  // Fetch initial config state
+  fetch('/dashboard/config')
+    .then(function(res) { return res.json(); })
+    .then(function(cfg) {
+      var on = !!cfg.api_auto_send;
+      apiToggle.setAttribute('aria-checked', String(on));
+      if (on) {
+        apiToggle.classList.add('on');
+      } else {
+        apiToggle.classList.remove('on');
+      }
+    })
+    .catch(function() { /* best-effort */ });
+
+  // Gear button opens/closes popover
+  settingsBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    popover.classList.toggle('hidden');
+  });
+
+  // Close on outside click
+  document.addEventListener('pointerdown', function(e) {
+    var wrap = el('settings-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      hide(popover);
+    }
+  });
+
+  // API auto-send toggle
+  apiToggle.addEventListener('click', function() {
+    var current = apiToggle.getAttribute('aria-checked') === 'true';
+    var next    = !current;
+    apiToggle.setAttribute('aria-checked', String(next));
+    if (next) {
+      apiToggle.classList.add('on');
+    } else {
+      apiToggle.classList.remove('on');
+    }
+
+    fetch('/dashboard/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ api_auto_send: next })
+    })
+      .then(function(res) { return res.json(); })
+      .then(function(cfg) {
+        var confirmed = !!cfg.api_auto_send;
+        apiToggle.setAttribute('aria-checked', String(confirmed));
+        if (confirmed) {
+          apiToggle.classList.add('on');
+        } else {
+          apiToggle.classList.remove('on');
+        }
+      })
+      .catch(function() {
+        // Revert on error
+        apiToggle.setAttribute('aria-checked', String(current));
+        if (current) apiToggle.classList.add('on');
+        else apiToggle.classList.remove('on');
+        pushToast({ tone: 'bad', title: 'Config update failed', body: 'Could not save API auto-send setting.' });
+      });
+  });
+}
+
+/* ============================================================
+   BATCH SEND-ALL BUTTON
+   ============================================================ */
+
+function initBatchSendAll() {
+  var btn = el('batch-send-all-btn');
+  if (!btn) return;
+
+  btn.addEventListener('click', function() {
+    var scored = batchState.results.filter(function(e) { return e && e.result; });
+    if (!scored.length) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Sending 0 / ' + scored.length + '…';
+
+    var sent = 0;
+    var promises = scored.map(function(entry) {
+      return sendToBookingFlow({
+        source:  'manual',
+        payload: rowToPayload(entry.row),
+        result:  entry.result
+      }).then(function() {
+        sent++;
+        btn.textContent = 'Sending ' + sent + ' / ' + scored.length + '…';
+      }).catch(function() {
+        sent++;
+      });
+    });
+
+    Promise.all(promises).then(function() {
+      btn.textContent = 'Sent ' + sent + ' ✓';
+      pushToast({ tone: 'ok', title: 'Batch sent', body: sent + ' row(s) sent to booking flow.' });
+      loadConversionsIfActive();
+    });
+  });
+}
+
+/* ============================================================
+   CONVERSIONS PANEL (4th tab)
+   ============================================================ */
+
+/**
+ * loadConversions — GET /dashboard/conversions and render the table.
+ * Called when the Conversions tab is opened or after any manual send.
+ */
+function loadConversions() {
+  var loading  = el('conversions-loading');
+  var empty    = el('conversions-empty');
+  var tableWrap = el('conversions-table-wrap');
+  var tbody    = el('conversions-tbody');
+
+  if (!loading || !tbody) return;
+
+  hide(empty);
+  hide(tableWrap);
+  show(loading);
+
+  fetch('/dashboard/conversions')
+    .then(function(res) {
+      if (!res.ok) throw new Error('status ' + res.status);
+      return res.json();
+    })
+    .then(function(rows) {
+      hide(loading);
+      tbody.innerHTML = '';
+
+      if (!rows || !rows.length) {
+        show(empty);
+        return;
+      }
+
+      show(tableWrap);
+      rows.forEach(function(row) {
+        var tr = document.createElement('tr');
+        tr.className = 'ha-tr';
+
+        // Time: recorded_at (ISO string), show as local time
+        var timeStr = '—';
+        if (row.recorded_at) {
+          try {
+            var d = new Date(row.recorded_at);
+            timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          } catch (_) { timeStr = String(row.recorded_at).substring(0, 19); }
+        }
+
+        // Source badge
+        var srcLabel = escHtml(row.source || 'manual');
+
+        // Category / job_id
+        var cat   = escHtml(row.category || row.service_category || '—');
+        var jobId = escHtml((row.job_id || '').substring(0, 18));
+
+        // Midpoint
+        var midStr = row.midpoint ? usd(row.midpoint) : '—';
+
+        // Confidence
+        var confPct = row.confidence ? Math.round(Number(row.confidence) * 100) + '%' : '—';
+
+        // Live vs Simulated badge
+        var isLive = row.live === true;
+        var badge  = isLive
+          ? '<span class="ha-conv-badge ha-conv-badge--live">LIVE</span>'
+          : '<span class="ha-conv-badge ha-conv-badge--sim">SIMULATED</span>';
+
+        tr.innerHTML =
+          '<td class="ha-mono" style="font-size:12px;color:var(--faint);white-space:nowrap">' + timeStr + '</td>' +
+          '<td><span class="ha-conv-source">' + srcLabel + '</span></td>' +
+          '<td>' +
+            '<div class="ha-td-cat">' + cat + '</div>' +
+            '<div class="ha-td-subdesc ha-mono">' + jobId + '</div>' +
+          '</td>' +
+          '<td style="text-align:right" class="ha-num">' + midStr + '</td>' +
+          '<td class="ha-num" style="font-weight:700">' + confPct + '</td>' +
+          '<td>' + badge + '</td>';
+
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(function() {
+      hide(loading);
+      show(empty);
+    });
+}
+
+/* ============================================================
    INIT
    ============================================================ */
 
@@ -1451,5 +1771,8 @@ document.addEventListener('DOMContentLoaded', function() {
   initTabs();
   initPredict();
   initBatch();
+  initWebsiteAutosend();
+  initSettings();
+  initBatchSendAll();
   probeApiStatus();
 });

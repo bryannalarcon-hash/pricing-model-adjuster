@@ -21,4 +21,10 @@ Rails.application.routes.draw do
   post "/dashboard/predict"     => "dashboard#predict"
   get  "/dashboard/metrics"     => "dashboard#metrics"
   get  "/dashboard/predictions" => "dashboard#predictions"
+
+  # Booking + conversion + config routes
+  post "/dashboard/booking"     => "booking#create"
+  get  "/dashboard/conversions" => "booking#index"
+  get  "/dashboard/config"      => "booking#config"
+  post "/dashboard/config"      => "booking#config_update"
 end
