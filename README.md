@@ -170,6 +170,17 @@ The same endpoint is aliased at `POST /.netlify/functions/pricing-estimate`.
 | 405 | `{"error":"Method not allowed"}` | Non-POST request |
 | 500 | `{"error":"inference unavailable"}` | Sidecar unreachable or timed out |
 
+## Deliverables
+
+| Deliverable | Where it lives in this repo |
+|---|---|
+| **Source code** | **Model** — `src/houseprice/` (`train.py`, `model_v2.py`, `confidence.py`, `predict.py`, `infer_service.py`, `data_load.py`, `features.py`, `scope.py`, …) + `model/bundle.pkl`. **Rails API + dashboard** — `api/app/**` (controllers, services, concerns), `api/config/**`, `api/public/dashboard/{index.html,app.js,styles.css}`. **Integration** — `integration/sign_and_post.py`. **Build** — `Dockerfile`, `api/Dockerfile`, `requirements.txt`. **Research/experiments** — `experiments/*.py` |
+| **Technical documentation** | `MODELING.md` (model card: data, training, confidence) · `JOURNAL.md` (research journal) · `ASSUMPTIONS.md` · `docs/BUILD_PLAN.md` · `docs/design/` (brief + screenshots) · this `README.md` |
+| **Demo video** | Recorded separately — not in the repo |
+| **Deployment guide** | `docs/DEPLOYMENT.md` · `scripts/up.sh` (one-command bring-up) · the [Quickstart](#quickstart) above · `Dockerfile` / `api/Dockerfile` · `.env.example` |
+| **Test results** | **Tests** — `tests/` (21 pytest + 14 Playwright e2e), `api/spec/requests/` (42 RSpec). **Outputs** — `reports/eval_report.md`, `reports/eval_metrics.json`, `predictions/predictions.csv` (leakage-free OOF) |
+| **AI usage log** | `AI_USAGE.md` (logging tooling: `scripts/prompt_logger.py`) |
+
 ## Project layout
 
 ```
