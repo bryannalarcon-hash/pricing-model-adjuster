@@ -93,6 +93,19 @@ RSpec.describe "Booking routes", type: :request do
           req.headers["App-Timestamp"].present?
         }
     end
+
+    it "marks a rejected live send as failed (non-2xx -> ok:false)" do
+      stub_request(:post, /pro\.houseparty\.dev\/api\/bookings/)
+        .to_return(status: 401, body: "unauthorized")
+
+      post "/dashboard/booking", params: valid_payload.to_json, headers: json_headers
+
+      body = JSON.parse(response.body)
+      expect(body["live"]).to be true
+      expect(body["status"]).to eq(401)
+      expect(body["ok"]).to be false   # the SEND failed, even though the request was handled
+      expect(body["conversion"]).to include("status" => 401, "live" => true)
+    end
   end
 
   # -----------------------------------------------------------------------

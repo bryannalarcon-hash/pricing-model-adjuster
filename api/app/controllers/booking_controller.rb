@@ -13,7 +13,9 @@ class BookingController < ApplicationController
     sent    = BookingClient.send_booking(booking)
     entry   = ConversionStore.record_send(source: raw["source"] || "manual",
                                           payload: raw["payload"] || {}, result: result, sent: sent)
-    render json: { ok: true, live: sent[:live], status: sent[:status], conversion: entry }
+    # ok = send succeeded: simulated is always ok; a live send only if staging returned 2xx.
+    ok = !sent[:live] || (200..299).cover?(sent[:status].to_i)
+    render json: { ok: ok, live: sent[:live], status: sent[:status], conversion: entry }
   rescue JSON::ParserError
     render json: { error: "Malformed JSON" }, status: :bad_request
   end

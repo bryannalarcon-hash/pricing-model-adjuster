@@ -673,9 +673,20 @@ function renderResultCard(data, submittedPayload) {
     sendBtn.textContent = 'Sending…';
     sendToBookingFlow({ source: 'manual', payload: capturedPayload, result: capturedResult })
       .then(function(resp) {
-        sendStatus.textContent = resp.live
-          ? 'Sent ✓ — live (HTTP ' + resp.status + ')'
-          : 'Sent ✓ — simulated';
+        // A live send only "succeeded" if staging accepted it (resp.ok); a rejected
+        // live send (e.g. HTTP 401 — bad/absent signing key) is a FAILED state, not a tick.
+        if (!resp.live) {
+          sendStatus.textContent = 'Sent ✓ — simulated';
+          sendStatus.style.color = '';
+        } else if (resp.ok) {
+          sendStatus.textContent = 'Sent ✓ — live (HTTP ' + resp.status + ')';
+          sendStatus.style.color = 'var(--ok-text, #1a7a55)';
+        } else {
+          sendStatus.textContent = 'Failed ✗ — live send rejected (HTTP ' + resp.status + ')';
+          sendStatus.style.color = 'var(--bad-text, #b42318)';
+          pushToast({ tone: 'bad', title: 'Booking send failed',
+            body: 'Staging rejected the booking (HTTP ' + resp.status + '). Check HOUSEACCOUNT_SIGNING_KEY.' });
+        }
         show(sendStatus);
         sendBtn.disabled = false;     // keep it available for a re-send (never inline-hidden)
         sendBtn.innerHTML = sendLabel;
@@ -1764,11 +1775,15 @@ function loadConversions() {
         // Confidence
         var confPct = row.confidence ? Math.round(Number(row.confidence) * 100) + '%' : '—';
 
-        // Live vs Simulated badge
+        // Live / Simulated / Failed badge. A live send is only LIVE if staging accepted it
+        // (2xx); a non-2xx (e.g. 401 — rejected) is a FAILED send, not a success.
         var isLive = row.live === true;
-        var badge  = isLive
-          ? '<span class="ha-conv-badge ha-conv-badge--live">LIVE</span>'
-          : '<span class="ha-conv-badge ha-conv-badge--sim">SIMULATED</span>';
+        var statusOk = Number(row.status) >= 200 && Number(row.status) < 300;
+        var badge = (isLive && !statusOk)
+          ? '<span class="ha-conv-badge ha-conv-badge--failed">FAILED</span>'
+          : isLive
+            ? '<span class="ha-conv-badge ha-conv-badge--live">LIVE</span>'
+            : '<span class="ha-conv-badge ha-conv-badge--sim">SIMULATED</span>';
 
         tr.innerHTML =
           '<td class="ha-mono" style="font-size:12px;color:var(--faint);white-space:nowrap">' + timeStr + '</td>' +
