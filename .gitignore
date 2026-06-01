@@ -89,3 +89,13 @@ api/vendor/bundle/
 
 # Dashboard demo reference data shipped inside the rails image (build context = api/)
 !api/dashboard_data/predictions.csv
+
+# Demo recording artifacts — local-only prep for the demo video (script, slides, captures).
+# These are not repo deliverables; the demo video itself is recorded/submitted separately.
+demo/
+*.mp4
+*.mov
+*.webm
+*.mkv
+*.m4a
+*.gif
