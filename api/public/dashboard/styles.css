@@ -968,6 +968,7 @@ body {
 .ha-toolbar-actions {
   display: flex;
   gap: 9px;
+  flex-wrap: wrap;
 }
 
 /* JSON preview */
@@ -1858,4 +1859,22 @@ body {
   .ha-bar-rect       { width: 40px; }
   .ha-chart-header   { flex-wrap: wrap; }
   .ha-chart-expand-label { display: none; }
+
+  /* Batch toolbar: groups stack instead of forcing the buttons off-screen. */
+  .ha-batch-toolbar  { gap: 12px; }
+  .ha-toolbar-left   { min-width: 0; width: 100%; }
+  .ha-progress-wrap  { min-width: 0; width: 100%; }
+  .ha-toolbar-actions { width: 100%; }
+  .ha-toolbar-actions .ha-btn { flex: 1 1 auto; }
+  .ha-preview-header { flex-wrap: wrap; gap: 8px; }
+
+  /* Batch results table fits the screen: drop the secondary description line
+     (full detail is in the row drawer) and tighten cells so all five columns
+     fit without a sideways scroll. */
+  #batch-tbody .ha-td-subdesc { display: none; }
+  #batch-table-wrap .ha-table td,
+  #batch-table-wrap .ha-table th { padding: 9px 8px; }
+  #batch-table-wrap .ha-ring-bar { min-width: 34px; }
+  #batch-table-wrap .ha-td-conf-wrap { gap: 6px; }
+  #batch-table-wrap .ha-td-conf-pct { width: 30px; }
 }
