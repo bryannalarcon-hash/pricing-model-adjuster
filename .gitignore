@@ -79,3 +79,7 @@ handoff/
 # Booking feature runtime state (local-only)
 data/conversions.jsonl
 data/booking_config.json
+
+# Claude Code local settings (personal allowlist)
+.claude/settings.local.json
+logs/
