@@ -266,6 +266,27 @@ general-purpose in-context prior can't exploit the residual-on-estimate structur
 LightGBM is tuned for. **LightGBM v2 stays.** Pipeline: `experiments/tabpfn_eval.py`.
 **This closes the last open lever (data AND architecture). v2.1.0 is final.**
 
+### R22 — Mutation engine: 10x jittered oversampling (distribution-preserving) — REJECTED
+Tested the "even out by 10x-ing every row, keeping the category distribution" idea via a
+mutation engine (`experiments/mutation_eval.py`): each labeled row replicated 10x, the 9 extra
+copies given ~5% independent lognormal jitter on the price fields (original_estimate, lo/hi,
+final_price); category/zip/description untouched. **Leakage-safe**: only each fold's TRAIN split
+is mutated; the held-out test rows are the original 411, never mutated.
+| condition | blended | real-only |
+|---|---|---|
+| baseline (no aug) | 10.65% | 26.19% |
+| + mutation 10x | **14.36%** | **35.60%** |
+**Worse by −3.72pp blended / −9.40pp real-only**, and seed-std jumped 0.16→1.84 (less stable).
+On the dashboard samples, confidence did NOT even up — it **crashed on the well-supported
+categories** (Cleaning 0.79→0.29, HVAC 0.61→0.29) and only nudged the sparse Plumbing ones
+(0.19→0.36). Root cause: jittered duplicates add **no new information** but do introduce a
+train/serve mismatch — the conformal intervals widen (jittered residuals = noise) and the
+novelty index/calibration is built on dense near-duplicate clusters, so the real (un-mutated)
+bookings look more atypical and get wider intervals → lower confidence. Confirms R14–R20's
+lesson at the data-shape level: you cannot manufacture signal for sparse categories by
+replicating/jittering — only real marketplace labels help. **Deployed model unchanged
+(v2.1.0).** The sparse-category low confidence is correct/honest (the brief requires it).
+
 ## Final architecture (deployed, gauntlet-v2.1.0)
 Residual target log(final/original) · LightGBM **L2 + MAPE-aligned weight 1/√final_price** point
 model on ALL data · **normalized cross-conformal** quantile intervals (coverage ~83%) · bagged 6-seed
