@@ -139,6 +139,8 @@ def test_page_load_header_status_and_tabs(page: Page):
 def test_predict_happy_path(page: Page):
     """Load sample → Predict → result card shows lo/midpoint/hi, confidence, uncertainties."""
     page.click("#load-sample-btn")
+    # Load sample opens a 4-item dropdown; pick the first (Plumbing · water heater)
+    page.click(".ha-sample-item[data-sample='plumbing']")
 
     # Verify textarea is populated
     raw = page.eval_on_selector("#booking-input", "el => el.value")
@@ -192,8 +194,8 @@ def test_predict_happy_path(page: Page):
     assert not uncertainties_section.get_attribute("class", timeout=2000).__contains__("hidden"), (
         "Uncertainties section should be visible"
     )
-    uncertainty_items = page.locator("#uncertainties-list li")
-    assert uncertainty_items.count() > 0, "At least one uncertainty item expected"
+    uncertainty_items = page.locator("#uncertainties-list .ha-flag")
+    assert uncertainty_items.count() > 0, "At least one uncertainty chip expected"
 
 
 # ===========================================================================
@@ -334,6 +336,11 @@ def test_batch_csv_upload_and_run(page: Page, browser):
         # Run batch — wait for table to appear
         run_btn.click()
         page.wait_for_selector("#batch-table-wrap:not(.hidden)", timeout=30000)
+        # Rows stream in asynchronously as each prediction resolves — wait for all 5
+        page.wait_for_function(
+            "() => document.querySelectorAll('#batch-tbody tr').length === 5",
+            timeout=30000,
+        )
 
         # Count rows
         rows = page.locator("#batch-tbody tr")
@@ -441,13 +448,13 @@ def test_results_panel_metrics_and_predictions(page: Page):
 
     # Coverage pass check — 82.7 >= 80 so should pass
     cov_check_text = page.locator("#sc-cov-check").inner_text()
-    assert "Pass" in cov_check_text, (
+    assert "pass" in cov_check_text.lower(), (
         f"Coverage {cov_val}% >= 80% should show Pass, got: {cov_check_text!r}"
     )
 
     # Blended MAPE pass check — 10.49 < 11.56 baseline → Pass
     blended_check_text = page.locator("#sc-blended-check").inner_text()
-    assert "Pass" in blended_check_text, (
+    assert "pass" in blended_check_text.lower(), (
         f"Blended MAPE {blended_val}% < baseline {api_metrics['baseline_blended']}% should Pass, "
         f"got: {blended_check_text!r}"
     )

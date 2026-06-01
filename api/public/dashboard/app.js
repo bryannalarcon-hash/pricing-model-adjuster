@@ -1,345 +1,403 @@
-/**
- * HouseAccount Pricing Dashboard — app.js
- * Vanilla JS, no external deps, no secrets.
- */
+// HouseAccount Pricing Dashboard — app.js
+// Vanilla JS SPA: wires the design-token UI to the real same-origin API.
+// No framework, no build step, no secrets in client code (proxy injects auth).
+// Collaborators: index.html (structure), styles.css (tokens/components).
 
-/* ======================================================
-   CONSTANTS & STATE
-   ====================================================== */
+'use strict';
+
+/* ============================================================
+   CONSTANTS
+   ============================================================ */
+
 const CONCURRENCY_CAP = 4;
 
-const SAMPLE_BOOKING = {
-  job_id: "demo-plumbing-001",
-  service_category: "Plumbing",
-  zip_code: "78704",
-  job_description:
-    "50-gallon gas water heater stopped working, pilot won't stay lit. Need replacement.",
-  original_estimate: 1850
+const REQUIRED_FIELDS = ['job_id', 'service_category', 'zip_code', 'job_description'];
+
+const SAMPLES = {
+  plumbing: {
+    name: 'Plumbing · water heater',
+    payload: {
+      job_id: 'wh-90b3f1',
+      service_category: 'Plumbing',
+      service_subtype: 'Water Heater Replacement',
+      zip_code: '78704',
+      job_description: '50-gal gas water heater won\'t stay lit — needs replacement.',
+      deadline: 'Within 1-2 weeks',
+      booking_month: '2026-05',
+      original_estimate: 1850
+    }
+  },
+  small: {
+    name: 'Plumbing · small fix',
+    payload: {
+      job_id: 'pl-2271aa',
+      service_category: 'Plumbing',
+      service_subtype: 'Plumbing',
+      zip_code: '33484',
+      job_description: 'Replace kitchen sink shutoff valve (you supply valve)',
+      deadline: 'As soon as possible',
+      booking_month: '2026-04',
+      original_estimate: 150
+    }
+  },
+  remodel: {
+    name: 'Remodel · large (low conf)',
+    payload: {
+      job_id: 'rm-77c0e2',
+      service_category: 'Remodeling',
+      service_subtype: 'Kitchen remodel',
+      zip_code: '75062',
+      job_description: 'Full kitchen remodel — cabinets, counters, flooring, some plumbing',
+      deadline: 'I\'m flexible',
+      booking_month: '2026-05',
+      original_estimate: 7200
+    }
+  },
+  auto: {
+    name: 'Auto · out-of-category',
+    payload: {
+      job_id: 'au-19fd3b',
+      service_category: 'Auto',
+      service_subtype: 'Mobile detailing',
+      zip_code: '33324',
+      job_description: 'Full interior + exterior detail, midsize SUV',
+      deadline: 'I\'m flexible',
+      booking_month: '2026-04',
+      original_estimate: 280
+    }
+  }
 };
 
-/* ======================================================
-   UTILITY HELPERS
-   ====================================================== */
+const SAMPLE_CSV = `job_id,service_category,service_subtype,zip_code,booking_month,job_description,original_estimate,deadline
+b-1001,Plumbing,Water Heater Replacement,78704,2026-05,50-gal gas water heater replacement,1850,Within 1-2 weeks
+b-1002,Pest Control,Bed bugs,33324,2026-04,Bed bug heat treatment 2BR apartment,828,Within 1 week
+b-1003,Cleaning,Window washing (exterior),75062,2026-03,Exterior window wash 2-story 20 windows,258,I'm flexible
+b-1004,Electrical,Panel,30307,2026-05,Replace 200A electrical panel and breakers,2100,As soon as possible
+b-1005,Handyman,Tv Mounting,90011,2026-04,Mount 65 inch TV on drywall conceal cables,140,As soon as possible
+b-1006,Remodeling,Kitchen remodel,75062,2026-05,Full kitchen remodel cabinets counters flooring,7200,I'm flexible
+b-1007,Landscaping,Lawn care,33463,2026-03,Weekly lawn mowing and edging small yard,80,I'm flexible
+b-1008,HVAC,AC repair,33484,2026-04,AC not cooling needs diagnostic and recharge,,Within 1-2 weeks
+b-1009,Auto,Detailing,33324,2026-04,Full interior detail midsize SUV,280,I'm flexible
+b-1010,Roofing,Repair,30307,2026-05,Repair roof leak around chimney flashing,950,As soon as possible
+b-1011,Painting,Interior painting,33463,2026-03,Bathroom walls painting project,,As soon as possible
+b-1012,,Misc,33484,2026-04,Various small fixes around the house,200,I'm flexible`;
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+
+function el(id) { return document.getElementById(id); }
+
+function show(elem) { if (elem) elem.classList.remove('hidden'); }
+function hide(elem) { if (elem) elem.classList.add('hidden'); }
 
 function usd(n) {
-  return "$" + Number(n).toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  });
+  return '$' + Math.round(Number(n)).toLocaleString('en-US');
 }
 
-function pct(n) {
-  return (Number(n) * 100).toFixed(1) + "%";
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
-function clamp(val, lo, hi) {
-  return Math.max(lo, Math.min(hi, val));
+/** confidence → band metadata */
+function band(conf) {
+  if (conf >= 0.8) return { key: 'high', label: 'High confidence', tone: 'ok',   note: 'Above the 0.80 threshold — homeowners and providers can book on this.' };
+  if (conf >= 0.5) return { key: 'mid',  label: 'Ambiguous',       tone: 'amber', note: 'Between 0.50 and 0.80 — usable, but worth a human glance before quoting.' };
+  return            { key: 'low',  label: 'Low confidence',   tone: 'bad',   note: 'Below 0.50 — outside the training distribution. Route for manual review.' };
 }
 
-function el(id) {
-  return document.getElementById(id);
+const TONE_COLOR = {
+  ok:    'var(--ok)',
+  amber: 'var(--warn)',
+  bad:   'var(--bad)'
+};
+
+const FLAG_HELP = {
+  'Scope inferred from free text': 'No structured scope fields exist — the model reads square footage, fixture count and complexity out of the description text.',
+  'Scope ambiguous from description': 'The description is short or vague, so the model widened the range to cover plausible scopes.',
+  'Wide range — interval over 3× median': 'The predicted interval is wider than 3× the median observed range — an out-of-distribution signal.',
+  'Outside production category': 'This service category is outside the current 10 production verticals, so confidence is reduced.',
+  'Large job outside typical range': 'Midpoint is above the $5,000 95th-percentile of training data — passed through, but flagged low-confidence.'
+};
+
+function flagHelp(label) {
+  if (FLAG_HELP[label]) return FLAG_HELP[label];
+  if (/^Original estimate differs/.test(label)) return 'The model\'s midpoint diverges from the previous-model estimate by this amount.';
+  return label;
 }
 
-function show(elem) {
-  if (elem) elem.classList.remove("hidden");
-}
+/* ============================================================
+   SVG ICONS (inline strings for innerHTML use)
+   ============================================================ */
+const ICON = {
+  check:    '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.5"/></svg>',
+  x:        '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>',
+  info:     '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="6.4"/><path d="M8 7.3v3.4" stroke-linecap="round"/><circle cx="8" cy="5" r=".5" fill="currentColor" stroke="none"/></svg>',
+  alert:    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.7L15 14H1z"/><path d="M8 6.3v3.2"/><circle cx="8" cy="11.6" r=".6" fill="currentColor" stroke="none"/></svg>',
+  spinner:  '<svg class="ha-spin" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 1.6a6.4 6.4 0 106.4 6.4" opacity="1"/></svg>'
+};
 
-function hide(elem) {
-  if (elem) elem.classList.add("hidden");
-}
-
-/* ======================================================
+/* ============================================================
    TOAST NOTIFICATIONS
-   ====================================================== */
+   ============================================================ */
 
-function showToast(message, type) {
-  // type: "error" | "warn" | "success"
-  var container = el("toast-container");
-  var toast = document.createElement("div");
-  toast.className = "toast toast-" + (type || "error");
-  toast.innerHTML =
-    '<span class="toast-msg">' + escapeHtml(message) + "</span>" +
-    '<button class="toast-close" aria-label="Dismiss">&times;</button>';
+function pushToast({ tone, title, body, retry }) {
+  // tone: 'bad' | 'amber' | 'ok' | 'info'
+  const toneColor = { bad: 'var(--bad)', amber: 'var(--warn)', ok: 'var(--ok)', info: 'var(--blue)' };
+  const toneIcon  = { bad: ICON.alert,   amber: ICON.alert,    ok: ICON.check,  info: ICON.info   };
+  const color = toneColor[tone] || toneColor.info;
+  const icon  = toneIcon[tone]  || ICON.info;
+  const autoDismiss = retry ? 9000 : 6000;
 
-  toast.querySelector(".toast-close").addEventListener("click", function () {
-    toast.remove();
-  });
+  const toast = document.createElement('div');
+  toast.className = 'ha-toast';
+  toast.style.borderLeftColor = color;
 
+  const iconSpan = document.createElement('span');
+  iconSpan.className = 'ha-toast-icon';
+  iconSpan.style.color = color;
+  iconSpan.innerHTML = icon;
+
+  const bodyDiv = document.createElement('div');
+  bodyDiv.className = 'ha-toast-body';
+
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'ha-toast-title';
+  titleDiv.textContent = title;
+  bodyDiv.appendChild(titleDiv);
+
+  if (body) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'ha-toast-msg';
+    msgDiv.textContent = body;
+    bodyDiv.appendChild(msgDiv);
+
+    // Countdown for retry toasts
+    if (retry) {
+      let left = retry;
+      const iv = setInterval(function() {
+        left--;
+        if (left <= 0) { clearInterval(iv); return; }
+        msgDiv.textContent = body.replace(/\d+s/, left + 's');
+      }, 1000);
+    }
+  }
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'ha-toast-close';
+  closeBtn.innerHTML = ICON.x;
+  closeBtn.addEventListener('click', function() { toast.remove(); });
+
+  toast.appendChild(iconSpan);
+  toast.appendChild(bodyDiv);
+  toast.appendChild(closeBtn);
+
+  const container = el('toast-container');
   container.appendChild(toast);
 
-  // Auto-dismiss after 6 s
-  setTimeout(function () {
-    if (toast.parentNode) toast.remove();
-  }, 6000);
+  setTimeout(function() { if (toast.parentNode) toast.remove(); }, autoDismiss);
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+/* ============================================================
+   CONFIDENCE RING (vanilla DOM)
+   ============================================================ */
+
+function renderConfidenceRing(containerEl, conf, size) {
+  size = size || 66;
+  const b = band(conf);
+  const deg = conf * 360;
+  const inner = size - 16;
+  containerEl.style.width  = size + 'px';
+  containerEl.style.height = size + 'px';
+  containerEl.style.background = 'conic-gradient(' + TONE_COLOR[b.tone] + ' ' + deg + 'deg, #eef2f5 0)';
+  containerEl.style.borderRadius = '50%';
+  containerEl.style.display = 'grid';
+  containerEl.style.placeItems = 'center';
+  containerEl.style.flexShrink = '0';
+  containerEl.style.position = 'relative';
+
+  // Clear previous inner
+  containerEl.innerHTML = '';
+  const inner_el = document.createElement('i');
+  inner_el.className = 'ha-ring-inner ha-num';
+  inner_el.style.width  = inner + 'px';
+  inner_el.style.height = inner + 'px';
+  inner_el.style.fontSize = Math.round(size * 0.26) + 'px';
+  inner_el.innerHTML = Math.round(conf * 100) + '<span style="font-size:' + Math.round(size * 0.16) + 'px">%</span>';
+  containerEl.appendChild(inner_el);
 }
 
-/* ======================================================
+/* ============================================================
+   FLAG CHIPS
+   ============================================================ */
+
+function renderFlagChips(container, flags, tone) {
+  container.innerHTML = '';
+  flags.forEach(function(label) {
+    const wrap = document.createElement('span');
+    wrap.className = 'ha-tip-wrap';
+
+    const chip = document.createElement('span');
+    chip.className = 'ha-flag';
+
+    const dot = document.createElement('span');
+    dot.className = 'ha-flag-dot';
+    dot.style.background = TONE_COLOR[tone === 'ok' ? 'amber' : tone];
+
+    const text = document.createTextNode(label);
+    chip.appendChild(dot);
+    chip.appendChild(text);
+    wrap.appendChild(chip);
+
+    // Tooltip
+    const tipText = flagHelp(label);
+    if (tipText) {
+      let tip = null;
+      wrap.addEventListener('mouseenter', function() {
+        tip = document.createElement('span');
+        tip.className = 'ha-tip';
+        tip.textContent = tipText;
+        wrap.appendChild(tip);
+      });
+      wrap.addEventListener('mouseleave', function() {
+        if (tip) { tip.remove(); tip = null; }
+      });
+    }
+
+    container.appendChild(wrap);
+  });
+}
+
+/* ============================================================
    TAB NAVIGATION
-   ====================================================== */
+   ============================================================ */
+
+const PANEL_TITLES = {
+  predict: ['Predict', 'Paste or compose one booking, get one estimate with a confidence interval.'],
+  batch:   ['Batch',   'Upload a CSV of bookings, convert to the API shape, and score them in bulk.'],
+  results: ['Results', 'How the model performs against the previous pricing baseline.']
+};
+
+let activeTab = 'predict';
 
 function initTabs() {
-  var buttons = document.querySelectorAll(".tab-btn");
-  buttons.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var target = btn.dataset.panel;
+  const buttons = document.querySelectorAll('.tab-btn');
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const target = btn.dataset.panel;
+      if (target === activeTab) return;
+      activeTab = target;
 
-      // Update button states
-      buttons.forEach(function (b) {
-        b.classList.remove("active");
-        b.setAttribute("aria-selected", "false");
+      buttons.forEach(function(b) {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
       });
-      btn.classList.add("active");
-      btn.setAttribute("aria-selected", "true");
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
 
-      // Swap panels
-      document.querySelectorAll(".panel").forEach(function (p) {
-        p.classList.add("hidden");
-      });
-      show(el("panel-" + target));
+      document.querySelectorAll('.panel').forEach(function(p) { p.classList.add('hidden'); });
+      show(el('panel-' + target));
 
-      // Trigger load on Results tab
-      if (target === "results") {
+      // Update page title
+      const titles = PANEL_TITLES[target];
+      el('page-h1').textContent = titles[0];
+      el('page-sub').textContent = titles[1];
+
+      if (target === 'results') {
         loadResults();
       }
     });
   });
 }
 
-/* ======================================================
+/* ============================================================
    API STATUS PROBE
-   ====================================================== */
+   ============================================================ */
+
+let apiOnline = false;
+let modelVersion = 'gauntlet-v2.1.0';
 
 function probeApiStatus() {
-  var dot = el("status-dot");
-  var label = el("status-label");
-  var badge = el("model-badge");
+  const dot   = el('status-dot');
+  const label = el('status-label');
+  const badge = el('model-badge');
 
-  fetch("/dashboard/metrics")
-    .then(function (res) {
-      if (!res.ok) throw new Error("status " + res.status);
+  label.textContent = 'Checking…';
+  dot.className = 'ha-status-dot';
+
+  fetch('/dashboard/metrics')
+    .then(function(res) {
+      if (!res.ok) throw new Error('status ' + res.status);
       return res.json();
     })
-    .then(function (data) {
-      dot.className = "status-dot online";
-      label.textContent = "API connected";
-      var v = data.model_version || "unknown";
+    .then(function(data) {
+      apiOnline = true;
+      dot.className = 'ha-status-dot online';
+      label.textContent = 'API connected';
+      var v = data.model_version || 'gauntlet-v2.1.0';
+      modelVersion = v;
       badge.textContent = v;
-      el("footer-version").textContent = v;
+      el('footer-version').textContent = v;
+      hide(el('offline-banner'));
     })
-    .catch(function () {
-      dot.className = "status-dot offline";
-      label.textContent = "API offline";
+    .catch(function() {
+      apiOnline = false;
+      dot.className = 'ha-status-dot offline';
+      label.textContent = 'API offline';
+      show(el('offline-banner'));
     });
 }
 
-/* ======================================================
-   PREDICT PANEL (U5)
-   ====================================================== */
-
-function initPredict() {
-  el("load-sample-btn").addEventListener("click", function () {
-    el("booking-input").value = JSON.stringify(SAMPLE_BOOKING, null, 2);
-    hide(el("json-error"));
-  });
-
-  el("predict-btn").addEventListener("click", function () {
-    var raw = el("booking-input").value.trim();
-    var parsed;
-
-    // Client-side JSON validation
-    try {
-      parsed = JSON.parse(raw);
-    } catch (e) {
-      var errEl = el("json-error");
-      errEl.textContent = "Invalid JSON: " + e.message;
-      show(errEl);
-      return;
-    }
-    hide(el("json-error"));
-
-    runPredict(parsed);
-  });
-}
-
-function runPredict(booking) {
-  var btn = el("predict-btn");
-  var btnText = btn.querySelector(".btn-text");
-  var spinner = el("predict-spinner");
-
-  // Loading state
-  btn.disabled = true;
-  btnText.textContent = "Predicting…";
-  show(spinner);
-  hide(el("result-card"));
-
-  fetch("/dashboard/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(booking)
-  })
-    .then(function (res) {
-      return res.json().then(function (body) {
-        return { status: res.status, body: body };
-      });
-    })
-    .then(function (resp) {
-      if (resp.status === 429) {
-        var retry = resp.body.retry_after ? " Retry in " + resp.body.retry_after + "s." : "";
-        showToast("Rate limit exceeded." + retry, "warn");
-      } else if (resp.status >= 400) {
-        showToast(resp.body.error || "Error " + resp.status, "error");
-      } else {
-        renderResultCard(resp.body);
-      }
-    })
-    .catch(function (err) {
-      showToast("Network error: " + err.message, "error");
-    })
-    .finally(function () {
-      btn.disabled = false;
-      btnText.textContent = "Predict";
-      hide(spinner);
-    });
-}
-
-function renderResultCard(data) {
-  var card = el("result-card");
-  var lo = Number(data.estimate_lo);
-  var mid = Number(data.estimate_midpoint);
-  var hi = Number(data.estimate_hi);
-  var conf = Number(data.confidence);
-
-  // Version badge
-  el("result-version").textContent = data.model_version || "";
-
-  // Low-confidence banner
-  if (conf < 0.5) {
-    show(el("ood-banner"));
-  } else {
-    hide(el("ood-banner"));
-  }
-
-  // Interval labels
-  el("label-lo").textContent = usd(lo);
-  el("label-mid").textContent = usd(mid);
-  el("label-hi").textContent = usd(hi);
-
-  // Interval bar: position midpoint tick as % along [lo, hi]
-  var range = hi - lo;
-  var midPct = range > 0 ? ((mid - lo) / range) * 100 : 50;
-  el("midpoint-tick").style.left = clamp(midPct, 2, 98) + "%";
-  // Fill bar shows the full range (cosmetic — always 100% of the track)
-  el("interval-fill").style.width = "100%";
-
-  // Confidence meter
-  var confPct = clamp(conf * 100, 0, 100);
-  el("confidence-value").textContent = confPct.toFixed(1) + "%";
-  var fill = el("confidence-fill");
-  fill.style.width = confPct + "%";
-  fill.className = "confidence-fill";
-  if (conf >= 0.8) {
-    fill.classList.add("conf-high");
-  } else if (conf >= 0.5) {
-    fill.classList.add("conf-mid");
-  } else {
-    fill.classList.add("conf-low");
-  }
-
-  // Uncertainties
-  var listEl = el("uncertainties-list");
-  listEl.innerHTML = "";
-  var uncertainties = data.uncertainties;
-  if (uncertainties) {
-    // May be a string (comma-separated) or an array
-    var items = Array.isArray(uncertainties)
-      ? uncertainties
-      : String(uncertainties)
-          .split(/[,;|]+/)
-          .map(function (s) { return s.trim(); })
-          .filter(Boolean);
-
-    if (items.length > 0) {
-      items.forEach(function (item) {
-        var li = document.createElement("li");
-        li.className = "uncertainty-item";
-        li.textContent = item;
-        listEl.appendChild(li);
-      });
-      show(el("uncertainties-section"));
-    } else {
-      hide(el("uncertainties-section"));
-    }
-  } else {
-    hide(el("uncertainties-section"));
-  }
-
-  show(card);
-}
-
-/* ======================================================
-   CSV PARSER — pure function (U6)
-   ====================================================== */
+/* ============================================================
+   CSV PARSER  (pure function — csvToBookings)
+   ============================================================ */
 
 /**
- * Parse CSV text into an array of booking objects.
- * First row is treated as headers.
- * Returns an array of plain objects; rows that are blank are skipped.
+ * csvToBookings — parse CSV text into booking objects.
+ * First row is headers; blank rows are skipped.
+ * Required by: batch panel, Playwright test hooks.
  */
 function csvToBookings(text) {
   var lines = text.split(/\r?\n/);
   if (lines.length < 2) return [];
-
   var headers = parseCsvRow(lines[0]);
-  var bookings = [];
-
+  var out = [];
   for (var i = 1; i < lines.length; i++) {
     var line = lines[i].trim();
     if (!line) continue;
-
-    var values = parseCsvRow(line);
+    var cells = parseCsvRow(line);
     var obj = {};
-    headers.forEach(function (h, idx) {
-      var key = h.trim().toLowerCase().replace(/\s+/g, "_");
-      var val = values[idx] !== undefined ? values[idx] : "";
-      // Coerce numeric fields
-      if (key === "original_estimate" && val !== "") {
-        var num = parseFloat(val);
-        obj[key] = isNaN(num) ? val : num;
+    headers.forEach(function(h, idx) {
+      var key = h.trim().toLowerCase().replace(/\s+/g, '_');
+      var val = cells[idx] !== undefined ? cells[idx].trim() : '';
+      if (key === 'original_estimate' && val !== '') {
+        var n = parseFloat(val);
+        obj[key] = isNaN(n) ? val : n;
       } else {
         obj[key] = val;
       }
     });
-    bookings.push(obj);
+    out.push(obj);
   }
-  return bookings;
+  return out;
 }
 
-/** Parse a single CSV row respecting quoted fields. */
+/** Parse one CSV row handling double-quoted fields. */
 function parseCsvRow(row) {
-  var fields = [];
-  var cur = "";
-  var inQuote = false;
-
+  var fields = [], cur = '', inQ = false;
   for (var i = 0; i < row.length; i++) {
     var ch = row[i];
     if (ch === '"') {
-      if (inQuote && row[i + 1] === '"') {
-        cur += '"';
-        i++;
-      } else {
-        inQuote = !inQuote;
-      }
-    } else if (ch === "," && !inQuote) {
-      fields.push(cur);
-      cur = "";
+      if (inQ && row[i + 1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+    } else if (ch === ',' && !inQ) {
+      fields.push(cur); cur = '';
     } else {
       cur += ch;
     }
@@ -348,541 +406,1048 @@ function parseCsvRow(row) {
   return fields;
 }
 
-/** Validate that a booking object has the required fields. */
+/**
+ * validateBooking — check required fields.
+ * Returns null if valid, error string if invalid.
+ */
 function validateBooking(b) {
-  var required = ["service_category", "zip_code", "job_description"];
-  var missing = required.filter(function (k) { return !b[k]; });
-  if (missing.length > 0) {
-    return "Missing fields: " + missing.join(", ");
+  for (var i = 0; i < REQUIRED_FIELDS.length; i++) {
+    var f = REQUIRED_FIELDS[i];
+    if (!b[f] || String(b[f]).trim() === '') return f + ' required';
   }
-  return null; // valid
+  return null;
 }
 
-/* ======================================================
-   BATCH PANEL (U6)
-   ====================================================== */
+/* ============================================================
+   PREDICT PANEL
+   ============================================================ */
 
-var batchBookings = [];
-var batchResults = [];
+let predictPhase = 'empty'; // empty | loading | done
+
+function initPredict() {
+  // Sample dropdown toggle
+  const trigger = el('load-sample-btn');
+  const dropdown = el('sample-dropdown');
+
+  trigger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    dropdown.classList.toggle('hidden');
+  });
+
+  document.addEventListener('pointerdown', function(e) {
+    if (!el('sample-menu-wrap').contains(e.target)) hide(dropdown);
+  });
+
+  // Sample items
+  document.querySelectorAll('.ha-sample-item').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var key = btn.dataset.sample;
+      var sample = SAMPLES[key];
+      if (sample) {
+        el('booking-input').value = JSON.stringify(sample.payload, null, 2);
+        hideJsonError();
+      }
+      hide(dropdown);
+    });
+  });
+
+  // Predict button
+  el('predict-btn').addEventListener('click', runPredict);
+
+  // Cmd/Ctrl+Enter
+  el('booking-input').addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') runPredict();
+  });
+
+  // Clear error on type
+  el('booking-input').addEventListener('input', function() { hideJsonError(); });
+}
+
+function showJsonError(msg) {
+  el('json-error-text').textContent = msg;
+  show(el('json-error'));
+  // Ensure it includes "Invalid JSON" when appropriate
+}
+
+function hideJsonError() { hide(el('json-error')); }
+
+function setPredictLoading(on) {
+  var btn = el('predict-btn');
+  var content = el('predict-btn-content');
+  btn.disabled = on;
+  if (on) {
+    content.innerHTML = ICON.spinner + ' Predicting…';
+  } else {
+    content.innerHTML = 'Predict price <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+  }
+}
+
+function showPredictState(state) {
+  hide(el('result-empty'));
+  hide(el('result-loading'));
+  hide(el('result-card'));
+  if (state === 'empty')   show(el('result-empty'));
+  if (state === 'loading') show(el('result-loading'));
+  if (state === 'done')    show(el('result-card'));
+}
+
+function runPredict() {
+  hideJsonError();
+
+  var raw = el('booking-input').value.trim();
+  if (!raw) {
+    showJsonError('Paste a payload or Load sample first.');
+    // Show error but do NOT fire network request
+    return;
+  }
+
+  var payload;
+  try {
+    payload = JSON.parse(raw);
+  } catch (e) {
+    // Must include "Invalid JSON" per test hook spec
+    showJsonError('Invalid JSON — ' + e.message);
+    return; // DO NOT fire network request on malformed JSON
+  }
+
+  // Validate required fields
+  for (var i = 0; i < REQUIRED_FIELDS.length; i++) {
+    var f = REQUIRED_FIELDS[i];
+    if (!payload[f] || String(payload[f]).trim() === '') {
+      showJsonError(f + ' required');
+      return;
+    }
+  }
+
+  predictPhase = 'loading';
+  showPredictState('loading');
+  setPredictLoading(true);
+
+  fetch('/dashboard/predict', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(function(res) {
+      return res.json().then(function(body) { return { status: res.status, body: body }; });
+    })
+    .then(function(resp) {
+      if (resp.status === 429) {
+        var ra = resp.body.retry_after ? ' Retry in ' + resp.body.retry_after + 's.' : '';
+        pushToast({ tone: 'amber', title: '429 Rate limit exceeded', body: 'Rate limit hit.' + ra, retry: resp.body.retry_after || 60 });
+        showPredictState('empty');
+      } else if (resp.status >= 400) {
+        pushToast({ tone: 'bad', title: 'Error ' + resp.status, body: resp.body.error || 'Request failed.' });
+        showPredictState('empty');
+      } else {
+        renderResultCard(resp.body, payload);
+      }
+    })
+    .catch(function(err) {
+      pushToast({ tone: 'bad', title: 'Network error', body: err.message });
+      showPredictState('empty');
+    })
+    .finally(function() {
+      setPredictLoading(false);
+      predictPhase = 'done';
+    });
+}
+
+function renderResultCard(data, submittedPayload) {
+  var lo   = Number(data.estimate_lo);
+  var mid  = Number(data.estimate_midpoint);
+  var hi   = Number(data.estimate_hi);
+  var conf = Number(data.confidence);
+
+  var b = band(conf);
+
+  // Category chip
+  var category = (submittedPayload && submittedPayload.service_category) || data.service_category || '';
+  var subtype  = (submittedPayload && (submittedPayload.service_subtype || submittedPayload.service_category)) || category;
+  var zip      = (submittedPayload && submittedPayload.zip_code) || '';
+
+  el('result-category-chip').textContent = category;
+
+  // OOD banner
+  if (conf < 0.5) {
+    el('ood-banner-text').textContent =
+      'Out-of-distribution — confidence ' + Math.round(conf * 100) +
+      '%. Pass it through, but route for manual review rather than auto-quoting.';
+    show(el('ood-banner'));
+    pushToast({ tone: 'amber', title: 'Low-confidence estimate', body: category + ' flagged out-of-distribution (' + Math.round(conf * 100) + '%).' });
+  } else {
+    hide(el('ood-banner'));
+  }
+
+  // Midpoint
+  el('label-mid').textContent = usd(mid);
+  el('result-sub').textContent = subtype + ' · ZIP ' + zip;
+
+  // Interval labels
+  el('label-lo').textContent = usd(lo);
+  el('label-hi').textContent = usd(hi);
+
+  // Interval bar midpoint marker
+  var range = hi - lo;
+  var midPct = range > 0 ? ((mid - lo) / range) * 100 : 50;
+  el('interval-mid-marker').style.left = 'calc(' + clamp(midPct, 2, 97) + '% - 2.5px)';
+
+  // Confidence ring
+  var ringEl = el('conf-ring');
+  renderConfidenceRing(ringEl, conf, 66);
+
+  // Band label: set the visible text as a text node before the child span
+  var bandLabelEl = el('conf-band-label');
+  bandLabelEl.style.color = TONE_COLOR[b.tone];
+  // Keep the #confidence-value child span; update the preceding text node
+  var confValEl = el('confidence-value');
+  var confPctText = (conf * 100).toFixed(1) + '%';
+  if (confValEl) {
+    confValEl.textContent = confPctText;
+  }
+  // Set band label text via firstChild or prepend text node
+  // Remove any existing text nodes before the span
+  var childNodes = Array.from(bandLabelEl.childNodes);
+  childNodes.forEach(function(node) {
+    if (node.nodeType === Node.TEXT_NODE) node.remove();
+  });
+  bandLabelEl.insertBefore(
+    document.createTextNode(b.label + ' · ' + confPctText + ' '),
+    bandLabelEl.firstChild
+  );
+  el('conf-band-note').textContent = b.note;
+
+  // Uncertainties / flags
+  var uncertaintiesSection = el('uncertainties-section');
+  var uncertaintiesList    = el('uncertainties-list');
+
+  // API returns uncertainties as a STRING joined by "; "
+  var flags = [];
+  if (data.uncertainties) {
+    var raw = String(data.uncertainties).trim();
+    if (raw) {
+      flags = raw.split(/\s*;\s*/).filter(Boolean);
+    }
+  }
+
+  if (flags.length > 0) {
+    renderFlagChips(uncertaintiesList, flags, b.tone);
+    show(uncertaintiesSection);
+  } else {
+    hide(uncertaintiesSection);
+  }
+
+  // Footer
+  el('result-model-version').textContent = data.model_version || modelVersion;
+  el('result-job-id').textContent = data.job_id || '';
+
+  predictPhase = 'done';
+  showPredictState('done');
+}
+
+/* ============================================================
+   BATCH PANEL
+   ============================================================ */
+
+var batchState = {
+  fileName: null,
+  rows: null,       // raw parsed CSV rows
+  phase: 'empty',  // empty | parsed | scoring | done
+  results: [],
+  drawerEntry: null
+};
 
 function initBatch() {
-  var fileInput = el("csv-file-input");
-  var dropzone = el("dropzone");
-
-  // File input change
-  fileInput.addEventListener("change", function () {
-    var file = fileInput.files[0];
-    if (file) loadCsvFile(file);
-  });
-
-  // Drag-and-drop
-  dropzone.addEventListener("dragover", function (e) {
+  // Dropzone drag-and-drop
+  var dz = el('batch-dropzone');
+  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
+  dz.addEventListener('drop', function(e) {
     e.preventDefault();
-    dropzone.classList.add("drag-over");
-  });
-  dropzone.addEventListener("dragleave", function () {
-    dropzone.classList.remove("drag-over");
-  });
-  dropzone.addEventListener("drop", function (e) {
-    e.preventDefault();
-    dropzone.classList.remove("drag-over");
+    dz.classList.remove('drag-over');
     var file = e.dataTransfer.files[0];
-    if (file) loadCsvFile(file);
+    if (file) loadBatchFile(file);
   });
 
-  el("batch-run-btn").addEventListener("click", runBatch);
+  // File input
+  el('csv-file-input').addEventListener('change', function() {
+    var file = el('csv-file-input').files[0];
+    if (file) loadBatchFile(file);
+  });
 
-  // Drawer close
-  el("drawer-close").addEventListener("click", closeDrawer);
-  el("drawer-overlay").addEventListener("click", closeDrawer);
+  // Toolbar buttons
+  el('batch-run-btn').addEventListener('click', runBatch);
+  el('batch-replace-btn').addEventListener('click', resetBatch);
+  el('batch-view-json-btn').addEventListener('click', openJsonModal);
+  el('batch-expand-json-btn').addEventListener('click', openJsonModal);
+  el('use-sample-csv-btn').addEventListener('click', loadSampleCsv);
+  el('batch-export-btn').addEventListener('click', exportBatchCsv);
+
+  // Drawer
+  el('drawer-close').addEventListener('click', closeDrawer);
+  el('drawer-scrim').addEventListener('click', closeDrawer);
+
+  // JSON modal
+  el('json-modal-close').addEventListener('click', closeJsonModal);
+  el('json-modal-scrim').addEventListener('click', function(e) {
+    if (e.target === el('json-modal-scrim')) closeJsonModal();
+  });
 }
 
-function loadCsvFile(file) {
-  var errEl = el("csv-error");
-  hide(errEl);
+function loadSampleCsv() {
+  var rows = csvToBookings(SAMPLE_CSV);
+  setBatchLoaded('houseaccount_sample.csv', rows);
+}
 
+function loadBatchFile(file) {
+  if (!/\.csv$/i.test(file.name)) {
+    pushToast({ tone: 'bad', title: "Couldn’t parse CSV", body: 'Expected a .csv file. Got "' + escHtml(file.name) + '".' });
+    return;
+  }
   var reader = new FileReader();
-  reader.onload = function (e) {
+  reader.onload = function(e) {
     try {
-      batchBookings = csvToBookings(e.target.result);
-      if (batchBookings.length === 0) {
-        errEl.textContent = "Couldn't parse CSV — no data rows found.";
-        show(errEl);
-        return;
-      }
-      // Show filename
-      var fnEl = el("dropzone-filename");
-      fnEl.textContent = file.name + " — " + batchBookings.length + " rows";
-      show(fnEl);
-
-      // Show JSON preview (cap at 20 rows for display)
-      var preview = batchBookings.slice(0, 20);
-      el("json-preview").textContent = JSON.stringify(preview, null, 2);
-      el("json-row-count").textContent = "(" + batchBookings.length + " rows" +
-        (batchBookings.length > 20 ? ", showing first 20" : "") + ")";
-      show(el("json-preview-section"));
-
-      // Enable run button
-      el("batch-run-btn").disabled = false;
-
-      // Reset previous results
-      hide(el("batch-table-wrap"));
-      hide(el("batch-summary"));
-      el("batch-tbody").innerHTML = "";
+      var rows = csvToBookings(String(e.target.result));
+      if (!rows.length) throw new Error('no rows');
+      setBatchLoaded(file.name, rows);
     } catch (err) {
-      errEl.textContent = "Couldn't parse CSV: " + err.message;
-      show(errEl);
+      pushToast({ tone: 'bad', title: "Couldn’t parse CSV", body: 'The file didn’t match the expected booking columns.' });
     }
   };
   reader.readAsText(file);
 }
 
+function setBatchLoaded(fileName, rows) {
+  batchState.fileName = fileName;
+  batchState.rows     = rows;
+  batchState.phase    = 'parsed';
+  batchState.results  = [];
+
+  // Hide dropzone, show toolbar
+  hide(el('batch-dropzone'));
+  show(el('batch-toolbar'));
+  el('batch-filename').textContent   = fileName;
+  el('batch-toolbar-sub').textContent = rows.length + ' bookings · converted to API payload';
+
+  // Show JSON preview
+  var payloads = rows.map(rowToPayload);
+  var previewJson = JSON.stringify(payloads.slice(0, 2), null, 2);
+  if (payloads.length > 2) previewJson += '\n  … +' + (payloads.length - 2) + ' more';
+  el('json-preview').textContent = previewJson;
+  el('json-row-count').textContent = rows.length + ' rows';
+  show(el('json-preview-section'));
+
+  // Reset results table
+  hide(el('batch-table-wrap'));
+  el('batch-tbody').innerHTML = '';
+  hide(el('batch-summary'));
+
+  // Enable run
+  el('batch-run-btn').disabled = false;
+  hide(el('batch-export-btn'));
+  show(el('batch-replace-btn'));
+
+  // Progress hidden
+  hide(el('batch-progress-wrap'));
+}
+
+function resetBatch() {
+  batchState = { fileName: null, rows: null, phase: 'empty', results: [], drawerEntry: null };
+  show(el('batch-dropzone'));
+  hide(el('batch-toolbar'));
+  hide(el('json-preview-section'));
+  hide(el('batch-table-wrap'));
+  hide(el('batch-summary'));
+  el('batch-tbody').innerHTML = '';
+  el('csv-file-input').value = '';
+}
+
+function rowToPayload(r) {
+  var o = { job_id: r.job_id, service_category: r.service_category };
+  if (r.service_subtype) o.service_subtype = r.service_subtype;
+  o.zip_code = r.zip_code;
+  o.job_description = r.job_description;
+  if (r.booking_month) o.booking_month = r.booking_month;
+  if (r.original_estimate != null && r.original_estimate !== '' && !isNaN(Number(r.original_estimate)))
+    o.original_estimate = Number(r.original_estimate);
+  if (r.deadline) o.deadline = r.deadline;
+  return o;
+}
+
 function runBatch() {
-  if (!batchBookings.length) return;
+  if (!batchState.rows || !batchState.rows.length) return;
 
-  batchResults = [];
-  var btn = el("batch-run-btn");
-  var progress = el("batch-progress");
-  var tbody = el("batch-tbody");
-  tbody.innerHTML = "";
+  batchState.phase   = 'scoring';
+  batchState.results = [];
 
-  btn.disabled = true;
-  show(progress);
-  hide(el("batch-table-wrap"));
-  hide(el("batch-summary"));
+  // UI: hide preview, show table, show progress
+  hide(el('json-preview-section'));
+  el('batch-tbody').innerHTML = '';
+  hide(el('batch-summary'));
+  hide(el('batch-export-btn'));
 
-  var total = batchBookings.length;
-  var done = 0;
-  var idx = 0;
+  var progressWrap = el('batch-progress-wrap');
+  var progressFill = el('batch-progress-fill');
+  var progressLabel = el('batch-progress-label');
+  show(progressWrap);
+
+  var tableWrap = el('batch-table-wrap');
+  show(tableWrap);
+
+  el('batch-run-btn').disabled = true;
+  hide(el('batch-replace-btn'));
+
+  var total   = batchState.rows.length;
+  var done    = 0;
+  var nextIdx = 0;
+  var accum   = new Array(total);
 
   function updateProgress() {
-    progress.textContent = done + " / " + total + " scored";
+    var pct = total > 0 ? (done / total * 100) : 0;
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = done + ' / ' + total + ' scored';
   }
-
   updateProgress();
 
-  function scoreNext() {
-    if (idx >= total) return;
-
-    var i = idx;
-    idx++;
-
-    var booking = batchBookings[i];
-    var validErr = validateBooking(booking);
-
-    if (validErr) {
-      // Client validation failure — flag row, don't abort
-      var result = {
-        booking: booking,
-        error: validErr,
-        status: "invalid"
-      };
-      batchResults[i] = result;
-      appendBatchRow(tbody, result, i);
-      done++;
-      updateProgress();
-      if (done === total) finishBatch();
-      return;
-    }
-
-    fetch("/dashboard/predict", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(booking)
-    })
-      .then(function (res) {
-        return res.json().then(function (body) {
-          return { status: res.status, body: body };
-        });
-      })
-      .then(function (resp) {
-        var result;
-        if (resp.status >= 400) {
-          result = {
-            booking: booking,
-            error: resp.body.error || "HTTP " + resp.status,
-            status: "api-error"
-          };
-        } else {
-          result = {
-            booking: booking,
-            prediction: resp.body,
-            status: "ok"
-          };
-        }
-        batchResults[i] = result;
-        appendBatchRow(tbody, result, i);
-      })
-      .catch(function (err) {
-        var result = {
-          booking: booking,
-          error: "Network: " + err.message,
-          status: "api-error"
-        };
-        batchResults[i] = result;
-        appendBatchRow(tbody, result, i);
-      })
-      .finally(function () {
-        done++;
-        updateProgress();
-        if (done === total) finishBatch();
-      });
+  function appendRow(entry, idx) {
+    var tr = buildBatchRow(entry, idx);
+    el('batch-tbody').appendChild(tr);
   }
 
-  // Launch up to CONCURRENCY_CAP concurrent requests
-  function pump() {
-    var active = idx - (total - done) < 0 ? 0 : idx - (total - done);
-    while (idx < total && (idx - done) < CONCURRENCY_CAP) {
-      scoreNext();
-    }
+  function finish() {
+    batchState.phase   = 'done';
+    batchState.results = Array.from(accum);
+    hide(progressWrap);
+
+    var scored  = accum.filter(function(e) { return e && e.result; }).length;
+    var skipped = accum.filter(function(e) { return e && e.error;  }).length;
+
+    // Summary pills
+    var pills = el('batch-summary-pills');
+    pills.innerHTML =
+      '<span class="ha-pill-ok">' + scored + ' scored</span>' +
+      (skipped > 0 ? '<span class="ha-pill-bad">' + skipped + ' skipped</span>' : '');
+
+    // Summary bar (for test hook: text contains "scored" and "skipped"/"flagged")
+    var summaryBar = el('batch-summary');
+    summaryBar.textContent = scored + ' scored' + (skipped > 0 ? ', ' + skipped + ' skipped' : '');
+    show(summaryBar);
+
+    el('batch-run-btn').disabled = false;
+    show(el('batch-replace-btn'));
+    if (scored > 0) show(el('batch-export-btn'));
+
+    pushToast({
+      tone: skipped > 0 ? 'amber' : 'ok',
+      title: 'Batch complete',
+      body: scored + ' scored' + (skipped > 0 ? ', ' + skipped + ' skipped.' : '.')
+    });
   }
-
-  // Monkey-patch scoreNext to re-pump after each completion
-  var origScoreNext = scoreNext;
-  function scoreNextAndPump(i) {
-    var booking = batchBookings[i];
-    var validErr = validateBooking(booking);
-
-    if (validErr) {
-      var result = { booking: booking, error: validErr, status: "invalid" };
-      batchResults[i] = result;
-      appendBatchRow(tbody, result, i);
-      done++;
-      updateProgress();
-      if (done === total) { finishBatch(); return; }
-      launchOne();
-      return;
-    }
-
-    fetch("/dashboard/predict", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(booking)
-    })
-      .then(function (res) {
-        return res.json().then(function (body) { return { status: res.status, body: body }; });
-      })
-      .then(function (resp) {
-        var result;
-        if (resp.status >= 400) {
-          result = { booking: booking, error: resp.body.error || "HTTP " + resp.status, status: "api-error" };
-        } else {
-          result = { booking: booking, prediction: resp.body, status: "ok" };
-        }
-        batchResults[i] = result;
-        appendBatchRow(tbody, result, i);
-      })
-      .catch(function (err) {
-        var result = { booking: booking, error: "Network: " + err.message, status: "api-error" };
-        batchResults[i] = result;
-        appendBatchRow(tbody, result, i);
-      })
-      .finally(function () {
-        done++;
-        updateProgress();
-        if (done === total) { finishBatch(); return; }
-        launchOne();
-      });
-  }
-
-  var nextIdx = 0;
 
   function launchOne() {
     if (nextIdx >= total) return;
-    var i = nextIdx;
-    nextIdx++;
-    scoreNextAndPump(i);
+    var i = nextIdx++;
+    var row = batchState.rows[i];
+    var validErr = validateBooking(row);
+
+    if (validErr) {
+      var entry = { row: row, error: validErr };
+      accum[i] = entry;
+      appendRow(entry, i);
+      done++;
+      updateProgress();
+      if (done === total) finish();
+      else launchOne();
+      return;
+    }
+
+    var payload = rowToPayload(row);
+    fetch('/dashboard/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function(res) {
+        return res.json().then(function(body) { return { status: res.status, body: body }; });
+      })
+      .then(function(resp) {
+        var entry;
+        if (resp.status >= 400) {
+          entry = { row: row, error: resp.body.error || 'HTTP ' + resp.status };
+        } else {
+          // Coerce values to numbers
+          var b = resp.body;
+          b.estimate_lo        = Number(b.estimate_lo);
+          b.estimate_midpoint  = Number(b.estimate_midpoint);
+          b.estimate_hi        = Number(b.estimate_hi);
+          b.confidence         = Number(b.confidence);
+          entry = { row: row, result: b };
+        }
+        accum[i] = entry;
+        appendRow(entry, i);
+      })
+      .catch(function(err) {
+        var entry = { row: row, error: 'Network: ' + err.message };
+        accum[i] = entry;
+        appendRow(entry, i);
+      })
+      .finally(function() {
+        done++;
+        updateProgress();
+        if (done === total) finish();
+        else launchOne();
+      });
   }
 
-  // Launch initial wave
-  var initialCount = Math.min(CONCURRENCY_CAP, total);
-  for (var k = 0; k < initialCount; k++) {
+  // Launch initial wave (concurrency-capped)
+  var initialWave = Math.min(CONCURRENCY_CAP, total);
+  for (var k = 0; k < initialWave; k++) {
     launchOne();
   }
 }
 
-function appendBatchRow(tbody, result, rowIdx) {
-  var tr = document.createElement("tr");
-  tr.className = "results-row" + (result.status !== "ok" ? " row-error" : "");
-  tr.dataset.rowIdx = rowIdx;
+function buildBatchRow(entry, idx) {
+  var tr = document.createElement('tr');
+  tr.className = 'ha-tr' + (entry.error ? ' row-error' : '');
 
-  var b = result.booking;
-  var shortDesc = b.job_description
-    ? b.job_description.substring(0, 60) + (b.job_description.length > 60 ? "…" : "")
-    : "—";
-
-  if (result.status === "ok") {
-    var p = result.prediction;
-    var conf = Number(p.confidence);
-    var confClass = conf >= 0.8 ? "conf-chip-high" : conf >= 0.5 ? "conf-chip-mid" : "conf-chip-low";
-
+  if (entry.error) {
     tr.innerHTML =
-      "<td>" + escapeHtml(b.service_category || "—") + "</td>" +
-      "<td>" + escapeHtml(b.zip_code || "—") + "</td>" +
-      "<td class='desc-cell'>" + escapeHtml(shortDesc) + "</td>" +
-      "<td>" + usd(p.estimate_lo) + "</td>" +
-      "<td class='mid-cell'>" + usd(p.estimate_midpoint) + "</td>" +
-      "<td>" + usd(p.estimate_hi) + "</td>" +
-      "<td><span class='conf-chip " + confClass + "'>" + pct(conf) + "</span></td>" +
-      "<td><span class='status-chip ok'>&#10003;</span></td>";
-  } else {
-    tr.innerHTML =
-      "<td>" + escapeHtml(b.service_category || "—") + "</td>" +
-      "<td>" + escapeHtml(b.zip_code || "—") + "</td>" +
-      "<td class='desc-cell'>" + escapeHtml(shortDesc) + "</td>" +
-      "<td colspan='4' class='error-cell'>" + escapeHtml(result.error || "Error") + "</td>" +
-      "<td><span class='status-chip warn'>&#9888;</span></td>";
+      '<td class="ha-td-num ha-mono">' + (idx + 1) + '</td>' +
+      '<td colspan="2">' +
+        '<div class="ha-td-cat">' + escHtml(entry.row.service_category || '—') + '</div>' +
+        '<div class="ha-td-subdesc">' + escHtml((entry.row.job_description || '').substring(0, 80)) + '</div>' +
+      '</td>' +
+      '<td colspan="2" style="text-align:right">' +
+        '<span class="ha-error-chip">' + ICON.alert + ' skipped — ' + escHtml(entry.error) + '</span>' +
+      '</td>';
+    return tr;
   }
 
-  tr.addEventListener("click", function () {
-    openDrawer(result, rowIdx);
-  });
+  var r    = entry.result;
+  var b    = band(r.confidence);
+  var conf = r.confidence;
 
-  tbody.appendChild(tr);
+  // Build confidence bar
+  var confBarHtml =
+    '<div class="ha-td-conf-wrap">' +
+      '<div style="flex:1;min-width:54px">' +
+        '<div class="ha-ring-bar"><div class="ha-ring-barfill" style="width:' + (conf * 100).toFixed(1) + '%;background:' + TONE_COLOR[b.tone] + '"></div></div>' +
+      '</div>' +
+      '<span class="ha-td-conf-pct" style="color:' + TONE_COLOR[b.tone] + '">' + Math.round(conf * 100) + '%</span>' +
+    '</div>';
+
+  tr.innerHTML =
+    '<td class="ha-td-num ha-mono">' + (idx + 1) + '</td>' +
+    '<td>' +
+      '<div class="ha-td-cat">' + escHtml(entry.row.service_category) + '</div>' +
+      '<div class="ha-td-subdesc ha-td-desc">' + escHtml((entry.row.job_description || '').substring(0, 80)) + '</div>' +
+    '</td>' +
+    '<td class="ha-td-zip ha-mono">' + escHtml(entry.row.zip_code || '') + '</td>' +
+    '<td class="ha-td-right">' +
+      '<div class="ha-td-mid ha-num">' + usd(r.estimate_midpoint) + '</div>' +
+      '<div class="ha-td-range">' + usd(r.estimate_lo) + '–' + usd(r.estimate_hi) + '</div>' +
+    '</td>' +
+    '<td style="width:140px">' + confBarHtml + '</td>';
+
+  tr.addEventListener('click', function() { openDrawer(entry); });
+  tr.addEventListener('mouseenter', function() { tr.style.background = 'var(--bg-soft)'; });
+  tr.addEventListener('mouseleave', function() { tr.style.background = entry.error ? 'var(--bad-tint)' : 'transparent'; });
+
+  return tr;
 }
 
-function finishBatch() {
-  el("batch-run-btn").disabled = false;
-  show(el("batch-table-wrap"));
+/* ---- Drawer ---- */
 
-  var ok = batchResults.filter(function (r) { return r && r.status === "ok"; }).length;
-  var failed = batchResults.length - ok;
-  var summary = el("batch-summary");
-  summary.textContent = ok + " scored" + (failed > 0 ? ", " + failed + " skipped (flagged above)" : "");
-  show(summary);
-}
+function openDrawer(entry) {
+  batchState.drawerEntry = entry;
+  var row = entry.row;
+  var r   = entry.result;
+  var b   = r ? band(r.confidence) : null;
 
-function openDrawer(result, rowIdx) {
-  var drawer = el("detail-drawer");
-  var body = el("drawer-body");
-  body.innerHTML = "";
+  el('drawer-title').innerHTML =
+    escHtml(row.service_category || '—') +
+    '<span class="muted"> · ' + escHtml(row.service_subtype || '—') + '</span>';
 
-  if (result.status === "ok") {
-    var p = result.prediction;
-    var conf = Number(p.confidence);
+  var bodyEl = el('drawer-body');
+  bodyEl.innerHTML = '';
 
-    // Render a mini version of the result card inside the drawer
-    var confPct = clamp(conf * 100, 0, 100).toFixed(1);
-    var confClass = conf >= 0.8 ? "conf-high" : conf >= 0.5 ? "conf-mid" : "conf-low";
+  if (entry.error) {
+    var errDiv = document.createElement('div');
+    errDiv.innerHTML =
+      '<div class="ha-eyebrow" style="margin-bottom:8px">Error</div>' +
+      '<p style="font-size:13px;color:var(--muted)">' + escHtml(entry.error) + '</p>' +
+      '<div class="ha-eyebrow" style="margin:12px 0 8px">Booking</div>' +
+      '<pre class="ha-mono" style="font-size:11.5px;color:var(--ink-soft);white-space:pre-wrap">' + escHtml(JSON.stringify(row, null, 2)) + '</pre>';
+    bodyEl.appendChild(errDiv);
+  } else {
+    // Description
+    var descDiv = document.createElement('div');
+    descDiv.style.cssText = 'font-size:13px;color:var(--muted);line-height:1.5';
+    descDiv.textContent = row.job_description || '';
+    bodyEl.appendChild(descDiv);
 
-    var uncertaintiesHtml = "";
-    if (p.uncertainties) {
-      var items = Array.isArray(p.uncertainties)
-        ? p.uncertainties
-        : String(p.uncertainties).split(/[,;|]+/).map(function (s) { return s.trim(); }).filter(Boolean);
-      if (items.length) {
-        uncertaintiesHtml = "<div class='drawer-section-title'>Why it might vary</div><ul class='uncertainties-list'>" +
-          items.map(function (u) { return "<li class='uncertainty-item'>" + escapeHtml(u) + "</li>"; }).join("") +
-          "</ul>";
-      }
+    // ZIP / Deadline / Month
+    var metaDiv = document.createElement('div');
+    metaDiv.style.cssText = 'display:flex;gap:18px;font-size:12.5px';
+    metaDiv.innerHTML =
+      '<div><div class="ha-eyebrow">ZIP</div><div style="font-weight:700;margin-top:3px" class="ha-mono">' + escHtml(row.zip_code || '—') + '</div></div>' +
+      '<div><div class="ha-eyebrow">Deadline</div><div style="font-weight:700;margin-top:3px">' + escHtml(row.deadline || '—') + '</div></div>' +
+      '<div><div class="ha-eyebrow">Month</div><div style="font-weight:700;margin-top:3px" class="ha-mono">' + escHtml(row.booking_month || '—') + '</div></div>';
+    bodyEl.appendChild(metaDiv);
+
+    // Divider
+    bodyEl.appendChild(Object.assign(document.createElement('div'), { className: 'ha-divider' }));
+
+    // Midpoint
+    var midDiv = document.createElement('div');
+    midDiv.innerHTML =
+      '<div class="ha-num" style="font-size:42px;font-weight:800;letter-spacing:-.02em;line-height:1">' + usd(r.estimate_midpoint) + '</div>' +
+      '<div style="font-size:12.5px;color:var(--muted);margin-top:5px">estimate midpoint</div>';
+    bodyEl.appendChild(midDiv);
+
+    // Interval bar
+    var ivDiv = document.createElement('div');
+    ivDiv.className = 'ha-iv';
+    var range  = r.estimate_hi - r.estimate_lo;
+    var midPct = range > 0 ? ((r.estimate_midpoint - r.estimate_lo) / range * 100) : 50;
+    ivDiv.innerHTML =
+      '<div class="ha-iv-track">' +
+        '<div class="ha-iv-fill"></div>' +
+        '<div class="ha-iv-mid" style="left:calc(' + clamp(midPct, 2, 97) + '% - 2.5px)"></div>' +
+      '</div>' +
+      '<div class="ha-iv-ends ha-num"><span>low&nbsp; <b>' + usd(r.estimate_lo) + '</b></span><span>high&nbsp; <b>' + usd(r.estimate_hi) + '</b></span></div>';
+    bodyEl.appendChild(ivDiv);
+
+    // Divider
+    bodyEl.appendChild(Object.assign(document.createElement('div'), { className: 'ha-divider' }));
+
+    // Confidence ring + band
+    var confRow = document.createElement('div');
+    confRow.className = 'ha-conf-row';
+
+    var ringEl = document.createElement('div');
+    ringEl.className = 'ha-ring';
+    renderConfidenceRing(ringEl, r.confidence, 62);
+
+    var bandDiv = document.createElement('div');
+    bandDiv.innerHTML =
+      '<div style="font-size:14px;font-weight:800;color:' + TONE_COLOR[b.tone] + '">' + b.label + ' · ' + Math.round(r.confidence * 100) + '%</div>' +
+      '<div style="font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45">' + b.note + '</div>';
+
+    confRow.appendChild(ringEl);
+    confRow.appendChild(bandDiv);
+    bodyEl.appendChild(confRow);
+
+    // Flags
+    if (r.uncertainties) {
+      var flagsDiv = document.createElement('div');
+      var flagLabel = document.createElement('div');
+      flagLabel.className = 'ha-eyebrow';
+      flagLabel.style.marginBottom = '9px';
+      flagLabel.textContent = 'Why it might vary';
+      flagsDiv.appendChild(flagLabel);
+
+      var flagsWrap = document.createElement('div');
+      flagsWrap.className = 'ha-flags';
+      var flagList = String(r.uncertainties).split(/\s*;\s*/).filter(Boolean);
+      renderFlagChips(flagsWrap, flagList, b.tone);
+      flagsDiv.appendChild(flagsWrap);
+      bodyEl.appendChild(flagsDiv);
     }
-
-    body.innerHTML =
-      "<div class='drawer-kv'><span class='kv-label'>Category</span><span>" + escapeHtml(p.service_category || result.booking.service_category || "—") + "</span></div>" +
-      "<div class='drawer-kv'><span class='kv-label'>ZIP</span><span>" + escapeHtml(result.booking.zip_code || "—") + "</span></div>" +
-      "<div class='drawer-kv'><span class='kv-label'>Model</span><span>" + escapeHtml(p.model_version || "—") + "</span></div>" +
-      "<div class='drawer-interval'>" +
-        "<div class='drawer-interval-row'><span class='kv-label'>Low</span><strong>" + usd(p.estimate_lo) + "</strong></div>" +
-        "<div class='drawer-interval-row'><span class='kv-label'>Midpoint</span><strong class='mid-cell'>" + usd(p.estimate_midpoint) + "</strong></div>" +
-        "<div class='drawer-interval-row'><span class='kv-label'>High</span><strong>" + usd(p.estimate_hi) + "</strong></div>" +
-      "</div>" +
-      "<div class='drawer-conf-row'><span class='kv-label'>Confidence</span>" +
-        "<div class='confidence-track'><div class='confidence-fill " + confClass + "' style='width:" + confPct + "%'></div></div>" +
-        "<span>" + confPct + "%</span>" +
-      "</div>" +
-      (conf < 0.5 ? "<div class='ood-banner'>Low confidence — out-of-distribution signal.</div>" : "") +
-      uncertaintiesHtml;
-  } else {
-    body.innerHTML =
-      "<div class='drawer-error'>" +
-        "<div class='drawer-section-title'>Error</div>" +
-        "<p>" + escapeHtml(result.error || "Unknown error") + "</p>" +
-        "<div class='drawer-section-title'>Booking</div>" +
-        "<pre class='json-preview'>" + escapeHtml(JSON.stringify(result.booking, null, 2)) + "</pre>" +
-      "</div>";
   }
 
-  show(el("drawer-overlay"));
-  show(drawer);
+  show(el('drawer-scrim'));
+  show(el('detail-drawer'));
 }
 
 function closeDrawer() {
-  hide(el("detail-drawer"));
-  hide(el("drawer-overlay"));
+  hide(el('detail-drawer'));
+  hide(el('drawer-scrim'));
+  batchState.drawerEntry = null;
 }
 
-/* ======================================================
-   RESULTS PANEL (U7)
-   ====================================================== */
+/* ---- JSON modal ---- */
+
+function openJsonModal() {
+  if (!batchState.rows) return;
+  var payloads = batchState.rows.map(rowToPayload);
+  el('json-modal-sub').textContent = payloads.length + ' bookings → JSON array';
+  el('json-modal-pre').textContent = JSON.stringify(payloads, null, 2);
+  show(el('json-modal-scrim'));
+}
+
+function closeJsonModal() {
+  hide(el('json-modal-scrim'));
+}
+
+/* ---- Export CSV ---- */
+
+function exportBatchCsv() {
+  var head = 'job_id,service_category,zip_code,estimate_lo,estimate_midpoint,estimate_hi,confidence,model_version';
+  var lines = batchState.results
+    .filter(function(e) { return e && e.result; })
+    .map(function(e) {
+      var r = e.result;
+      return [
+        e.row.job_id, e.row.service_category, e.row.zip_code,
+        r.estimate_lo, r.estimate_midpoint, r.estimate_hi,
+        r.confidence, r.model_version
+      ].join(',');
+    });
+  var blob = new Blob([head + '\n' + lines.join('\n')], { type: 'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'scored_bookings.csv';
+  a.click();
+  pushToast({ tone: 'ok', title: 'Export ready', body: 'scored_bookings.csv downloaded.' });
+}
+
+/* ============================================================
+   RESULTS PANEL
+   ============================================================ */
 
 var resultsLoaded = false;
 
 function loadResults() {
   if (resultsLoaded) return;
-
-  // Load metrics
-  fetch("/dashboard/metrics")
-    .then(function (res) {
-      if (res.status === 503 || res.status === 404) {
-        throw new Error("unavailable");
-      }
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    })
-    .then(function (data) {
-      renderMetricCards(data);
-      renderComparisonChart(data);
-    })
-    .catch(function (err) {
-      if (err.message === "unavailable" || err.message.includes("404")) {
-        showMetricsUnavailable();
-      } else {
-        showMetricsUnavailable();
-      }
-    });
-
-  // Load predictions
-  fetch("/dashboard/predictions")
-    .then(function (res) {
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    })
-    .then(function (rows) {
-      renderPredictionsTable(rows);
-    })
-    .catch(function () {
-      // Predictions table just stays hidden — non-critical
-    });
-
   resultsLoaded = true;
+
+  // Show skeleton, hide loaded
+  show(el('results-skeleton'));
+  hide(el('results-loaded'));
+  hide(el('metrics-unavailable'));
+
+  // Fetch metrics + predictions in parallel
+  Promise.all([
+    fetch('/dashboard/metrics').then(function(res) {
+      if (!res.ok) throw { status: res.status };
+      return res.json();
+    }),
+    fetch('/dashboard/predictions').then(function(res) {
+      if (!res.ok) return [];
+      return res.json();
+    }).catch(function() { return []; })
+  ]).then(function(vals) {
+    var metrics     = vals[0];
+    var predictions = vals[1];
+
+    // Small artificial delay to let skeleton shimmer (design says ~950ms)
+    setTimeout(function() {
+      hide(el('results-skeleton'));
+      show(el('results-loaded'));
+      renderStatCards(metrics);
+      renderCompareChart(metrics);
+      renderScatter(predictions);
+      renderPredictionsTable(predictions);
+
+      // Update caption
+      var v = metrics.model_version || modelVersion;
+      el('results-caption-sub').textContent = '411-row priced subset · ' + v;
+      el('footer-version').textContent = v;
+    }, 950);
+  }).catch(function() {
+    hide(el('results-skeleton'));
+    show(el('metrics-unavailable'));
+  });
 }
 
-function showMetricsUnavailable() {
-  hide(el("stat-cards"));
-  hide(el("chart-section"));
-  show(el("metrics-unavailable"));
+/* ---- Stat cards ---- */
+
+function renderStatCards(data) {
+  // Values are ALREADY PERCENTAGES — do NOT multiply by 100
+  var blended    = Number(data.blended);
+  var baseBlended = Number(data.baseline_blended);
+  var real       = Number(data.real_only);
+  var baseReal   = Number(data.baseline_real);
+  var cov        = Number(data.coverage);
+  var targetCov  = 80;
+
+  // Blended MAPE — pass = model < baseline
+  var blendedPass = blended < baseBlended;
+  var blendedDelta = blended - baseBlended; // negative = improvement
+  renderStatCard(
+    'sc-blended-val', 'sc-blended-base', 'sc-blended-delta', 'sc-blended-check',
+    blended.toFixed(1) + '%',
+    baseBlended.toFixed(1) + '%',
+    blendedDelta,
+    blendedPass,
+    true   // goodWhenNegative
+  );
+  // Remove skeleton from card-blended
+  var cardBlended = el('card-blended');
+  if (cardBlended) cardBlended.classList.remove('skeleton');
+
+  // Real-only MAPE
+  var realPass = real < baseReal;
+  var realDelta = real - baseReal;
+  renderStatCard(
+    'sc-real-val', 'sc-real-base', 'sc-real-delta', 'sc-real-check',
+    real.toFixed(1) + '%',
+    baseReal.toFixed(1) + '%',
+    realDelta,
+    realPass,
+    true
+  );
+  var cardReal = el('card-real');
+  if (cardReal) cardReal.classList.remove('skeleton');
+
+  // Coverage — pass = cov >= 80
+  var covPass = cov >= targetCov;
+  var covDelta = cov - targetCov;
+  renderStatCard(
+    'sc-cov-val', 'sc-cov-base', 'sc-cov-delta', 'sc-cov-check',
+    cov.toFixed(1) + '%',
+    '≥80%',
+    covDelta,
+    covPass,
+    false  // goodWhenPositive for coverage
+  );
+  var cardCov = el('card-cov');
+  if (cardCov) cardCov.classList.remove('skeleton');
 }
 
-function renderMetricCards(data) {
-  el("metrics-unavailable") && hide(el("metrics-unavailable"));
+function renderStatCard(valId, baseId, deltaId, checkId, val, base, delta, pass, goodWhenNegative) {
+  el(valId).textContent  = val;
+  el(baseId).textContent = base;
 
-  // Remove skeleton class from all cards
-  document.querySelectorAll(".stat-card").forEach(function (c) {
-    c.classList.remove("skeleton");
+  var good = goodWhenNegative ? delta < 0 : delta > 0;
+  var arrow = delta < 0 ? '↓' : '↑';
+  el(deltaId).textContent = arrow + ' ' + Math.abs(delta).toFixed(1) + 'pp vs baseline';
+  el(deltaId).className = 'ha-stat-delta ' + (good ? 'good' : 'bad');
+
+  var checkEl = el(checkId);
+  checkEl.className = 'ha-pass-badge ' + (pass ? 'pass' : 'fail');
+  checkEl.innerHTML = (pass ? ICON.check : ICON.x) + ' ' + (pass ? 'Pass' : 'Fail');
+}
+
+/* ---- Compare chart (grouped vertical bars) ---- */
+
+function renderCompareChart(data) {
+  var blended    = Number(data.blended);
+  var baseBlended = Number(data.baseline_blended);
+  var real       = Number(data.real_only);
+  var baseReal   = Number(data.baseline_real);
+
+  var chartEl = el('compare-chart');
+  chartEl.innerHTML = '';
+
+  var groups = [
+    { name: 'Blended MAPE',  model: blended,  baseline: baseBlended },
+    { name: 'Real-only MAPE', model: real,     baseline: baseReal   }
+  ];
+
+  var MAX_H = 158; // px for 100% bar (scale to max ~40%)
+  var maxVal = Math.max(blended, baseBlended, real, baseReal, 1);
+
+  groups.forEach(function(g) {
+    var groupDiv = document.createElement('div');
+    groupDiv.className = 'ha-bar-group';
+
+    var pairDiv = document.createElement('div');
+    pairDiv.className = 'ha-bar-pair';
+
+    [
+      { key: 'model',    color: 'var(--amber)', textColor: 'var(--ink)',   val: g.model    },
+      { key: 'baseline', color: '#c6d0d8',      textColor: 'var(--muted)', val: g.baseline }
+    ].forEach(function(bar) {
+      var h = Math.round((bar.val / maxVal) * MAX_H);
+      var colDiv = document.createElement('div');
+      colDiv.className = 'ha-bar-col';
+
+      var label = document.createElement('span');
+      label.className = 'ha-bar-val-label';
+      label.style.color = bar.textColor;
+      label.textContent = bar.val.toFixed(1) + '%';
+
+      var rect = document.createElement('div');
+      rect.className = 'ha-bar-rect';
+      rect.style.cssText = 'width:52px;height:0;background:' + bar.color + ';border-radius:7px 7px 0 0;transition:height .5s cubic-bezier(.2,.8,.3,1)';
+
+      // Tooltip
+      var tipText = (bar.key === 'model' ? 'Model' : 'Baseline') + ': ' + bar.val.toFixed(1) + '%';
+      rect.title = tipText;
+
+      colDiv.appendChild(label);
+      colDiv.appendChild(rect);
+      pairDiv.appendChild(colDiv);
+
+      // Animate height
+      setTimeout(function() { rect.style.height = h + 'px'; }, 80);
+    });
+
+    var groupLabel = document.createElement('div');
+    groupLabel.className = 'ha-bar-group-label';
+    groupLabel.textContent = g.name;
+
+    groupDiv.appendChild(pairDiv);
+    groupDiv.appendChild(groupLabel);
+    chartEl.appendChild(groupDiv);
+  });
+}
+
+/* ---- Scatter: predicted midpoint by confidence ---- */
+
+function renderScatter(predictions) {
+  var svg = el('scatter-svg');
+  svg.innerHTML = '';
+
+  var tooltip = el('scatter-tooltip');
+
+  // Filter to rows with a parseable midpoint
+  var pts = (predictions || []).map(function(row) {
+    return {
+      midpoint:   Number(row.estimate_midpoint),
+      confidence: Number(row.confidence),
+      job_id:     row.job_id,
+      lo:         Number(row.estimate_lo),
+      hi:         Number(row.estimate_hi)
+    };
+  }).filter(function(p) { return p.midpoint > 0 && p.confidence >= 0 && p.confidence <= 1; });
+
+  if (!pts.length) {
+    // No data — show a placeholder message
+    var nodata = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    nodata.setAttribute('x', '240');
+    nodata.setAttribute('y', '140');
+    nodata.setAttribute('text-anchor', 'middle');
+    nodata.setAttribute('font-size', '13');
+    nodata.setAttribute('fill', 'var(--faint)');
+    nodata.textContent = 'No prediction data available';
+    svg.appendChild(nodata);
+    return;
+  }
+
+  // Log10 scale: x = midpoint, y = midpoint (log)
+  var W = 480, H = 280, padL = 44, padB = 36, padT = 12, padR = 12;
+
+  var allMids = pts.map(function(p) { return p.midpoint; });
+  var domMin  = Math.max(50,   Math.min.apply(null, allMids));
+  var domMax  = Math.min(20000, Math.max.apply(null, allMids));
+  if (domMin >= domMax) { domMax = domMin * 10; }
+
+  var lmin = Math.log10(domMin * 0.8);
+  var lmax = Math.log10(domMax * 1.2);
+
+  function sx(v) { return padL + (Math.log10(Math.max(v, 1)) - lmin) / (lmax - lmin) * (W - padL - padR); }
+  function sy(v) { return (H - padB) - (Math.log10(Math.max(v, 1)) - lmin) / (lmax - lmin) * (H - padT - padB); }
+
+  // Grid lines + ticks
+  var ticks = [100, 300, 500, 1000, 3000, 5000, 10000].filter(function(t) {
+    return t > domMin * 0.5 && t < domMax * 2;
+  }).slice(0, 6);
+
+  ticks.forEach(function(t) {
+    var yy = sy(t);
+    if (yy < padT || yy > H - padB) return;
+
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', padL); line.setAttribute('y1', yy);
+    line.setAttribute('x2', W - padR); line.setAttribute('y2', yy);
+    line.setAttribute('stroke', 'var(--line-soft)'); line.setAttribute('stroke-width', '1');
+    svg.appendChild(line);
+
+    var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', padL - 6); label.setAttribute('y', yy + 3);
+    label.setAttribute('text-anchor', 'end'); label.setAttribute('font-size', '9');
+    label.setAttribute('fill', 'var(--faint)');
+    label.setAttribute('font-family', 'var(--mono)');
+    label.textContent = t >= 1000 ? '$' + (t / 1000) + 'k' : '$' + t;
+    svg.appendChild(label);
+
+    // X-axis ticks (same values on x)
+    var xx = sx(t);
+    if (xx > padL && xx < W - padR) {
+      var xl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      xl.setAttribute('x', xx); xl.setAttribute('y', H - padB + 14);
+      xl.setAttribute('text-anchor', 'middle'); xl.setAttribute('font-size', '9');
+      xl.setAttribute('fill', 'var(--faint)');
+      xl.setAttribute('font-family', 'var(--mono)');
+      xl.textContent = t >= 1000 ? '$' + (t / 1000) + 'k' : '$' + t;
+      svg.appendChild(xl);
+    }
   });
 
-  // Blended MAPE — API returns value already as a percentage (e.g. 10.49 means 10.49%)
-  var blended = Number(data.blended);
-  var baseBlended = Number(data.baseline_blended);
-  var blendedDelta = baseBlended - blended; // positive = improvement, in percentage points
-  el("sc-blended-val").textContent = blended.toFixed(1) + "%";
-  el("sc-blended-base").textContent = "Baseline: " + baseBlended.toFixed(1) + "%";
-  el("sc-blended-delta").textContent = blendedDelta >= 0
-    ? "▼ " + blendedDelta.toFixed(1) + "pp improvement"
-    : "▲ " + Math.abs(blendedDelta).toFixed(1) + "pp worse";
-  el("sc-blended-delta").className = "stat-card-delta " + (blendedDelta >= 0 ? "delta-good" : "delta-bad");
-  el("sc-blended-check").textContent = blended < baseBlended ? "✓ Pass" : "✗ Fail";
-  el("sc-blended-check").className = "stat-card-check " + (blended < baseBlended ? "check-pass" : "check-fail");
+  // Axis labels
+  var yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  yLabel.setAttribute('x', padL - 6); yLabel.setAttribute('y', padT + 4);
+  yLabel.setAttribute('text-anchor', 'end'); yLabel.setAttribute('font-size', '9');
+  yLabel.setAttribute('fill', 'var(--muted)'); yLabel.setAttribute('font-weight', '700');
+  yLabel.textContent = 'midpoint →';
+  svg.appendChild(yLabel);
 
-  // Real-only MAPE — API returns value already as a percentage (e.g. 26.22 means 26.22%)
-  var real = Number(data.real_only);
-  var baseReal = Number(data.baseline_real);
-  var realDelta = baseReal - real;
-  el("sc-real-val").textContent = real.toFixed(1) + "%";
-  el("sc-real-base").textContent = "Baseline: " + baseReal.toFixed(1) + "%";
-  el("sc-real-delta").textContent = realDelta >= 0
-    ? "▼ " + realDelta.toFixed(1) + "pp improvement"
-    : "▲ " + Math.abs(realDelta).toFixed(1) + "pp worse";
-  el("sc-real-delta").className = "stat-card-delta " + (realDelta >= 0 ? "delta-good" : "delta-bad");
-  el("sc-real-check").textContent = real < baseReal ? "✓ Pass" : "✗ Fail";
-  el("sc-real-check").className = "stat-card-check " + (real < baseReal ? "check-pass" : "check-fail");
+  var xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  xLabel.setAttribute('x', W - padR); xLabel.setAttribute('y', H - padB + 28);
+  xLabel.setAttribute('text-anchor', 'end'); xLabel.setAttribute('font-size', '9');
+  xLabel.setAttribute('fill', 'var(--muted)'); xLabel.setAttribute('font-weight', '700');
+  xLabel.textContent = 'predicted →';
+  svg.appendChild(xLabel);
 
-  // Coverage — API returns value already as a percentage (e.g. 82.7 means 82.7%)
-  var cov = Number(data.coverage);
-  var targetCov = 80; // target >= 80%
-  el("sc-cov-val").textContent = cov.toFixed(1) + "%";
-  el("sc-cov-base").textContent = "Target: ≥80%";
-  el("sc-cov-delta").textContent = cov >= targetCov
-    ? "+" + (cov - targetCov).toFixed(1) + "pp above target"
-    : (cov - targetCov).toFixed(1) + "pp below target";
-  el("sc-cov-delta").className = "stat-card-delta " + (cov >= targetCov ? "delta-good" : "delta-bad");
-  el("sc-cov-check").textContent = cov >= targetCov ? "✓ Pass" : "✗ Fail";
-  el("sc-cov-check").className = "stat-card-check " + (cov >= targetCov ? "check-pass" : "check-fail");
+  // Points
+  pts.forEach(function(p, i) {
+    var b    = band(p.confidence);
+    var cx   = sx(p.midpoint);
+    var cy   = sy(p.midpoint); // y = midpoint too (no actual prices)
+    if (isNaN(cx) || isNaN(cy)) return;
 
-  show(el("stat-cards"));
+    var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', cx.toFixed(1));
+    circle.setAttribute('cy', cy.toFixed(1));
+    circle.setAttribute('r', '4.5');
+    circle.setAttribute('fill', TONE_COLOR[b.tone]);
+    circle.setAttribute('fill-opacity', '0.85');
+    circle.setAttribute('stroke', '#fff');
+    circle.setAttribute('stroke-width', '1.4');
+    circle.style.cursor = 'pointer';
+    circle.style.transition = 'r .1s';
+
+    circle.addEventListener('mouseenter', function() {
+      circle.setAttribute('r', '7');
+      tooltip.innerHTML =
+        'pred ' + usd(p.midpoint) + '<br>confidence ' + Math.round(p.confidence * 100) + '%';
+      show(tooltip);
+    });
+    circle.addEventListener('mouseleave', function() {
+      circle.setAttribute('r', '4.5');
+      hide(tooltip);
+    });
+
+    svg.appendChild(circle);
+  });
 }
 
-function renderComparisonChart(data) {
-  // Values are already percentages — use them directly (e.g. 10.49 means 10.49%)
-  var blended = Number(data.blended);
-  var baseBlended = Number(data.baseline_blended);
-  var real = Number(data.real_only);
-  var baseReal = Number(data.baseline_real);
-
-  // Max value for scaling bars (cap at reasonable max)
-  var maxVal = Math.max(blended, baseBlended, real, baseReal, 1);
-  var scale = 100 / maxVal; // scale to fill 100% of bar width at most
-
-  var chartEl = el("chart-bars");
-  chartEl.innerHTML =
-    renderBarGroup("Blended MAPE", blended, baseBlended, scale) +
-    renderBarGroup("Real-only MAPE", real, baseReal, scale);
-
-  show(el("chart-section"));
-}
-
-function renderBarGroup(label, modelVal, baseVal, scale) {
-  var mPct = clamp(modelVal * scale, 1, 100).toFixed(1);
-  var bPct = clamp(baseVal * scale, 1, 100).toFixed(1);
-  return (
-    "<div class='bar-group'>" +
-      "<div class='bar-group-label'>" + escapeHtml(label) + "</div>" +
-      "<div class='bar-row'>" +
-        "<span class='bar-key'>Model</span>" +
-        "<div class='bar-track'><div class='bar-fill bar-model' style='width:" + mPct + "%'></div></div>" +
-        "<span class='bar-val'>" + modelVal.toFixed(1) + "%</span>" +
-      "</div>" +
-      "<div class='bar-row'>" +
-        "<span class='bar-key'>Baseline</span>" +
-        "<div class='bar-track'><div class='bar-fill bar-baseline' style='width:" + bPct + "%'></div></div>" +
-        "<span class='bar-val'>" + baseVal.toFixed(1) + "%</span>" +
-      "</div>" +
-    "</div>"
-  );
-}
+/* ---- Predictions table ---- */
 
 function renderPredictionsTable(rows) {
-  if (!rows || rows.length === 0) return;
+  if (!rows || !rows.length) return;
 
-  var tbody = el("predictions-tbody");
-  tbody.innerHTML = "";
+  var tbody = el('predictions-tbody');
+  tbody.innerHTML = '';
 
-  // Cap display at 200 rows
   var display = rows.slice(0, 200);
 
-  display.forEach(function (row) {
+  display.forEach(function(row) {
     var conf = Number(row.confidence);
-    var confClass = conf >= 0.8 ? "conf-chip-high" : conf >= 0.5 ? "conf-chip-mid" : "conf-chip-low";
-    var tr = document.createElement("tr");
+    var b    = band(conf);
+    var tr   = document.createElement('tr');
+    tr.className = 'ha-tr';
     tr.innerHTML =
-      "<td class='mono-cell'>" + escapeHtml((row.job_id || "").substring(0, 12)) + "</td>" +
-      "<td>" + escapeHtml(row.service_category || "—") + "</td>" +
-      "<td>" + usd(row.estimate_lo) + "</td>" +
-      "<td class='mid-cell'>" + usd(row.estimate_midpoint) + "</td>" +
-      "<td>" + usd(row.estimate_hi) + "</td>" +
-      "<td><span class='conf-chip " + confClass + "'>" + pct(conf) + "</span></td>" +
-      "<td>" + (String(row.is_labeled) === "true" || row.is_labeled === true ? "✓" : "—") + "</td>";
+      '<td class="ha-mono" style="font-size:11px;color:var(--faint)">' + escHtml((row.job_id || '').substring(0, 14)) + '</td>' +
+      '<td>' + escHtml(row.service_category || '—') + '</td>' +
+      '<td style="text-align:right;font-variant-numeric:tabular-nums">' + usd(row.estimate_lo) + '</td>' +
+      '<td style="text-align:right;font-weight:800;font-variant-numeric:tabular-nums">' + usd(row.estimate_midpoint) + '</td>' +
+      '<td style="text-align:right;font-variant-numeric:tabular-nums">' + usd(row.estimate_hi) + '</td>' +
+      '<td style="font-weight:800;color:' + TONE_COLOR[b.tone] + ';font-variant-numeric:tabular-nums">' + Math.round(conf * 100) + '%</td>';
     tbody.appendChild(tr);
   });
 
-  show(el("predictions-section"));
+  show(el('predictions-section'));
 }
 
-/* ======================================================
+/* ============================================================
    INIT
-   ====================================================== */
+   ============================================================ */
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function() {
   initTabs();
   initPredict();
   initBatch();

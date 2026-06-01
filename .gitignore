@@ -72,3 +72,6 @@ experiments/results.csv
 
 # Handoff docs (context-management, local-only)
 handoff/
+
+# Design export drops (raw Claude Design zips)
+*.zip

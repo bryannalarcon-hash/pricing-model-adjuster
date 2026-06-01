@@ -1,255 +1,461 @@
 <!DOCTYPE html>
+<!-- HouseAccount Pricing Dashboard — shell HTML.
+     Loads Hanken Grotesk + JetBrains Mono via Google Fonts; all logic in app.js,
+     all tokens/components in styles.css. No framework, no build step. -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HouseAccount Pricing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
   <!-- ===================== STICKY HEADER ===================== -->
-  <header class="site-header" id="site-header">
-    <div class="header-left">
-      <span class="logo-mark">&#9670;</span>
-      <span class="product-name">HouseAccount Pricing</span>
-    </div>
-    <div class="header-center">
-      <nav class="tab-nav" role="tablist">
+  <header class="ha-header">
+    <div class="ha-header-inner">
+      <!-- Logo -->
+      <div class="ha-logo">
+        <span class="ha-logo-mark">
+          <span class="ha-logo-diamond"></span>
+        </span>
+        <span class="ha-logo-word">HouseAccount <span class="ha-logo-pricing">Pricing</span></span>
+      </div>
+
+      <!-- Tab nav -->
+      <nav class="ha-tabnav" role="tablist">
         <button class="tab-btn active" data-panel="predict" role="tab" aria-selected="true">Predict</button>
         <button class="tab-btn" data-panel="batch" role="tab" aria-selected="false">Batch</button>
         <button class="tab-btn" data-panel="results" role="tab" aria-selected="false">Results</button>
       </nav>
-    </div>
-    <div class="header-right">
-      <span class="status-dot" id="status-dot" title="Checking API…"></span>
-      <span class="status-label" id="status-label">Checking…</span>
-      <span class="model-badge" id="model-badge">—</span>
+
+      <!-- Right cluster -->
+      <div class="ha-header-right">
+        <div class="ha-status-cluster">
+          <span class="ha-status-dot" id="status-dot"></span>
+          <span class="ha-status-label" id="status-label">Checking…</span>
+        </div>
+        <span class="ha-model-badge ha-mono" id="model-badge">gauntlet-v2.1.0</span>
+      </div>
     </div>
   </header>
 
-  <!-- ===================== TOAST CONTAINER ===================== -->
-  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+  <!-- Offline banner (hidden by default, shown when offline) -->
+  <div class="ha-offline-banner hidden" id="offline-banner">
+    <div class="ha-offline-inner">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.7L15 14H1z"/><path d="M8 6.3v3.2"/><circle cx="8" cy="11.6" r=".6" fill="currentColor" stroke="none"/></svg>
+      API offline — predictions are paused. Check the inference service and retry.
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="ha-toasts" id="toast-container" aria-live="polite"></div>
 
   <!-- ===================== MAIN ===================== -->
-  <main class="main-content">
+  <main class="ha-main">
+
+    <!-- Page title block (swapped per tab) -->
+    <div class="ha-page-title" id="page-title-block">
+      <h1 id="page-h1">Predict</h1>
+      <p id="page-sub">Paste or compose one booking, get one estimate with a confidence interval.</p>
+    </div>
 
     <!-- ======== PREDICT PANEL ======== -->
     <section class="panel" id="panel-predict" role="tabpanel">
-      <div class="panel-inner">
-        <h2 class="panel-title">Single Prediction</h2>
-        <p class="panel-desc">Paste a booking JSON and get an AI price estimate with confidence interval.</p>
+      <div class="ha-predict-grid">
 
-        <div class="field-group">
-          <label class="field-label" for="booking-input">Booking JSON</label>
-          <div class="editor-wrap">
-            <textarea
-              id="booking-input"
-              class="json-editor"
-              rows="10"
-              spellcheck="false"
-              placeholder='Paste booking JSON here, or click "Load sample" below…'
-            ></textarea>
-          </div>
-          <div class="field-error hidden" id="json-error"></div>
-        </div>
-
-        <div class="action-row">
-          <button class="btn btn-secondary" id="load-sample-btn">Load sample</button>
-          <button class="btn btn-primary" id="predict-btn">
-            <span class="btn-text">Predict</span>
-            <span class="spinner hidden" id="predict-spinner"></span>
-          </button>
-        </div>
-
-        <!-- Result Card -->
-        <div class="result-card hidden" id="result-card">
-          <div class="result-header">
-            <span class="result-label">Price Estimate</span>
-            <span class="result-version" id="result-version"></span>
-          </div>
-
-          <!-- Low-confidence banner -->
-          <div class="ood-banner hidden" id="ood-banner">
-            Low confidence — this booking may be outside the model's training distribution. Treat the estimate as a rough guide.
-          </div>
-
-          <!-- Interval bar -->
-          <div class="interval-section">
-            <div class="interval-labels">
-              <span id="label-lo"></span>
-              <span id="label-mid"></span>
-              <span id="label-hi"></span>
-            </div>
-            <div class="interval-bar-wrap">
-              <div class="interval-bar" id="interval-bar">
-                <div class="interval-fill" id="interval-fill"></div>
-                <div class="midpoint-tick" id="midpoint-tick"></div>
+        <!-- Left: editor card -->
+        <div class="ha-card ha-editor-card">
+          <div class="ha-editor-header">
+            <span class="ha-eyebrow">Booking Payload</span>
+            <div class="ha-sample-menu" id="sample-menu-wrap">
+              <button class="ha-btn ha-btn--ghost ha-btn--sm ha-sample-trigger" id="load-sample-btn">
+                Load sample
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+              </button>
+              <div class="ha-sample-dropdown hidden" id="sample-dropdown">
+                <button class="ha-sample-item" data-sample="plumbing">Plumbing · water heater</button>
+                <button class="ha-sample-item" data-sample="small">Plumbing · small fix</button>
+                <button class="ha-sample-item" data-sample="remodel">Remodel · large (low conf)</button>
+                <button class="ha-sample-item" data-sample="auto">Auto · out-of-category</button>
               </div>
             </div>
-            <div class="interval-legend">
-              <span class="legend-item"><span class="legend-dot lo"></span>Low</span>
-              <span class="legend-item"><span class="legend-dot mid"></span>Midpoint</span>
-              <span class="legend-item"><span class="legend-dot hi"></span>High</span>
+          </div>
+
+          <textarea
+            id="booking-input"
+            class="ha-textarea ha-mono"
+            spellcheck="false"
+            placeholder='{&#10;  "job_id": "…",&#10;  "service_category": "Plumbing",&#10;  "zip_code": "78704",&#10;  "job_description": "…"&#10;}'
+          ></textarea>
+
+          <!-- Inline validation error -->
+          <div class="ha-inline-error hidden" id="json-error">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.7L15 14H1z"/><path d="M8 6.3v3.2"/><circle cx="8" cy="11.6" r=".6" fill="currentColor" stroke="none"/></svg>
+            <span id="json-error-text">Invalid JSON</span>
+          </div>
+
+          <div class="ha-editor-footer">
+            <button class="ha-btn ha-btn--primary ha-btn--md ha-btn--full" id="predict-btn">
+              <span id="predict-btn-content">
+                Predict price
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+              </span>
+            </button>
+            <span class="ha-mono ha-cmd-hint">⌘↵</span>
+          </div>
+        </div>
+
+        <!-- Right: result area -->
+        <div class="ha-result-area" id="result-area">
+
+          <!-- Empty state -->
+          <div class="ha-card ha-empty-state" id="result-empty">
+            <div class="ha-empty-icon">
+              <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </div>
+            <div class="ha-empty-title">Run a prediction</div>
+            <div class="ha-empty-body">Paste a booking payload or <b>Load sample</b>, then hit Predict to get an estimate with a confidence interval.</div>
+          </div>
+
+          <!-- Loading state -->
+          <div class="ha-card ha-loading-state hidden" id="result-loading">
+            <div class="ha-loading-row">
+              <span class="ha-spin-amber">
+                <svg class="ha-spin" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 1.6a6.4 6.4 0 106.4 6.4" opacity="1"/></svg>
+              </span>
+              <span class="ha-loading-text">Predicting…</span>
+            </div>
+            <div class="ha-sk" style="height:50px;width:55%"></div>
+            <div class="ha-sk" style="height:13px;width:100%"></div>
+            <div class="ha-divider"></div>
+            <div style="display:flex;gap:14px;align-items:center">
+              <div class="ha-sk" style="height:66px;width:66px;border-radius:999px;flex:none"></div>
+              <div style="flex:1">
+                <div class="ha-sk" style="height:14px;width:40%;margin-bottom:8px"></div>
+                <div class="ha-sk" style="height:12px;width:80%"></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <div class="ha-sk" style="height:28px;width:150px"></div>
+              <div class="ha-sk" style="height:28px;width:120px"></div>
             </div>
           </div>
 
-          <!-- Confidence meter -->
-          <div class="confidence-section">
-            <div class="confidence-label-row">
-              <span class="confidence-title">Confidence</span>
-              <span class="confidence-value" id="confidence-value"></span>
+          <!-- Result card -->
+          <div class="ha-card ha-result-card hidden" id="result-card">
+            <div class="ha-result-top">
+              <span class="ha-eyebrow">Estimate midpoint</span>
+              <span class="ha-category-chip" id="result-category-chip"></span>
             </div>
-            <div class="confidence-track">
-              <div class="confidence-fill" id="confidence-fill"></div>
+
+            <!-- OOD banner -->
+            <div class="ha-ood-banner hidden" id="ood-banner">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.7L15 14H1z"/><path d="M8 6.3v3.2"/><circle cx="8" cy="11.6" r=".6" fill="currentColor" stroke="none"/></svg>
+              <span id="ood-banner-text">Out-of-distribution — confidence N%. Pass it through, but route for manual review rather than auto-quoting.</span>
             </div>
-            <div class="confidence-bands">
-              <span class="band-label">Low &lt;50%</span>
-              <span class="band-label">Mid 50–79%</span>
-              <span class="band-label">High ≥80%</span>
+
+            <!-- Midpoint -->
+            <div>
+              <div class="ha-midpoint ha-num" id="label-mid"></div>
+              <div class="ha-midpoint-sub" id="result-sub"></div>
+            </div>
+
+            <!-- Interval bar -->
+            <div class="ha-iv">
+              <div class="ha-iv-track">
+                <div class="ha-iv-fill"></div>
+                <div class="ha-iv-mid" id="interval-mid-marker"></div>
+              </div>
+              <div class="ha-iv-ends ha-num">
+                <span>low&nbsp; <b id="label-lo"></b></span>
+                <span>high&nbsp; <b id="label-hi"></b></span>
+              </div>
+            </div>
+
+            <div class="ha-divider"></div>
+
+            <!-- Confidence row -->
+            <div class="ha-conf-row">
+              <div class="ha-ring" id="conf-ring" style="width:66px;height:66px">
+                <i class="ha-ring-inner ha-num" id="conf-ring-inner" style="width:50px;height:50px;font-size:17px"></i>
+              </div>
+              <div>
+                <div class="ha-conf-band-label" id="conf-band-label">
+                  <!-- #confidence-value: rendered confidence %, required by Playwright -->
+                  <span id="confidence-value"></span>
+                </div>
+                <div class="ha-conf-band-note" id="conf-band-note"></div>
+              </div>
+            </div>
+
+            <div class="ha-divider"></div>
+
+            <!-- Uncertainties / flags -->
+            <div id="uncertainties-section" class="hidden">
+              <div class="ha-eyebrow" style="margin-bottom:9px">Why it might vary</div>
+              <div class="ha-flags" id="uncertainties-list"></div>
+            </div>
+
+            <!-- Footer -->
+            <div class="ha-result-footer ha-mono">
+              <span id="result-model-version"></span>
+              <span>job_id <span id="result-job-id"></span></span>
             </div>
           </div>
 
-          <!-- Uncertainties -->
-          <div class="uncertainties-section" id="uncertainties-section">
-            <div class="uncertainties-title">Why it might vary</div>
-            <ul class="uncertainties-list" id="uncertainties-list"></ul>
-          </div>
-        </div><!-- /result-card -->
-
+        </div><!-- /result-area -->
       </div>
     </section>
 
     <!-- ======== BATCH PANEL ======== -->
     <section class="panel hidden" id="panel-batch" role="tabpanel">
-      <div class="panel-inner">
-        <h2 class="panel-title">Batch Scoring</h2>
-        <p class="panel-desc">Upload a CSV of bookings. Required columns: <code>job_id</code>, <code>service_category</code>, <code>zip_code</code>, <code>job_description</code>. Optional: <code>original_estimate</code>.</p>
+      <div class="ha-batch-col">
 
-        <!-- Dropzone -->
-        <div class="dropzone" id="dropzone">
-          <div class="dropzone-inner">
-            <span class="dropzone-icon">&#8679;</span>
-            <span class="dropzone-label">Drop a CSV file here, or</span>
-            <label class="btn btn-secondary btn-sm" for="csv-file-input">Choose file</label>
-            <input type="file" id="csv-file-input" accept=".csv,text/csv" class="visually-hidden" />
+        <!-- Dropzone (shown when empty) -->
+        <div class="ha-card ha-dropzone" id="batch-dropzone">
+          <div class="ha-dz-icon">
+            <svg width="26" height="26" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13V3.5M6 7l4-4 4 4"/><path d="M3.5 13.5V16a1 1 0 001 1h11a1 1 0 001-1v-2.5"/></svg>
           </div>
-          <div class="dropzone-filename hidden" id="dropzone-filename"></div>
-        </div>
-        <div class="field-error hidden" id="csv-error"></div>
-
-        <!-- JSON preview -->
-        <div class="json-preview-section hidden" id="json-preview-section">
-          <div class="section-sub-title">Converted JSON <span class="row-count" id="json-row-count"></span></div>
-          <pre class="json-preview" id="json-preview"></pre>
+          <div class="ha-dz-title">Drop a CSV of bookings</div>
+          <div class="ha-dz-sub">or <label for="csv-file-input" class="ha-dz-browse">browse files</label> — we'll convert each row to the API payload shape.</div>
+          <input type="file" id="csv-file-input" accept=".csv" style="display:none" />
+          <button class="ha-btn ha-btn--ghost ha-btn--sm" id="use-sample-csv-btn">Use sample CSV</button>
+          <div class="ha-mono ha-dz-hint">job_id, service_category, zip_code, job_description, …</div>
         </div>
 
-        <!-- Run batch -->
-        <div class="action-row" id="batch-action-row">
-          <button class="btn btn-primary" id="batch-run-btn" disabled>Run batch</button>
-          <span class="progress-label hidden" id="batch-progress"></span>
+        <!-- Toolbar (shown when file loaded) -->
+        <div class="ha-card ha-batch-toolbar hidden" id="batch-toolbar">
+          <div class="ha-toolbar-left">
+            <span class="ha-file-icon">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13V3.5M6 7l4-4 4 4"/><path d="M3.5 13.5V16a1 1 0 001 1h11a1 1 0 001-1v-2.5"/></svg>
+            </span>
+            <div>
+              <div class="ha-mono ha-filename" id="batch-filename"></div>
+              <div class="ha-toolbar-sub" id="batch-toolbar-sub"></div>
+            </div>
+          </div>
+          <!-- Progress bar (shown while scoring) -->
+          <div class="ha-progress-wrap hidden" id="batch-progress-wrap">
+            <div class="ha-progress-track">
+              <div class="ha-progress-fill" id="batch-progress-fill"></div>
+            </div>
+            <span class="ha-mono ha-progress-label ha-num" id="batch-progress-label"></span>
+          </div>
+          <div class="ha-toolbar-actions">
+            <button class="ha-btn ha-btn--ghost ha-btn--sm" id="batch-view-json-btn">View JSON</button>
+            <button class="ha-btn ha-btn--ghost ha-btn--sm hidden" id="batch-export-btn">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v7M5 7l3 3 3-3"/><path d="M3 12.5V14h10v-1.5"/></svg>
+              Export
+            </button>
+            <button class="ha-btn ha-btn--ghost ha-btn--sm" id="batch-replace-btn">Replace</button>
+            <button class="ha-btn ha-btn--primary ha-btn--sm" id="batch-run-btn" disabled>Run batch</button>
+          </div>
         </div>
 
-        <!-- Batch summary -->
-        <div class="batch-summary hidden" id="batch-summary"></div>
-
-        <!-- Batch results table -->
-        <div class="table-wrap hidden" id="batch-table-wrap">
-          <table class="results-table" id="batch-table">
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>ZIP</th>
-                <th>Description</th>
-                <th>Low</th>
-                <th>Midpoint</th>
-                <th>High</th>
-                <th>Confidence</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="batch-tbody"></tbody>
-          </table>
+        <!-- JSON preview (parsed state) -->
+        <div class="ha-card hidden" id="json-preview-section">
+          <div class="ha-preview-header">
+            <span class="ha-eyebrow">Converted JSON · Preview</span>
+            <button class="ha-btn ha-btn--ghost ha-btn--sm" id="batch-expand-json-btn">Expand full array</button>
+          </div>
+          <pre class="ha-mono ha-json-pre" id="json-preview"></pre>
+          <div class="ha-preview-footer ha-mono" id="json-row-count"></div>
         </div>
+
+        <!-- Results table (scoring / done) -->
+        <div class="ha-card hidden" id="batch-table-wrap">
+          <div class="ha-table-header">
+            <span class="ha-eyebrow">Results</span>
+            <div class="ha-summary-pills" id="batch-summary-pills"></div>
+            <span class="ha-table-hint">Click a row for detail</span>
+          </div>
+          <div class="ha-table-scroll">
+            <table class="ha-table">
+              <thead>
+                <tr class="ha-thead-row">
+                  <th>#</th>
+                  <th>Booking</th>
+                  <th>ZIP</th>
+                  <th style="text-align:right">Estimate</th>
+                  <th>Confidence</th>
+                </tr>
+              </thead>
+              <tbody id="batch-tbody"></tbody>
+            </table>
+          </div>
+          <div class="ha-batch-summary-bar hidden" id="batch-summary">
+            <!-- text set by JS: "N scored, M skipped" -->
+          </div>
+        </div>
+
       </div>
 
-      <!-- Row detail drawer -->
-      <div class="drawer-overlay hidden" id="drawer-overlay"></div>
-      <aside class="detail-drawer hidden" id="detail-drawer">
-        <div class="drawer-header">
-          <span class="drawer-title">Prediction Detail</span>
-          <button class="drawer-close" id="drawer-close" aria-label="Close">&times;</button>
+      <!-- JSON modal (rendered into body by JS) -->
+
+      <!-- Detail drawer -->
+      <div class="ha-scrim hidden" id="drawer-scrim"></div>
+      <aside class="ha-drawer hidden" id="detail-drawer">
+        <div class="ha-drawer-hdr">
+          <div>
+            <div class="ha-eyebrow">Prediction detail</div>
+            <div class="ha-drawer-title" id="drawer-title"></div>
+          </div>
+          <button class="ha-btn ha-btn--ghost ha-btn--sm" id="drawer-close">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+          </button>
         </div>
-        <div class="drawer-body" id="drawer-body"></div>
+        <div class="ha-drawer-body" id="drawer-body"></div>
       </aside>
+
     </section>
 
     <!-- ======== RESULTS PANEL ======== -->
     <section class="panel hidden" id="panel-results" role="tabpanel">
-      <div class="panel-inner">
-        <h2 class="panel-title">Model Results</h2>
-        <p class="panel-desc">Leakage-free out-of-fold metrics — model vs baseline on held-out data.</p>
+      <div class="ha-results-col" id="results-inner">
 
-        <!-- Skeleton / unavailable state -->
-        <div class="metrics-unavailable hidden" id="metrics-unavailable">
-          <div class="unavailable-icon">&#9888;</div>
-          <div class="unavailable-msg">Metrics not generated yet — run training to produce <code>reports/eval_metrics.json</code>.</div>
-        </div>
-
-        <!-- Stat cards -->
-        <div class="stat-cards" id="stat-cards">
-          <div class="stat-card skeleton" id="card-blended">
-            <div class="stat-card-title">Blended MAPE</div>
-            <div class="stat-card-value" id="sc-blended-val">—</div>
-            <div class="stat-card-baseline" id="sc-blended-base"></div>
-            <div class="stat-card-delta" id="sc-blended-delta"></div>
-            <div class="stat-card-check" id="sc-blended-check"></div>
+        <!-- Skeleton (shown while loading) -->
+        <div id="results-skeleton">
+          <div class="ha-stat-grid">
+            <div class="ha-card ha-stat-card skeleton" id="card-blended">
+              <div class="ha-sk" style="height:12px;width:50%"></div>
+              <div class="ha-sk" style="height:38px;width:60%;margin-top:8px"></div>
+              <div class="ha-sk" style="height:12px;width:70%;margin-top:8px"></div>
+            </div>
+            <div class="ha-card ha-stat-card skeleton" id="card-real">
+              <div class="ha-sk" style="height:12px;width:50%"></div>
+              <div class="ha-sk" style="height:38px;width:60%;margin-top:8px"></div>
+              <div class="ha-sk" style="height:12px;width:70%;margin-top:8px"></div>
+            </div>
+            <div class="ha-card ha-stat-card skeleton" id="card-cov">
+              <div class="ha-sk" style="height:12px;width:50%"></div>
+              <div class="ha-sk" style="height:38px;width:60%;margin-top:8px"></div>
+              <div class="ha-sk" style="height:12px;width:70%;margin-top:8px"></div>
+            </div>
           </div>
-          <div class="stat-card skeleton" id="card-real">
-            <div class="stat-card-title">Real-only MAPE</div>
-            <div class="stat-card-value" id="sc-real-val">—</div>
-            <div class="stat-card-baseline" id="sc-real-base"></div>
-            <div class="stat-card-delta" id="sc-real-delta"></div>
-            <div class="stat-card-check" id="sc-real-check"></div>
-          </div>
-          <div class="stat-card skeleton" id="card-cov">
-            <div class="stat-card-title">Interval Coverage</div>
-            <div class="stat-card-value" id="sc-cov-val">—</div>
-            <div class="stat-card-baseline" id="sc-cov-base"></div>
-            <div class="stat-card-delta" id="sc-cov-delta"></div>
-            <div class="stat-card-check" id="sc-cov-check"></div>
+          <div class="ha-chart-grid">
+            <div class="ha-card ha-sk" style="height:290px"></div>
+            <div class="ha-card ha-sk" style="height:290px"></div>
           </div>
         </div>
 
-        <!-- Comparison chart -->
-        <div class="chart-section hidden" id="chart-section">
-          <div class="section-sub-title">MAPE Comparison — lower is better</div>
-          <div class="chart-bars" id="chart-bars"></div>
+        <!-- Unavailable state -->
+        <div class="ha-card ha-unavailable hidden" id="metrics-unavailable">
+          <div class="ha-unavail-icon">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.7L15 14H1z"/><path d="M8 6.3v3.2"/><circle cx="8" cy="11.6" r=".6" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <div class="ha-unavail-title">Metrics not generated yet</div>
+          <div class="ha-unavail-body">Out-of-fold evaluation hasn't been run for this model version. Run training to produce leakage-free metrics, then they'll appear here.</div>
         </div>
 
-        <!-- Predictions table -->
-        <div class="predictions-section hidden" id="predictions-section">
-          <div class="section-sub-title">
-            Out-of-fold predictions
-            <span class="oof-caption">leakage-free out-of-fold</span>
+        <!-- Loaded content -->
+        <div class="hidden" id="results-loaded">
+          <!-- Caption row -->
+          <div class="ha-caption-row">
+            <span class="ha-caption-pill">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 4.5"/></svg>
+              Leakage-free out-of-fold metrics
+            </span>
+            <span class="ha-caption-sub" id="results-caption-sub">411-row priced subset · gauntlet-v2.1.0</span>
           </div>
-          <div class="table-wrap">
-            <table class="results-table" id="predictions-table">
-              <thead>
-                <tr>
-                  <th>Job ID</th>
-                  <th>Category</th>
-                  <th>Low</th>
-                  <th>Midpoint</th>
-                  <th>High</th>
-                  <th>Confidence</th>
-                  <th>Labeled</th>
-                </tr>
-              </thead>
-              <tbody id="predictions-tbody"></tbody>
-            </table>
+
+          <!-- Stat cards (real) -->
+          <div class="ha-stat-grid">
+            <div class="ha-card ha-stat-card" id="stat-card-blended">
+              <div class="ha-stat-top">
+                <span class="ha-eyebrow">Blended MAPE</span>
+                <span class="ha-pass-badge" id="sc-blended-check"></span>
+              </div>
+              <div class="ha-stat-nums ha-num">
+                <span class="ha-stat-val" id="sc-blended-val"></span>
+                <span class="ha-stat-base" id="sc-blended-base"></span>
+              </div>
+              <div class="ha-stat-delta" id="sc-blended-delta"></div>
+              <div class="ha-stat-foot">Full 411-row priced subset. Median APE 8.3%.</div>
+            </div>
+            <div class="ha-card ha-stat-card" id="stat-card-real">
+              <div class="ha-stat-top">
+                <span class="ha-eyebrow">Real-only MAPE</span>
+                <span class="ha-pass-badge" id="sc-real-check"></span>
+              </div>
+              <div class="ha-stat-nums ha-num">
+                <span class="ha-stat-val" id="sc-real-val"></span>
+                <span class="ha-stat-base" id="sc-real-base"></span>
+              </div>
+              <div class="ha-stat-delta" id="sc-real-delta"></div>
+              <div class="ha-stat-foot">Held-out portion of priced rows — the hardest test.</div>
+            </div>
+            <div class="ha-card ha-stat-card" id="stat-card-cov">
+              <div class="ha-stat-top">
+                <span class="ha-eyebrow">Interval Coverage</span>
+                <span class="ha-pass-badge" id="sc-cov-check"></span>
+              </div>
+              <div class="ha-stat-nums ha-num">
+                <span class="ha-stat-val" id="sc-cov-val"></span>
+                <span class="ha-stat-base" id="sc-cov-base"></span>
+              </div>
+              <div class="ha-stat-delta" id="sc-cov-delta"></div>
+              <div class="ha-stat-foot">Actuals landing inside the predicted interval. Target ≥ 80%.</div>
+            </div>
           </div>
-        </div>
+
+          <!-- Two charts -->
+          <div class="ha-chart-grid">
+            <!-- Compare chart (grouped bars) -->
+            <div class="ha-card" style="padding:20px" id="compare-chart-card">
+              <div class="ha-chart-header">
+                <span class="ha-eyebrow" style="white-space:nowrap">Model vs Baseline · MAPE</span>
+                <div class="ha-chart-legend">
+                  <span class="ha-legend-item"><span class="ha-legend-dot" style="background:var(--amber)"></span>Model</span>
+                  <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:#c6d0d8"></span>Baseline</span>
+                </div>
+              </div>
+              <div class="ha-chart-caption">Lower is better</div>
+              <div class="ha-bar-chart" id="compare-chart"></div>
+            </div>
+
+            <!-- Scatter: predicted midpoint by confidence -->
+            <div class="ha-card" style="padding:20px;position:relative" id="scatter-card">
+              <div class="ha-chart-header">
+                <span class="ha-eyebrow" style="white-space:nowrap">Predicted midpoint by confidence</span>
+                <div class="ha-chart-legend">
+                  <span class="ha-legend-item"><span class="ha-legend-dot" style="background:var(--ok)"></span>High</span>
+                  <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:var(--warn)"></span>Mid</span>
+                  <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:var(--bad)"></span>Low</span>
+                </div>
+              </div>
+              <div class="ha-chart-caption">From /dashboard/predictions — x = midpoint (log scale), color = confidence band</div>
+              <svg id="scatter-svg" class="ha-scatter-svg" viewBox="0 0 480 280" style="display:block;width:100%"></svg>
+              <div class="ha-scatter-tooltip hidden" id="scatter-tooltip"></div>
+            </div>
+          </div>
+
+          <!-- Predictions table -->
+          <div class="ha-card hidden" id="predictions-section">
+            <div class="ha-table-header">
+              <span class="ha-eyebrow">Out-of-fold Predictions</span>
+            </div>
+            <div class="ha-table-scroll">
+              <table class="ha-table">
+                <thead>
+                  <tr class="ha-thead-row">
+                    <th>Job ID</th>
+                    <th>Category</th>
+                    <th style="text-align:right">Low</th>
+                    <th style="text-align:right">Midpoint</th>
+                    <th style="text-align:right">High</th>
+                    <th>Confidence</th>
+                  </tr>
+                </thead>
+                <tbody id="predictions-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /results-loaded -->
 
       </div>
     </section>
@@ -257,11 +463,35 @@
   </main>
 
   <!-- ===================== FOOTER ===================== -->
-  <footer class="site-footer">
-    <span id="footer-version">HouseAccount Pricing</span>
-    &nbsp;&middot;&nbsp;
-    <span>Leakage-free out-of-fold metrics</span>
+  <footer class="ha-footer">
+    <div class="ha-footer-inner">
+      <div class="ha-logo ha-logo-dark">
+        <span class="ha-logo-mark ha-logo-mark-dark">
+          <span class="ha-logo-diamond"></span>
+        </span>
+        <span class="ha-logo-word-dark">HouseAccount <span class="ha-logo-pricing">Pricing</span></span>
+      </div>
+      <span class="ha-mono ha-footer-version" id="footer-version">gauntlet-v2.1.0</span>
+      <span class="ha-footer-sep">·</span>
+      <a href="#" class="ha-footer-link" id="oof-link">Leakage-free out-of-fold metrics</a>
+    </div>
   </footer>
+
+  <!-- JSON modal (portal, rendered by JS) -->
+  <div class="ha-scrim hidden" id="json-modal-scrim">
+    <div class="ha-card ha-json-modal" id="json-modal" role="dialog" aria-modal="true">
+      <div class="ha-modal-hdr">
+        <div>
+          <div class="ha-modal-title">Converted request payload</div>
+          <div class="ha-modal-sub" id="json-modal-sub"></div>
+        </div>
+        <button class="ha-btn ha-btn--ghost ha-btn--sm" id="json-modal-close">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+        </button>
+      </div>
+      <pre class="ha-mono ha-modal-pre" id="json-modal-pre"></pre>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
