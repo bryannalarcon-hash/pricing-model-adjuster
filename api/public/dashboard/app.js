@@ -4,7 +4,8 @@
 // Collaborators: index.html (structure), styles.css (tokens/components).
 // Features: Predict / Batch / Results / Conversions panels.
 // Booking flow: Control 1 (#website-autosend-toggle) for dashboard sends;
-//               Control 2 (#api-autosend-toggle in #settings-popover) for API calls.
+//               Control 2 (#api-autosend-toggle in #settings-popover) for API calls;
+//               Control 3 (#live-mode-toggle) real vs simulated sends + #live-indicator badge.
 
 'use strict';
 
@@ -1565,27 +1566,40 @@ function initWebsiteAutosend() {
 }
 
 /* ============================================================
-   SETTINGS POPOVER — Control 2: API → Booking
+   SETTINGS POPOVER — Control 2: API → Booking, Control 3: Live mode
    ============================================================ */
 
+/** Reflect a boolean on a ha-switch (aria-checked + .on class). */
+function setSwitch(toggleEl, on) {
+  if (!toggleEl) return;
+  toggleEl.setAttribute('aria-checked', String(!!on));
+  if (on) toggleEl.classList.add('on');
+  else toggleEl.classList.remove('on');
+}
+
+/** Show/hide the header LIVE indicator badge based on live-mode state. */
+function reflectLiveIndicator(on) {
+  var ind = el('live-indicator');
+  if (!ind) return;
+  if (on) show(ind);
+  else hide(ind);
+}
+
 function initSettings() {
-  var settingsBtn   = el('settings-btn');
-  var popover       = el('settings-popover');
-  var apiToggle     = el('api-autosend-toggle');
+  var settingsBtn = el('settings-btn');
+  var popover     = el('settings-popover');
+  var apiToggle   = el('api-autosend-toggle');
+  var liveToggle  = el('live-mode-toggle');
 
   if (!settingsBtn || !popover) return;
 
-  // Fetch initial config state
+  // Fetch initial config state — set BOTH toggles + the LIVE indicator
   fetch('/dashboard/config')
     .then(function(res) { return res.json(); })
     .then(function(cfg) {
-      var on = !!cfg.api_auto_send;
-      apiToggle.setAttribute('aria-checked', String(on));
-      if (on) {
-        apiToggle.classList.add('on');
-      } else {
-        apiToggle.classList.remove('on');
-      }
+      setSwitch(apiToggle, !!cfg.api_auto_send);
+      setSwitch(liveToggle, !!cfg.live);
+      reflectLiveIndicator(!!cfg.live);
     })
     .catch(function() { /* best-effort */ });
 
@@ -1603,16 +1617,11 @@ function initSettings() {
     }
   });
 
-  // API auto-send toggle
+  // API auto-send toggle (Control 2)
   apiToggle.addEventListener('click', function() {
     var current = apiToggle.getAttribute('aria-checked') === 'true';
     var next    = !current;
-    apiToggle.setAttribute('aria-checked', String(next));
-    if (next) {
-      apiToggle.classList.add('on');
-    } else {
-      apiToggle.classList.remove('on');
-    }
+    setSwitch(apiToggle, next);
 
     fetch('/dashboard/config', {
       method: 'POST',
@@ -1621,22 +1630,55 @@ function initSettings() {
     })
       .then(function(res) { return res.json(); })
       .then(function(cfg) {
-        var confirmed = !!cfg.api_auto_send;
-        apiToggle.setAttribute('aria-checked', String(confirmed));
-        if (confirmed) {
-          apiToggle.classList.add('on');
-        } else {
-          apiToggle.classList.remove('on');
-        }
+        setSwitch(apiToggle, !!cfg.api_auto_send);
       })
       .catch(function() {
-        // Revert on error
-        apiToggle.setAttribute('aria-checked', String(current));
-        if (current) apiToggle.classList.add('on');
-        else apiToggle.classList.remove('on');
+        setSwitch(apiToggle, current); // revert
         pushToast({ tone: 'bad', title: 'Config update failed', body: 'Could not save API auto-send setting.' });
       });
   });
+
+  // Live mode toggle (Control 3) — DANGEROUS: real staging bookings
+  if (liveToggle) {
+    liveToggle.addEventListener('click', function() {
+      var current = liveToggle.getAttribute('aria-checked') === 'true';
+      var next    = !current;
+
+      // Turning ON requires explicit confirmation
+      if (next) {
+        var ok = window.confirm('Turn ON live mode? Sends will create REAL bookings on HouseAccount staging.');
+        if (!ok) {
+          // Cancelled — revert (keep OFF) and do nothing
+          setSwitch(liveToggle, current);
+          return;
+        }
+      }
+
+      // Optimistic UI; server response is authoritative
+      setSwitch(liveToggle, next);
+      reflectLiveIndicator(next);
+
+      fetch('/dashboard/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ live: next })
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(cfg) {
+          var confirmed = !!cfg.live;
+          setSwitch(liveToggle, confirmed);
+          reflectLiveIndicator(confirmed);
+          if (confirmed) {
+            pushToast({ tone: 'amber', title: 'Live mode ON', body: 'Sends now create REAL bookings on staging.' });
+          }
+        })
+        .catch(function() {
+          setSwitch(liveToggle, current); // revert
+          reflectLiveIndicator(current);
+          pushToast({ tone: 'bad', title: 'Config update failed', body: 'Could not change live mode.' });
+        });
+    });
+  }
 }
 
 /* ============================================================

@@ -717,3 +717,96 @@ def test_conversions_tab_renders_table(page: Page):
         assert cells.count() == 6, (
             f"Expected 6 columns in conversions row, got {cells.count()}"
         )
+
+
+# ===========================================================================
+# TEST 13: Live mode switch — confirm-gated ON, LIVE indicator, persisted config
+# ===========================================================================
+
+def test_live_mode_toggle_and_indicator(page: Page):
+    """#live-mode-toggle in the header (alongside Website -> Booking): present + OFF;
+    confirm-accept turns it ON (config live:true, #live-indicator visible); turning OFF
+    clears both. Never triggers a real send; resets live:false in finally."""
+    # Accept any confirm() dialogs (the ON path uses window.confirm)
+    page.on("dialog", lambda d: d.accept())
+
+    try:
+        # Live mode toggle lives in the header — always visible, no popover needed
+        live_toggle = page.locator("#live-mode-toggle")
+        assert live_toggle.count() == 1, "#live-mode-toggle not found"
+        assert live_toggle.is_visible(), "#live-mode-toggle should be visible in the header"
+        assert live_toggle.get_attribute("aria-checked") == "false", (
+            "Live mode should start OFF"
+        )
+
+        # LIVE indicator hidden initially
+        live_indicator = page.locator("#live-indicator")
+        assert "hidden" in (live_indicator.get_attribute("class") or ""), (
+            "#live-indicator should be hidden when live mode is OFF"
+        )
+
+        # Click ON — confirm() is auto-accepted, then POST /dashboard/config {live:true}
+        with page.expect_response(
+            lambda r: "/dashboard/config" in r.url and r.request.method == "POST"
+        ) as on_resp_info:
+            live_toggle.click()
+        on_resp = on_resp_info.value
+        assert on_resp.status == 200, f"Config POST (ON) returned {on_resp.status}"
+        on_data = on_resp.json()
+        assert on_data.get("live") is True, (
+            f"Expected live:true after turning ON, got {on_data}"
+        )
+
+        # GET /dashboard/config reflects live:true
+        cfg_on = requests.get(f"{BASE_URL}/dashboard/config").json()
+        assert cfg_on.get("live") is True, (
+            f"GET /dashboard/config should show live:true, got {cfg_on}"
+        )
+
+        # Switch reflects ON and LIVE indicator becomes visible
+        page.wait_for_function(
+            "() => document.getElementById('live-mode-toggle').getAttribute('aria-checked') === 'true'",
+            timeout=4000,
+        )
+        page.wait_for_function(
+            "() => !document.getElementById('live-indicator').classList.contains('hidden')",
+            timeout=4000,
+        )
+        assert live_indicator.is_visible(), (
+            "#live-indicator should be visible when live mode is ON"
+        )
+
+        # Click OFF — no confirm; POST /dashboard/config {live:false}
+        with page.expect_response(
+            lambda r: "/dashboard/config" in r.url and r.request.method == "POST"
+        ) as off_resp_info:
+            live_toggle.click()
+        off_resp = off_resp_info.value
+        assert off_resp.status == 200, f"Config POST (OFF) returned {off_resp.status}"
+        off_data = off_resp.json()
+        assert off_data.get("live") is False, (
+            f"Expected live:false after turning OFF, got {off_data}"
+        )
+
+        # GET /dashboard/config reflects live:false
+        cfg_off = requests.get(f"{BASE_URL}/dashboard/config").json()
+        assert cfg_off.get("live") is False, (
+            f"GET /dashboard/config should show live:false, got {cfg_off}"
+        )
+
+        # Switch OFF and indicator hidden again
+        page.wait_for_function(
+            "() => document.getElementById('live-mode-toggle').getAttribute('aria-checked') === 'false'",
+            timeout=4000,
+        )
+        page.wait_for_function(
+            "() => document.getElementById('live-indicator').classList.contains('hidden')",
+            timeout=4000,
+        )
+    finally:
+        # Safety: always leave live OFF, even if the test failed mid-way
+        requests.post(
+            f"{BASE_URL}/dashboard/config",
+            json={"live": False},
+            headers={"Content-Type": "application/json"},
+        )

@@ -3,7 +3,8 @@
      Loads Hanken Grotesk + JetBrains Mono via Google Fonts; all logic in app.js,
      all tokens/components in styles.css. No framework, no build step.
      Panels: Predict / Batch / Results / Conversions.
-     Header controls: #website-autosend-toggle (website sends) + #settings-btn gear (API config). -->
+     Header controls: #website-autosend-toggle (website sends) + #settings-btn gear
+     (API config + #live-mode-toggle); #live-indicator badge shows when live mode is ON. -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -43,6 +44,11 @@
         </div>
         <span class="ha-model-badge ha-mono" id="model-badge">gauntlet-v2.1.0</span>
 
+        <!-- LIVE indicator: visible only when live mode is ON (real bookings will be created) -->
+        <span class="ha-live-indicator hidden" id="live-indicator" title="Live mode is ON — sends create REAL bookings on staging">
+          <span class="ha-live-dot"></span>LIVE
+        </span>
+
         <!-- Control 1: Website → Booking auto-send toggle -->
         <div class="ha-autosend-wrap" title="Website → Booking: auto-send estimates you run here">
           <div class="ha-autosend-label-group">
@@ -54,6 +60,22 @@
             role="switch"
             aria-checked="false"
             aria-label="Website → Booking: auto-send estimates you run here"
+          >
+            <span class="ha-switch-thumb"></span>
+          </button>
+        </div>
+
+        <!-- Control 3: Live mode toggle (DANGEROUS — real staging bookings), alongside Control 1 -->
+        <div class="ha-autosend-wrap ha-autosend-wrap--danger" title="Live mode: sends create REAL bookings on HouseAccount staging">
+          <div class="ha-autosend-label-group">
+            <span class="ha-autosend-label ha-settings-label--danger">Live&nbsp;mode</span>
+          </div>
+          <button
+            id="live-mode-toggle"
+            class="ha-switch ha-switch--danger"
+            role="switch"
+            aria-checked="false"
+            aria-label="Live mode: actually POST real bookings to HouseAccount staging"
           >
             <span class="ha-switch-thumb"></span>
           </button>
@@ -83,9 +105,10 @@
                 <span class="ha-switch-thumb"></span>
               </button>
             </div>
+
             <p class="ha-settings-note">
-              <b>Website&nbsp;→&nbsp;Booking</b> (header toggle) governs sends you trigger from this dashboard.
               <b>API&nbsp;→&nbsp;Booking</b> (this switch) governs programmatic <code>/pricing-estimate</code> calls from your server.
+              <b>Website&nbsp;→&nbsp;Booking</b> and <b>Live mode</b> (header toggles) govern dashboard sends and whether any send is real (POSTed to staging) vs simulated.
             </p>
           </div>
         </div>

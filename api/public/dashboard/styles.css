@@ -1,8 +1,9 @@
 /* HouseAccount Pricing Dashboard — styles.css
    Design-token–driven stylesheet matching the hi-fi handoff spec exactly.
    Collaborates with: index.html structure, app.js behavior.
-   New components: ha-switch (toggle), ha-autosend-wrap, ha-settings-wrap/popover,
-   ha-send-booking-wrap, ha-conv-badge, #panel-conversions table rows. */
+   New components: ha-switch (toggle, +danger variant), ha-autosend-wrap,
+   ha-settings-wrap/popover (+danger row for Live mode), ha-send-booking-wrap,
+   ha-conv-badge, ha-live-indicator (header LIVE badge), #panel-conversions rows. */
 
 /* ============================================================
    DESIGN TOKENS
@@ -297,6 +298,37 @@ body {
   border: 1px solid #ffffff1f;
   padding: 4px 9px;
   border-radius: 7px;
+}
+
+/* LIVE indicator — shown in header only when live mode is ON */
+.ha-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: #fff;
+  background: var(--bad);
+  border: 1px solid #c64430;
+  padding: 3px 9px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px #df534033;
+}
+
+.ha-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+  animation: ha-live-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ha-live-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .35; }
 }
 
 /* Offline banner */
@@ -1529,6 +1561,24 @@ body {
 .ha-switch--sm .ha-switch-thumb { width: 12px; height: 12px; }
 .ha-switch--sm.on .ha-switch-thumb { left: 16px; }
 
+/* Danger variant (Live mode) — red accent when ON */
+.ha-switch--danger {
+  background: var(--bad-tint);
+  border-color: #f3c4bb;
+}
+.ha-switch--danger .ha-switch-thumb { background: #fff; }
+.ha-switch--danger.on {
+  background: var(--bad);
+  border-color: #c64430;
+}
+
+/* Header Live-mode wrap (Control 3) — red-tinted so it reads as the dangerous toggle */
+.ha-autosend-wrap--danger {
+  background: rgba(223, 83, 64, 0.14);
+  border-color: rgba(223, 83, 64, 0.5);
+}
+.ha-autosend-wrap--danger .ha-autosend-label { color: #ffb4a6; }
+
 /* ============================================================
    WEBSITE AUTOSEND CONTROL (header, Control 1)
    ============================================================ */
@@ -1615,6 +1665,18 @@ body {
 .ha-settings-sublabel {
   font-size: 11.5px;
   color: var(--muted);
+}
+
+/* Danger row (Live mode) — warning-tinted block to set it apart */
+.ha-settings-row--danger {
+  background: var(--bad-tint);
+  border: 1px solid #f3c4bb;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.ha-settings-label--danger {
+  color: #a23423;
 }
 
 .ha-settings-note {

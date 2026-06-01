@@ -112,6 +112,35 @@ RSpec.describe "Booking routes", type: :request do
       get "/dashboard/config"
       expect(JSON.parse(response.body)["api_auto_send"]).to be true
     end
+
+    it "defaults live to false and persists live independently" do
+      get "/dashboard/config"
+      expect(JSON.parse(response.body)["live"]).to be false
+
+      post "/dashboard/config", params: { live: true }.to_json, headers: json_headers
+      body = JSON.parse(response.body)
+      expect(body["live"]).to be true
+      expect(body["api_auto_send"]).to be false
+    end
+
+    it "makes a send live when the live flag is on (BOOKING_LIVE unset)" do
+      stub_const("ENV", ENV.to_h.merge(
+        "HOUSEACCOUNT_SIGNING_KEY" => "test-key", "HOUSEACCOUNT_APP_NAME" => "gauntlet",
+        "CONVERSION_STORE_PATH" => tmp_store, "BOOKING_CONFIG_PATH" => tmp_config
+      ))
+      BookingConfig.update("live" => true)
+      stub_request(:post, /pro\.houseparty\.dev\/api\/bookings/)
+        .to_return(status: 201, body: "{}")
+
+      post "/dashboard/booking",
+           params: { source: "manual", payload: { job_id: "lv", service_category: "Cleaning",
+                     zip_code: "75062", job_description: "x" },
+                     result: { estimate_lo: 1, estimate_hi: 2, estimate_midpoint: 1.5,
+                               confidence: 0.7 } }.to_json,
+           headers: json_headers
+      expect(JSON.parse(response.body)["live"]).to be true
+      expect(WebMock).to have_requested(:post, /pro\.houseparty\.dev\/api\/bookings/)
+    end
   end
 
   # -----------------------------------------------------------------------
@@ -143,7 +172,7 @@ RSpec.describe "Booking routes", type: :request do
                    headers: { "Content-Type" => "application/json" })
 
       # Enable auto-send
-      BookingConfig.set(true)
+      BookingConfig.update("api_auto_send" => true)
 
       # Run Thread.new blocks synchronously for deterministic assertions
       allow(Thread).to receive(:new) { |&blk| blk.call; double("thread") }

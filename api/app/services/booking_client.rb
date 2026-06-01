@@ -16,7 +16,7 @@ module BookingClient
   # @param booking_hash [Hash] fully-built booking attributes
   # @return [Hash] keys: :live (Boolean), :status (Integer), :body (String)
   def self.send_booking(booking_hash)
-    return SIMULATED unless ENV["BOOKING_LIVE"] == "1"
+    return SIMULATED unless ENV["BOOKING_LIVE"] == "1" || BookingConfig.live?
 
     body = booking_hash.to_json
     ts   = Time.now.to_i.to_s
