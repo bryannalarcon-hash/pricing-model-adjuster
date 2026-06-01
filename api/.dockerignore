@@ -29,3 +29,6 @@
 !/storage/.keep
 /tmp/storage/*
 !/tmp/storage/.keep
+
+# Ignore locally-vendored gems (repro/dev only; the image installs its own).
+/vendor/bundle/

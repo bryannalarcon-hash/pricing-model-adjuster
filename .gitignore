@@ -83,3 +83,6 @@ data/booking_config.json
 # Claude Code local settings (personal allowlist)
 .claude/settings.local.json
 logs/
+
+# Local Rails repro bundle (not shipped)
+api/vendor/bundle/
