@@ -63,9 +63,12 @@ COPY --from=build /rails /rails
 # Create log/ and tmp/ first: `railway up` uploads only git-tracked files, and the
 # empty log/.keep + tmp/.keep dirs aren't tracked, so they're absent from the build
 # context. mkdir keeps the chown (and puma's pidfile writes) working everywhere.
+# Also create /data (= Rails.root/../data) owned by rails: ConversionStore +
+# BookingConfig write there, and the non-root user can't mkdir it at / otherwise
+# (booking sends 500'd with EACCES). Ephemeral — resets on redeploy.
 RUN useradd rails --create-home --shell /bin/bash && \
-    mkdir -p log tmp tmp/pids && \
-    chown -R rails:rails log tmp
+    mkdir -p log tmp tmp/pids /data && \
+    chown -R rails:rails log tmp /data
 USER rails:rails
 
 # Entrypoint prepares the database.
