@@ -810,3 +810,50 @@ def test_live_mode_toggle_and_indicator(page: Page):
             json={"live": False},
             headers={"Content-Type": "application/json"},
         )
+
+
+# ===========================================================================
+# TEST 14: Send button persists across toggle gymnastics (regression)
+# After a send, toggling Website->Booking on/off (twice) and Live on must NOT
+# leave the manual send button stuck hidden. Decoupled from the toggles.
+# ===========================================================================
+
+def test_send_button_persists_across_toggles(page: Page):
+    """Regression: the manual #send-booking-btn must stay visible after a send and
+    through Website->Booking on/off and Live-mode toggling. All sends simulated."""
+    page.on("dialog", lambda d: d.accept())
+
+    def btn_visible():
+        b = page.locator("#send-booking-btn")
+        if b.count() == 0:
+            return False
+        # visible = wrap not hidden AND button not inline display:none
+        wrap_hidden = "hidden" in (page.locator("#send-booking-wrap").get_attribute("class") or "")
+        return (not wrap_hidden) and b.is_visible()
+
+    try:
+        # Predict (Website->Booking OFF by default) -> button shows
+        page.fill("#booking-input", json.dumps({
+            "job_id": "e2e-persist", "service_category": "Cleaning",
+            "zip_code": "75062", "job_description": "2BR clean", "original_estimate": 160,
+        }))
+        page.click("#predict-btn")
+        page.wait_for_selector("#result-card:not(.hidden)", timeout=8000)
+        assert btn_visible(), "send button should show after a prediction"
+
+        # Manually send (simulated) -> button must remain visible (re-sendable)
+        page.click("#send-booking-btn")
+        page.wait_for_selector("#send-booking-status:not(.hidden)", timeout=5000)
+        assert btn_visible(), "send button must remain visible after a send (regression)"
+
+        # Toggle Website->Booking ON then OFF (twice) -> button still visible
+        page.click("#website-autosend-toggle"); page.wait_for_timeout(150)
+        page.click("#website-autosend-toggle"); page.wait_for_timeout(150)
+        assert btn_visible(), "send button must survive Website->Booking on/off toggling"
+
+        # Toggle Live mode ON -> button still visible
+        page.click("#live-mode-toggle"); page.wait_for_timeout(400)
+        assert btn_visible(), "send button must survive Live-mode toggle"
+    finally:
+        requests.post(f"{BASE_URL}/dashboard/config", json={"live": False},
+                      headers={"Content-Type": "application/json"})

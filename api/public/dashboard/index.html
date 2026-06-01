@@ -107,8 +107,9 @@
             </div>
 
             <p class="ha-settings-note">
-              <b>API&nbsp;→&nbsp;Booking</b> (this switch) governs programmatic <code>/pricing-estimate</code> calls from your server.
-              <b>Website&nbsp;→&nbsp;Booking</b> and <b>Live mode</b> (header toggles) govern dashboard sends and whether any send is real (POSTed to staging) vs simulated.
+              <b>API&nbsp;→&nbsp;Booking</b> (this switch) decides whether programmatic <code>/pricing-estimate</code> calls auto-send to booking.
+              <b>Website&nbsp;→&nbsp;Booking</b> (header) auto-sends dashboard estimates.
+              <b>Live mode</b> (header) applies to <b>every</b> send — dashboard <i>and</i> programmatic — deciding real (POSTed to staging) vs simulated.
             </p>
           </div>
         </div>

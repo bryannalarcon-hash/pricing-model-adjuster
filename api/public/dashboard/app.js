@@ -653,42 +653,39 @@ function renderResultCard(data, submittedPayload) {
   el('result-model-version').textContent = data.model_version || modelVersion;
   el('result-job-id').textContent = data.job_id || '';
 
-  // Send button: show when website auto-send is OFF (manual mode)
+  // Send-to-booking button: ALWAYS available after a prediction (manual send), decoupled
+  // from the auto-send toggle so toggling can never leave it stuck hidden. Re-sendable.
   var sendWrap = el('send-booking-wrap');
   var sendBtn  = el('send-booking-btn');
   var sendStatus = el('send-booking-status');
+  var sendLabel = 'Send to booking flow <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
 
-  if (!websiteAutosendOn) {
-    sendBtn.disabled = false;
-    sendBtn.textContent = '';
-    sendBtn.innerHTML = 'Send to booking flow <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
-    hide(sendStatus);
-    show(sendWrap);
+  sendBtn.disabled = false;
+  sendBtn.style.display = '';        // clear any inline hide left by a prior send
+  sendBtn.innerHTML = sendLabel;
+  hide(sendStatus);
+  show(sendWrap);
 
-    // Wire up send button for this prediction
-    var capturedPayload = submittedPayload;
-    var capturedResult  = data;
-    sendBtn.onclick = function() {
-      sendBtn.disabled = true;
-      sendBtn.textContent = 'Sending…';
-      sendToBookingFlow({ source: 'manual', payload: capturedPayload, result: capturedResult })
-        .then(function(resp) {
-          var msg = resp.live
-            ? 'Sent ✓ — live (HTTP ' + resp.status + ')'
-            : 'Sent ✓ — simulated';
-          sendStatus.textContent = msg;
-          show(sendStatus);
-          sendBtn.style.display = 'none';
-          loadConversionsIfActive();
-        })
-        .catch(function() {
-          sendBtn.disabled = false;
-          sendBtn.textContent = 'Retry send';
-        });
-    };
-  } else {
-    hide(sendWrap);
-  }
+  var capturedPayload = submittedPayload;
+  var capturedResult  = data;
+  sendBtn.onclick = function() {
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending…';
+    sendToBookingFlow({ source: 'manual', payload: capturedPayload, result: capturedResult })
+      .then(function(resp) {
+        sendStatus.textContent = resp.live
+          ? 'Sent ✓ — live (HTTP ' + resp.status + ')'
+          : 'Sent ✓ — simulated';
+        show(sendStatus);
+        sendBtn.disabled = false;     // keep it available for a re-send (never inline-hidden)
+        sendBtn.innerHTML = sendLabel;
+        loadConversionsIfActive();
+      })
+      .catch(function() {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Retry send';
+      });
+  };
 
   predictPhase = 'done';
   showPredictState('done');
@@ -886,10 +883,11 @@ function runBatch() {
     show(el('batch-replace-btn'));
     if (scored > 0) show(el('batch-export-btn'));
 
-    // Show "Send all scored" when website auto-send is OFF and there are scored rows
-    if (!websiteAutosendOn && scored > 0) {
+    // "Send all scored" is always available after scoring (decoupled from the auto-send toggle)
+    if (scored > 0) {
       var sendAllBtn = el('batch-send-all-btn');
       sendAllBtn.textContent = 'Send all scored (' + scored + ')';
+      sendAllBtn.style.display = '';
       show(sendAllBtn);
     }
 
@@ -1546,22 +1544,9 @@ function initWebsiteAutosend() {
     } else {
       toggle.classList.remove('on');
     }
-
-    // When toggling off → show send button if result card is visible; hide send-all
-    // When toggling on  → hide manual send buttons
-    var resultCard  = el('result-card');
-    var sendWrap    = el('send-booking-wrap');
-    var sendAllBtn  = el('batch-send-all-btn');
-
-    if (websiteAutosendOn) {
-      hide(sendWrap);
-      hide(sendAllBtn);
-    } else {
-      // Only show if result card is visible (prediction exists)
-      if (resultCard && !resultCard.classList.contains('hidden')) {
-        show(sendWrap);
-      }
-    }
+    // The manual send buttons are decoupled from this toggle — they stay visible after a
+    // prediction/scoring regardless. This toggle only controls whether NEW predictions also
+    // auto-send. (Avoids the button getting stuck hidden across toggles.)
   });
 }
 

@@ -189,6 +189,27 @@ RSpec.describe "Booking routes", type: :request do
       api_entry = entries.find { |e| e["source"] == "api" }
       expect(api_entry).not_to be_nil
       expect(api_entry["job_id"]).to eq("api-001")
+      expect(api_entry["live"]).to be false   # live OFF -> programmatic send simulated
+    end
+
+    it "sends the programmatic auto-send LIVE when live mode is on" do
+      stub_const("ENV", ENV.to_h.merge(
+        "GAUNTLET_PRICING_SECRET" => auth_secret, "HOUSEACCOUNT_SIGNING_KEY" => "test-key",
+        "HOUSEACCOUNT_APP_NAME" => "gauntlet",
+        "CONVERSION_STORE_PATH" => tmp_store, "BOOKING_CONFIG_PATH" => tmp_config
+      ))
+      BookingConfig.update("api_auto_send" => true, "live" => true)
+      stub_request(:post, /8011\/infer/)
+        .to_return(status: 200, body: sidecar_response.to_json,
+                   headers: { "Content-Type" => "application/json" })
+      stub_request(:post, /pro\.houseparty\.dev\/api\/bookings/).to_return(status: 201, body: "{}")
+
+      post "/pricing-estimate", params: estimate_payload.to_json, headers: auth_headers
+
+      expect(WebMock).to have_requested(:post, /pro\.houseparty\.dev\/api\/bookings/)
+      get "/dashboard/conversions"
+      api_entry = JSON.parse(response.body).find { |e| e["source"] == "api" }
+      expect(api_entry["live"]).to be true   # live ON -> programmatic send is real
     end
   end
 end
