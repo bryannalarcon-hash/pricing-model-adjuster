@@ -14,7 +14,7 @@ class DashboardController < ApplicationController
   # @return [void]
   def predict
     payload = JSON.parse(request.raw_post)
-    result  = PricingProxy.forward(payload, base: request.base_url)
+    result  = PricingProxy.forward(payload, base: upstream_base)
     render json: result[:body], status: result[:status]
   rescue JSON::ParserError
     render json: { error: "Malformed JSON" }, status: :bad_request
@@ -37,6 +37,13 @@ class DashboardController < ApplicationController
   end
 
   private
+
+  # Loopback base for the internal /pricing-estimate self-call. Going back out
+  # through Railway's public HTTPS edge 502'd (port 443 with no TLS); puma binds
+  # 0.0.0.0:$PORT so 127.0.0.1:$PORT reaches it directly. assume_ssl keeps
+  # force_ssl from redirecting this plaintext loopback request.
+  # @return [String]
+  def upstream_base = "http://127.0.0.1:#{ENV.fetch('PORT', request.port)}"
 
   # @return [Pathname, nil] first path that exists on disk
   def first_existing(paths) = paths.find { |p| File.exist?(p) }

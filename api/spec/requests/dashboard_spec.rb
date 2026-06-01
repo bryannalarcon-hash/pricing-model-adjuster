@@ -49,6 +49,18 @@ RSpec.describe "Dashboard routes", type: :request do
       expect(body["coverage"]).to eq(0.83)
     end
 
+    it "calls the upstream over loopback, not the public URL" do
+      # Prod 502: request.base_url was https://… so PricingProxy hit :443 with no
+      # TLS and got non-JSON back. The self-call must target 127.0.0.1:$PORT.
+      allow(PricingProxy).to receive(:forward).and_return(status: 200, body: { "ok" => true })
+
+      post "/dashboard/predict", params: payload.to_json,
+           headers: { "Content-Type" => "application/json" }
+
+      expect(PricingProxy).to have_received(:forward)
+        .with(anything, base: a_string_starting_with("http://127.0.0.1:"))
+    end
+
     it "forwards the Authorization Bearer header" do
       post "/dashboard/predict", params: payload.to_json,
            headers: { "Content-Type" => "application/json" }

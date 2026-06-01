@@ -17,6 +17,7 @@ module PricingProxy
     uri    = URI.parse("#{base}#{ENDPOINT}")
 
     http              = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl      = uri.scheme == "https" # else an https base sends cleartext to :443
     http.open_timeout = TIMEOUT_SECONDS
     http.read_timeout = TIMEOUT_SECONDS
 
