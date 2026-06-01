@@ -86,3 +86,6 @@ logs/
 
 # Local Rails repro bundle (not shipped)
 api/vendor/bundle/
+
+# Dashboard demo reference data shipped inside the rails image (build context = api/)
+!api/dashboard_data/predictions.csv

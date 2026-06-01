@@ -142,4 +142,33 @@ RSpec.describe "Dashboard routes", type: :request do
       expect(JSON.parse(response.body)["error"]).to eq("predictions unavailable")
     end
   end
+
+  # -----------------------------------------------------------------------
+  # Deployment self-containment — Railway builds the rails image from api/
+  # only (rootDirectory=/api), so repo-root reports/ + predictions/ are NOT
+  # in the container. Without in-context copies, metrics + predictions 503
+  # and the SPA shows "API offline". Regression for that live failure.
+  # -----------------------------------------------------------------------
+  describe "in-image dashboard data (build context = api/)" do
+    it "ships eval_metrics.json + predictions.csv inside api/" do
+      expect(File).to exist(Rails.root.join("dashboard_data", "eval_metrics.json"))
+      expect(File).to exist(Rails.root.join("dashboard_data", "predictions.csv"))
+    end
+
+    it "serves both from the in-context copy when repo-root outputs are absent" do
+      m_legacy = DashboardController::METRICS_PATHS.first
+      p_legacy = DashboardController::PREDICTIONS_PATHS.first
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with(m_legacy).and_return(false)
+      allow(File).to receive(:exist?).with(p_legacy).and_return(false)
+
+      get "/dashboard/metrics"
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)).to include("model_version")
+
+      get "/dashboard/predictions"
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).first).to have_key("estimate_midpoint")
+    end
+  end
 end

@@ -1,0 +1,1433 @@
+job_id,service_category,estimate_lo,estimate_hi,estimate_midpoint,confidence,is_labeled,model_version
+a188b02f4a90,Plumbing,111.49,190.06,123.09,0.193,False,gauntlet-v2.1.0
+f338a66d1dc6,Roofing,322.17,912.98,442.5,0.025,False,gauntlet-v2.1.0
+8e48450ca7b5,Pest Control,675.15,948.75,759.39,0.732,True,gauntlet-v2.1.0
+74361bf1b85b,Appliance Repair,112.75,235.85,158.06,0.221,False,gauntlet-v2.1.0
+b44891323cc7,Painting,247.36,361.25,307.05,0.27,False,gauntlet-v2.1.0
+229564f3468d,Painting,477.42,1143.75,698.09,0.096,False,gauntlet-v2.1.0
+3a889422c6fa,Cleaning,229.83,293.1,266.45,0.855,True,gauntlet-v2.1.0
+7c7fead4c711,Plumbing,135.22,276.03,222.14,0.194,False,gauntlet-v2.1.0
+6b22d2aa2d70,Moving,528.89,750.49,621.31,0.45,True,gauntlet-v2.1.0
+8301d2c253bb,Roofing,104.09,201.85,134.95,0.225,False,gauntlet-v2.1.0
+c9916ca5880d,Handyman,162.46,253.71,212.06,0.327,False,gauntlet-v2.1.0
+411b255e8c92,Electrical,161.29,396.34,236.48,0.084,False,gauntlet-v2.1.0
+ae3f53ee778c,Pool,128.21,251.67,221.03,0.338,False,gauntlet-v2.1.0
+bab13030d2a4,Electrical,3718.15,8713.94,4995.78,0.082,False,gauntlet-v2.1.0
+9d205650ff45,Cleaning,353.1,477.23,390.32,0.788,True,gauntlet-v2.1.0
+8a993b22e181,Exterior,190.59,432.33,340.88,0.166,False,gauntlet-v2.1.0
+9ebeb6dc16e1,Cleaning,239.61,299.89,268.79,0.854,True,gauntlet-v2.1.0
+64915d049757,Electrical,158.13,358.52,249.85,0.141,False,gauntlet-v2.1.0
+0572f0f48c9d,Remodeling,970.37,2309.87,1323.03,0.076,False,gauntlet-v2.1.0
+43dcb1e9a64f,Plumbing,87.33,220.61,122.07,0.056,False,gauntlet-v2.1.0
+533f4ff07f8d,Flooring,1175.89,2976.51,1618.27,0.05,False,gauntlet-v2.1.0
+f05ab264302e,Handyman,103.94,203.58,153.54,0.224,False,gauntlet-v2.1.0
+8c99fd9fc5ec,Handyman,404.2,1090.8,607.43,0.052,False,gauntlet-v2.1.0
+7fdc10869c66,Roofing,158.7,349.09,241.64,0.202,False,gauntlet-v2.1.0
+6e0fa02a857e,Handyman,44.02,99.94,65.44,0.15,False,gauntlet-v2.1.0
+395e09e946b0,Handyman,299.22,567.69,361.91,0.191,False,gauntlet-v2.1.0
+a8a0d7d7bc81,HVAC,316.13,480.65,370.89,0.637,True,gauntlet-v2.1.0
+1f5e12a1dcc4,Painting,560.23,1342.49,851.0,0.106,False,gauntlet-v2.1.0
+63ccce1a850e,Handyman,211.32,313.18,259.02,0.341,False,gauntlet-v2.1.0
+7de53cf657da,Appliance Repair,91.96,214.43,134.44,0.183,False,gauntlet-v2.1.0
+2c0ae0244e75,Pest Control,323.0,416.37,369.77,0.842,True,gauntlet-v2.1.0
+aadce6517555,Appliance Repair,98.17,197.22,134.44,0.302,False,gauntlet-v2.1.0
+fa2be76c702f,Handyman,162.02,252.77,189.19,0.298,False,gauntlet-v2.1.0
+f79a832a1a7e,Pest Control,86.62,121.04,104.59,0.747,True,gauntlet-v2.1.0
+ae107f07f5d6,Appliance Repair,103.22,152.22,125.18,0.45,True,gauntlet-v2.1.0
+4b4a19e757f9,Landscaping,1178.08,1606.92,1407.33,0.792,True,gauntlet-v2.1.0
+79e6fa997f9c,Appliance Repair,180.4,251.22,218.26,0.45,True,gauntlet-v2.1.0
+f37fea625fae,Handyman,193.66,491.58,238.34,0.022,True,gauntlet-v2.1.0
+9bfc593c9d7f,HVAC,281.24,388.02,325.68,0.593,True,gauntlet-v2.1.0
+b1e18522e501,Moving,311.97,426.02,376.74,0.45,True,gauntlet-v2.1.0
+44359e96d069,Electrical,85.07,204.92,140.94,0.127,False,gauntlet-v2.1.0
+af97d1baebca,Roofing,235.87,507.72,307.19,0.161,False,gauntlet-v2.1.0
+83f16a7746e6,Handyman,138.89,270.25,170.95,0.181,False,gauntlet-v2.1.0
+9378bf2b31cc,Pest Control,683.4,925.69,786.63,0.785,True,gauntlet-v2.1.0
+55e1be4b917b,Landscaping,171.23,406.99,316.46,0.218,False,gauntlet-v2.1.0
+d65c42f5766d,Electrical,182.5,285.24,232.46,0.248,False,gauntlet-v2.1.0
+8117b9068ebe,Landscaping,219.87,290.51,252.51,0.82,True,gauntlet-v2.1.0
+1412d03a6dbf,Roofing,164.1,275.03,228.73,0.395,True,gauntlet-v2.1.0
+ed5a639fa5d2,Cleaning,359.38,454.26,384.29,0.847,True,gauntlet-v2.1.0
+c304a87b43ab,Painting,293.82,440.45,335.44,0.25,False,gauntlet-v2.1.0
+724c34e3d1eb,Handyman,54.71,131.34,74.71,0.089,False,gauntlet-v2.1.0
+bd6fc2484888,Roofing,225.82,309.06,252.27,0.45,True,gauntlet-v2.1.0
+7cd240b28b54,Cleaning,333.77,445.38,389.46,0.814,True,gauntlet-v2.1.0
+c49eb5e7bb09,Painting,76.23,167.15,127.2,0.167,False,gauntlet-v2.1.0
+386e8a0ee4d9,Electrical,774.19,1626.82,987.89,0.123,False,gauntlet-v2.1.0
+d9baff239c91,Appliance Repair,179.46,231.92,195.05,0.45,True,gauntlet-v2.1.0
+5cb58b248a74,Handyman,177.94,416.99,221.11,0.071,False,gauntlet-v2.1.0
+c2487d522173,Moving,325.25,425.79,371.42,0.45,True,gauntlet-v2.1.0
+96b6182f87de,Electrical,130.34,218.98,161.63,0.217,False,gauntlet-v2.1.0
+dbb3f5d0a54a,Cleaning,244.37,342.84,290.03,0.771,True,gauntlet-v2.1.0
+4ddfd5295fd6,Appliance Repair,198.89,269.7,236.67,0.45,True,gauntlet-v2.1.0
+e58bb6dcf394,Handyman,262.87,594.46,398.52,0.158,False,gauntlet-v2.1.0
+59be4ffadea6,Handyman,92.78,208.15,150.37,0.182,False,gauntlet-v2.1.0
+71b38cb18504,Handyman,726.09,1810.05,966.34,0.055,False,gauntlet-v2.1.0
+fe44376f5c09,HVAC,202.19,430.84,334.79,0.389,False,gauntlet-v2.1.0
+87ddad134d43,Painting,969.2,1564.9,1214.36,0.234,False,gauntlet-v2.1.0
+06ad5edd86e0,Handyman,655.51,1683.93,743.26,0.022,False,gauntlet-v2.1.0
+2ad1d9248424,Plumbing,141.04,364.43,247.33,0.113,False,gauntlet-v2.1.0
+d232184b1809,Landscaping,324.94,430.7,361.77,0.809,True,gauntlet-v2.1.0
+f71a6b4573d3,Handyman,103.2,245.38,145.84,0.107,False,gauntlet-v2.1.0
+e30364774f0a,Landscaping,108.75,146.79,123.67,0.677,True,gauntlet-v2.1.0
+2b8ef4d4e823,Pest Control,177.67,214.41,201.68,0.9,True,gauntlet-v2.1.0
+2cdfa92b9fc4,HVAC,4606.43,5844.33,5006.17,0.45,True,gauntlet-v2.1.0
+b1b9cbe9a6cf,Remodeling,746.47,1907.59,1103.69,0.064,False,gauntlet-v2.1.0
+d5202cfaa87f,Handyman,321.03,827.67,440.92,0.045,False,gauntlet-v2.1.0
+e71b7b18ef23,General Contractor,1574.52,3783.95,2025.27,0.054,False,gauntlet-v2.1.0
+99ee870b25db,HVAC,3701.24,4586.18,3967.64,0.45,True,gauntlet-v2.1.0
+ab43f022f81c,Plumbing,106.89,163.91,134.33,0.258,False,gauntlet-v2.1.0
+99fb3a5b96a6,Painting,354.5,851.34,478.36,0.071,False,gauntlet-v2.1.0
+bb49c53bd263,HVAC,2797.96,3526.74,3067.9,0.45,True,gauntlet-v2.1.0
+1e3803e3f3e1,Painting,157.53,355.97,266.9,0.159,False,gauntlet-v2.1.0
+6658580ba2dd,Flooring,652.22,1623.05,875.45,0.051,False,gauntlet-v2.1.0
+498e0c0c414c,Handyman,311.37,450.09,335.1,0.308,False,gauntlet-v2.1.0
+ef7a023cd036,Appliance Repair,209.4,292.08,261.03,0.45,True,gauntlet-v2.1.0
+71574e147fa1,Painting,530.99,902.75,709.68,0.224,False,gauntlet-v2.1.0
+12da634313d7,Landscaping,669.07,988.18,790.95,0.582,True,gauntlet-v2.1.0
+17ee10213d9b,General Contractor,1339.96,2134.85,1537.04,0.222,False,gauntlet-v2.1.0
+35543fa109d1,Plumbing,134.93,343.35,236.73,0.12,False,gauntlet-v2.1.0
+51eec8373bd6,Landscaping,210.99,281.37,247.32,0.816,True,gauntlet-v2.1.0
+12484421150,Plumbing,156.97,343.03,221.27,0.132,False,gauntlet-v2.1.0
+1219bf7ef233,Appliance Repair,124.17,242.33,180.21,0.45,False,gauntlet-v2.1.0
+eadfccb71b44,Handyman,62.17,124.06,88.57,0.206,True,gauntlet-v2.1.0
+3309e3883ea9,Plumbing,120.98,211.32,139.63,0.19,False,gauntlet-v2.1.0
+3fc7cd951ee8,Painting,403.52,911.33,593.0,0.125,False,gauntlet-v2.1.0
+6bf76be895da,Handyman,253.07,615.09,360.17,0.097,False,gauntlet-v2.1.0
+cb7f423e8c37,Electrical,175.54,440.64,243.1,0.055,False,gauntlet-v2.1.0
+a9ec7849e183,Handyman,276.44,723.81,371.6,0.026,False,gauntlet-v2.1.0
+221076708aca,Moving,674.95,1009.54,855.06,0.45,True,gauntlet-v2.1.0
+6a25547cf30b,Plumbing,318.06,794.78,379.42,0.018,False,gauntlet-v2.1.0
+c7017966913f,Handyman,68.76,156.34,92.06,0.116,False,gauntlet-v2.1.0
+6e348eb06763,Painting,105.9,252.57,176.45,0.132,False,gauntlet-v2.1.0
+e922a9e73b66,Plumbing,264.18,415.46,290.83,0.229,False,gauntlet-v2.1.0
+ae08ef776d53,Landscaping,52.37,72.99,58.8,0.534,False,gauntlet-v2.1.0
+94ae5c7efd0d,Appliance Repair,219.59,296.28,270.29,0.45,True,gauntlet-v2.1.0
+733f3fda0606,Plumbing,140.72,342.45,246.33,0.138,False,gauntlet-v2.1.0
+2a49f9dfe69e,Plumbing,124.3,318.36,207.32,0.103,False,gauntlet-v2.1.0
+b0c87a432511,Landscaping,207.3,272.0,240.96,0.829,True,gauntlet-v2.1.0
+9782db6027f5,Handyman,322.03,755.76,364.49,0.031,False,gauntlet-v2.1.0
+03b83534fb9b,Cleaning,303.65,382.86,324.48,0.691,False,gauntlet-v2.1.0
+c9ea9e7c6f30,Flooring,528.42,969.49,528.42,0.136,False,gauntlet-v2.1.0
+a37d6fca050f,Plumbing,183.16,464.08,287.14,0.09,False,gauntlet-v2.1.0
+0d02233b2626,Remodeling,749.34,1115.59,773.03,0.322,False,gauntlet-v2.1.0
+07bc9883c1fb,Painting,523.66,804.99,612.76,0.243,False,gauntlet-v2.1.0
+618fe68bbd8d,Landscaping,46.64,63.02,51.89,0.79,True,gauntlet-v2.1.0
+5e3399399a4d,Pool,174.91,362.02,319.46,0.283,False,gauntlet-v2.1.0
+38d0f423e408,Handyman,379.5,592.18,379.5,0.255,False,gauntlet-v2.1.0
+3ba8d888b1c0,Pest Control,183.17,232.46,209.62,0.856,True,gauntlet-v2.1.0
+327ec29056cc,Electrical,63.7,143.09,91.42,0.121,False,gauntlet-v2.1.0
+c61bd8aaeedf,Handyman,135.72,340.86,210.7,0.108,False,gauntlet-v2.1.0
+da19ec9481cb,Painting,284.83,399.77,326.32,0.275,False,gauntlet-v2.1.0
+762ee53f5339,Handyman,136.86,346.96,228.12,0.127,False,gauntlet-v2.1.0
+98b29bed8086,Flooring,1634.06,3766.0,1885.51,0.045,False,gauntlet-v2.1.0
+4a05d299cf1b,Handyman,67.76,155.18,102.3,0.154,False,gauntlet-v2.1.0
+3720b27e092c,Handyman,227.02,537.22,300.72,0.087,False,gauntlet-v2.1.0
+9f386c158e3a,Pest Control,803.49,1214.19,1020.43,0.708,True,gauntlet-v2.1.0
+c73f38cdda97,HVAC,3320.16,4168.74,3725.35,0.45,True,gauntlet-v2.1.0
+bb3d93dacebf,Electrical,108.6,250.35,160.44,0.117,False,gauntlet-v2.1.0
+408c6aa439d0,Landscaping,186.38,232.44,211.09,0.87,True,gauntlet-v2.1.0
+f7f72e4b14ce,Cleaning,324.77,412.66,352.2,0.845,True,gauntlet-v2.1.0
+79ae5bcd3219,Handyman,554.4,1085.35,612.17,0.146,False,gauntlet-v2.1.0
+a4ec28637201,Handyman,143.68,316.13,229.06,0.187,False,gauntlet-v2.1.0
+cbc565903562,Handyman,344.92,910.68,390.91,0.022,False,gauntlet-v2.1.0
+ee2d687bce0f,Roofing,450.39,636.67,513.57,0.45,True,gauntlet-v2.1.0
+aba49b35712f,Cleaning,144.96,177.24,156.13,0.867,True,gauntlet-v2.1.0
+d7888933c3e1,Landscaping,110.41,153.37,138.42,0.671,True,gauntlet-v2.1.0
+dad1574b7f03,Plumbing,156.39,372.11,269.18,0.144,False,gauntlet-v2.1.0
+96ca0f3dab10,Painting,716.08,1705.23,1113.73,0.115,False,gauntlet-v2.1.0
+6ecfcccd10de,Electrical,456.51,1129.53,622.01,0.058,False,gauntlet-v2.1.0
+d7b6fab9aa91,Handyman,969.43,1495.45,982.46,0.264,False,gauntlet-v2.1.0
+c393f6347e02,Handyman,1841.33,4688.94,2276.71,0.022,False,gauntlet-v2.1.0
+d380660d4db0,Exterior,169.21,318.37,256.26,0.203,False,gauntlet-v2.1.0
+5acb56526dbc,Pest Control,919.11,1374.5,1158.41,0.726,True,gauntlet-v2.1.0
+864a936a3532,Electrical,96.93,144.66,104.88,0.244,False,gauntlet-v2.1.0
+08e9b4b2c90c,HVAC,304.8,414.2,346.18,0.767,True,gauntlet-v2.1.0
+eb96f31e2575,Cleaning,305.33,398.72,356.28,0.834,True,gauntlet-v2.1.0
+0bf366a6fdd6,Handyman,158.74,365.47,200.92,0.089,False,gauntlet-v2.1.0
+0494a59d9174,Landscaping,112.08,138.46,122.0,0.872,True,gauntlet-v2.1.0
+a7091d75bf49,Handyman,349.9,569.32,371.98,0.245,False,gauntlet-v2.1.0
+a3adef724ce8,Electrical,121.27,191.62,153.33,0.243,False,gauntlet-v2.1.0
+6106ed9c65a2,Plumbing,187.18,424.1,279.76,0.13,False,gauntlet-v2.1.0
+e25d185a526b,Remodeling,360.59,844.32,482.11,0.114,False,gauntlet-v2.1.0
+0886327340b1,Electrical,410.9,1138.97,666.32,0.054,False,gauntlet-v2.1.0
+042dfcff29e6,Pest Control,225.9,285.07,259.33,0.862,True,gauntlet-v2.1.0
+263b20fc4cb4,Handyman,168.22,295.92,192.19,0.218,False,gauntlet-v2.1.0
+2fe269ee87e9,Painting,106.5,249.95,180.98,0.144,False,gauntlet-v2.1.0
+0e3642650bc0,Roofing,1331.38,3320.31,1672.04,0.035,False,gauntlet-v2.1.0
+cce6b6e944ae,Landscaping,161.86,206.06,189.62,0.858,True,gauntlet-v2.1.0
+5240ab05dc75,Roofing,384.01,955.75,556.31,0.101,False,gauntlet-v2.1.0
+14c3280522e8,Landscaping,666.57,994.31,775.92,0.569,True,gauntlet-v2.1.0
+b5c8764bfa66,Painting,145.85,342.51,255.99,0.151,False,gauntlet-v2.1.0
+6d0cf8b5b954,Plumbing,307.58,726.57,424.64,0.087,False,gauntlet-v2.1.0
+97d2244a7046,Handyman,135.61,322.69,213.19,0.142,False,gauntlet-v2.1.0
+0ce3dc873932,Pest Control,406.55,544.52,456.33,0.801,True,gauntlet-v2.1.0
+6c4878bc9fe1,Plumbing,773.78,1878.41,977.45,0.044,False,gauntlet-v2.1.0
+1037a4b06c1b,HVAC,182.04,242.9,206.59,0.742,True,gauntlet-v2.1.0
+7.80238E+15,Electrical,122.12,283.68,208.23,0.149,False,gauntlet-v2.1.0
+0eaf5b92c132,Roofing,426.13,548.2,472.35,0.45,True,gauntlet-v2.1.0
+d0fce2877f1a,Handyman,684.61,1623.09,842.59,0.058,False,gauntlet-v2.1.0
+cbea5b1e12b2,Electrical,287.22,678.82,407.45,0.094,False,gauntlet-v2.1.0
+aaf758307145,Handyman,1357.27,3312.06,1952.36,0.098,False,gauntlet-v2.1.0
+fd99ea8de5c1,Handyman,106.94,256.05,161.12,0.125,False,gauntlet-v2.1.0
+3de208b92f9e,Painting,71.91,165.1,111.24,0.13,False,gauntlet-v2.1.0
+6d1a1e482ee8,Flooring,2327.53,5921.59,3356.72,0.063,False,gauntlet-v2.1.0
+ba70f9774b3c,Handyman,400.96,624.87,443.67,0.283,False,gauntlet-v2.1.0
+a32c58ef2254,Handyman,92.33,200.17,134.02,0.168,False,gauntlet-v2.1.0
+944854c2ee3e,Painting,207.07,422.91,369.02,0.206,False,gauntlet-v2.1.0
+4921cf8ce359,Exterior,571.03,1344.43,915.26,0.126,False,gauntlet-v2.1.0
+0de203b8a94c,HVAC,205.63,294.52,254.05,0.762,True,gauntlet-v2.1.0
+4bd8de3d0456,Exterior,460.35,1053.15,731.8,0.136,False,gauntlet-v2.1.0
+5e7c0a7159ec,HVAC,182.73,265.58,220.27,0.74,True,gauntlet-v2.1.0
+2a50a99e1bc4,Handyman,217.13,326.77,267.05,0.309,False,gauntlet-v2.1.0
+55f247e9a0dd,Appliance Repair,249.88,547.67,310.9,0.131,False,gauntlet-v2.1.0
+5b2bf937c74b,Flooring,158.86,367.99,240.36,0.125,False,gauntlet-v2.1.0
+8aaa550d7fa1,Plumbing,113.61,268.91,195.55,0.146,False,gauntlet-v2.1.0
+384c96b54551,Handyman,62.08,135.32,85.96,0.152,False,gauntlet-v2.1.0
+af0f1ad0d382,Appliance Repair,187.26,426.2,290.15,0.186,False,gauntlet-v2.1.0
+da4621a707cf,Handyman,87.33,131.22,101.29,0.301,False,gauntlet-v2.1.0
+b4d61dc34f0d,Plumbing,337.7,574.0,370.37,0.193,False,gauntlet-v2.1.0
+cb7f82dc3ddf,Landscaping,156.52,370.64,273.39,0.214,False,gauntlet-v2.1.0
+c18377cbb0ff,Plumbing,192.14,314.57,246.67,0.236,False,gauntlet-v2.1.0
+a9bb528ed82c,Handyman,468.42,1212.48,663.73,0.055,False,gauntlet-v2.1.0
+b4a906ff5d63,Handyman,555.92,1407.68,823.59,0.086,False,gauntlet-v2.1.0
+6da2374e596f,Electrical,231.8,524.1,318.7,0.107,False,gauntlet-v2.1.0
+f783272376bf,Appliance Repair,215.34,331.23,248.33,0.45,False,gauntlet-v2.1.0
+68945d92232b,Landscaping,206.13,267.04,240.82,0.842,True,gauntlet-v2.1.0
+9cb8e4b41732,Landscaping,173.48,209.1,193.32,0.898,True,gauntlet-v2.1.0
+939331a7a3c0,Chimney,636.56,1660.53,867.01,0.027,False,gauntlet-v2.1.0
+638827611d41,Appliance Repair,132.97,188.49,153.14,0.45,True,gauntlet-v2.1.0
+956e3a30aa83,Handyman,41.11,100.28,59.57,0.101,False,gauntlet-v2.1.0
+2876370ec5a4,Painting,2477.48,4019.24,3227.4,0.238,False,gauntlet-v2.1.0
+1d5830bae2f8,Electrical,232.16,514.51,330.88,0.126,False,gauntlet-v2.1.0
+92b4a95ac340,HVAC,261.07,393.48,308.28,0.517,True,gauntlet-v2.1.0
+5585ed9f4eb5,Flooring,1279.13,2282.22,1563.21,0.195,True,gauntlet-v2.1.0
+2e99a1f37adb,Painting,168.39,403.35,302.96,0.149,False,gauntlet-v2.1.0
+836477d3ed00,Plumbing,365.55,970.22,552.73,0.055,False,gauntlet-v2.1.0
+9ca169e0b657,Moving,299.04,377.38,338.53,0.45,True,gauntlet-v2.1.0
+be7835abed78,Landscaping,74.86,103.87,79.25,0.601,False,gauntlet-v2.1.0
+ad0296f6906b,Handyman,640.01,1605.24,884.48,0.066,False,gauntlet-v2.1.0
+3c426aafbf01,Handyman,97.34,220.99,160.0,0.18,False,gauntlet-v2.1.0
+fe8ea078ee40,Handyman,169.38,392.32,256.58,0.145,False,gauntlet-v2.1.0
+ee8c0f2cdea1,Flooring,399.7,673.71,470.37,0.213,True,gauntlet-v2.1.0
+929c524a9a14,Handyman,303.18,475.12,360.08,0.285,False,gauntlet-v2.1.0
+68b6e1a360a7,Painting,556.38,1155.99,820.64,0.162,False,gauntlet-v2.1.0
+00fcb2d718c2,Handyman,193.75,478.0,251.05,0.051,False,gauntlet-v2.1.0
+dabec2a5f5a0,Handyman,1967.42,4764.14,2543.16,0.063,False,gauntlet-v2.1.0
+dcf9a90a7392,Moving,586.46,888.3,745.67,0.45,True,gauntlet-v2.1.0
+a0ef9ed1b8cb,Moving,522.46,755.25,608.22,0.45,True,gauntlet-v2.1.0
+002554ab7de2,Appliance Repair,149.44,185.51,167.67,0.45,True,gauntlet-v2.1.0
+d21a83036d7b,HVAC,201.35,285.72,244.8,0.766,True,gauntlet-v2.1.0
+6f560276324a,Handyman,47.33,111.25,66.65,0.113,False,gauntlet-v2.1.0
+0eadf1d576bd,Remodeling,1001.2,2421.32,1234.67,0.036,False,gauntlet-v2.1.0
+9da8d94e8401,Handyman,101.61,224.48,176.8,0.213,False,gauntlet-v2.1.0
+94c1127ab5e9,Roofing,299.93,724.53,395.84,0.082,False,gauntlet-v2.1.0
+95abc0f2102c,Pest Control,113.87,141.67,127.17,0.852,True,gauntlet-v2.1.0
+771f82c2b398,Landscaping,130.98,156.97,147.07,0.905,True,gauntlet-v2.1.0
+c2295e6ea87d,Electrical,129.08,318.44,207.28,0.108,False,gauntlet-v2.1.0
+85119adc6712,Handyman,181.47,467.47,219.21,0.022,False,gauntlet-v2.1.0
+3fdfb2cd6e2f,Moving,252.2,366.31,317.59,0.45,True,gauntlet-v2.1.0
+a56cb7cbab4a,HVAC,193.62,270.8,238.05,0.756,True,gauntlet-v2.1.0
+d071cbb875fb,Cleaning,205.23,443.76,305.73,0.28,False,gauntlet-v2.1.0
+891d72848822,Handyman,246.0,545.71,367.49,0.164,False,gauntlet-v2.1.0
+0d03464929b5,Painting,284.79,396.91,330.04,0.279,False,gauntlet-v2.1.0
+c5673f7c381b,Roofing,135.39,184.44,168.97,0.45,True,gauntlet-v2.1.0
+0d8b669dcf9d,Handyman,90.71,206.84,153.45,0.185,False,gauntlet-v2.1.0
+a4d0601fc7e4,Roofing,187.85,278.84,236.41,0.45,True,gauntlet-v2.1.0
+83aed4e509a9,Landscaping,100.59,137.15,118.74,0.679,True,gauntlet-v2.1.0
+b8081c1b8ee8,Electrical,187.03,442.82,258.28,0.085,False,gauntlet-v2.1.0
+8886b38372d1,Cleaning,274.23,364.61,324.3,0.821,True,gauntlet-v2.1.0
+15e3e07c18ca,Moving,381.71,499.94,437.07,0.45,True,gauntlet-v2.1.0
+f7abacc7cbca,Handyman,263.65,644.91,337.91,0.053,False,gauntlet-v2.1.0
+62ba6bd6753a,Cleaning,341.27,443.84,367.35,0.82,True,gauntlet-v2.1.0
+26480e357442,Plumbing,142.83,236.43,180.44,0.229,False,gauntlet-v2.1.0
+1648683fce1b,Handyman,129.63,312.0,184.34,0.11,False,gauntlet-v2.1.0
+de3daca6a937,Remodeling,345.91,906.8,456.48,0.017,False,gauntlet-v2.1.0
+d840689d7a7e,Electrical,102.69,255.08,153.73,0.085,False,gauntlet-v2.1.0
+f34992fefe7a,Plumbing,166.98,419.07,283.6,0.117,False,gauntlet-v2.1.0
+e7307d066eaa,Appliance Repair,191.27,431.98,263.78,0.149,False,gauntlet-v2.1.0
+5dbfd76e584f,Handyman,994.42,2187.0,1153.19,0.086,False,gauntlet-v2.1.0
+bbd307789c2f,Handyman,2105.21,5376.96,2619.4,0.022,False,gauntlet-v2.1.0
+48ccfd09d04c,Chimney,414.35,661.36,422.4,0.257,False,gauntlet-v2.1.0
+ba3b2846e38a,Flooring,364.89,839.36,470.58,0.082,False,gauntlet-v2.1.0
+a326f5a7e05e,Cleaning,170.3,211.85,188.03,0.868,True,gauntlet-v2.1.0
+957b0d9447b1,Exterior,352.99,932.7,575.62,0.079,False,gauntlet-v2.1.0
+9464be44a417,Painting,131.48,311.96,225.34,0.141,False,gauntlet-v2.1.0
+4fbe32f6dfe4,Handyman,263.97,551.84,379.55,0.185,False,gauntlet-v2.1.0
+1c40b7658984,HVAC,135.43,223.3,191.38,0.654,False,gauntlet-v2.1.0
+51f857a7090a,Handyman,123.16,298.78,184.45,0.116,False,gauntlet-v2.1.0
+bb76dc3c076c,Remodeling,2724.24,6259.27,3214.92,0.051,False,gauntlet-v2.1.0
+ae50aa63289c,Electrical,114.98,205.01,135.23,0.182,False,gauntlet-v2.1.0
+1d27ca12704e,Handyman,180.24,433.6,212.69,0.03,False,gauntlet-v2.1.0
+524920a07413,HVAC,95.36,129.09,107.72,0.792,True,gauntlet-v2.1.0
+05734f848cef,Handyman,379.49,815.2,445.59,0.106,False,gauntlet-v2.1.0
+36ed0cb851bc,Painting,129.93,272.18,206.87,0.175,True,gauntlet-v2.1.0
+3df300b63644,Appliance Repair,181.96,249.75,213.2,0.45,True,gauntlet-v2.1.0
+d2150586010e,Plumbing,52.48,130.66,73.98,0.066,False,gauntlet-v2.1.0
+d21753641f9e,Painting,360.18,921.54,607.97,0.105,False,gauntlet-v2.1.0
+bedd6dae0321,Moving,335.04,467.49,391.36,0.45,True,gauntlet-v2.1.0
+c4876de490dc,Handyman,739.29,1762.74,817.72,0.022,False,gauntlet-v2.1.0
+5e04164ebdc9,Cleaning,313.59,397.03,357.99,0.858,True,gauntlet-v2.1.0
+9d300b9020da,Roofing,443.6,613.99,507.81,0.45,True,gauntlet-v2.1.0
+72c2a3e487fa,Handyman,392.71,615.27,442.71,0.276,False,gauntlet-v2.1.0
+e33b9415bc4a,Handyman,200.87,301.13,256.4,0.341,False,gauntlet-v2.1.0
+badc1520e836,Handyman,106.12,254.99,183.88,0.166,False,gauntlet-v2.1.0
+7a7e0649e980,Flooring,155.53,354.98,240.07,0.137,False,gauntlet-v2.1.0
+944ad4be77d8,HVAC,3594.55,4595.8,3932.16,0.45,True,gauntlet-v2.1.0
+ea0d38a7b972,Moving,286.54,397.0,347.41,0.45,True,gauntlet-v2.1.0
+74a8fed41c15,Cleaning,309.02,415.33,364.81,0.81,True,gauntlet-v2.1.0
+8a3e3a819b86,Electrical,274.83,729.39,448.12,0.078,False,gauntlet-v2.1.0
+a963f70b91e6,HVAC,3644.01,4546.91,3893.6,0.45,True,gauntlet-v2.1.0
+4d57a4519591,Handyman,177.65,439.79,239.91,0.067,False,gauntlet-v2.1.0
+1d637966d2d2,Roofing,447.26,668.48,489.72,0.397,False,gauntlet-v2.1.0
+6a1a3cee7c70,Cleaning,262.11,310.35,289.12,0.908,True,gauntlet-v2.1.0
+8ddf24ab1d3a,Handyman,163.05,376.87,208.21,0.089,False,gauntlet-v2.1.0
+d630d3deb695,Handyman,304.75,677.93,398.66,0.121,False,gauntlet-v2.1.0
+15c98351e90e,Flooring,324.38,777.77,365.25,0.019,False,gauntlet-v2.1.0
+e1996260241c,Landscaping,145.75,185.88,166.16,0.851,True,gauntlet-v2.1.0
+2d177700b7ae,Handyman,1500.21,3477.16,1921.01,0.088,False,gauntlet-v2.1.0
+c3aef00ab747,Moving,251.73,377.5,302.46,0.45,True,gauntlet-v2.1.0
+07a7458399be,Plumbing,231.54,362.15,287.16,0.249,False,gauntlet-v2.1.0
+20d0fbf03df3,Exterior,350.78,896.6,536.03,0.075,False,gauntlet-v2.1.0
+425584af1497,Painting,206.82,463.58,312.8,0.135,False,gauntlet-v2.1.0
+e2f153898f8f,Landscaping,400.61,564.41,465.35,0.76,True,gauntlet-v2.1.0
+a7d55bdbd1e0,Landscaping,116.09,227.83,187.31,0.478,False,gauntlet-v2.1.0
+e7ad40523cbc,Handyman,170.76,263.99,215.15,0.301,False,gauntlet-v2.1.0
+d6ed25f6f21d,Cleaning,130.96,287.88,229.57,0.244,False,gauntlet-v2.1.0
+f901969c60b3,Electrical,88.31,204.35,130.57,0.115,False,gauntlet-v2.1.0
+26d72e99775e,Painting,803.62,1254.61,993.3,0.245,False,gauntlet-v2.1.0
+19f97769ca89,Plumbing,71.28,175.04,114.61,0.112,False,gauntlet-v2.1.0
+7f0935c5d0d3,HVAC,3187.69,4111.82,3545.27,0.45,True,gauntlet-v2.1.0
+b303d8f83f33,Handyman,38.6,90.68,60.71,0.149,False,gauntlet-v2.1.0
+4624e5498817,Roofing,434.13,586.5,500.06,0.45,True,gauntlet-v2.1.0
+5f65bd0309b0,Handyman,733.17,1885.33,841.9,0.022,False,gauntlet-v2.1.0
+72bdf4da8ba6,Handyman,399.13,1105.93,538.11,0.022,False,gauntlet-v2.1.0
+89318a103722,Handyman,250.24,647.57,317.35,0.022,False,gauntlet-v2.1.0
+bfe7c8113aed,Plumbing,120.72,277.61,180.39,0.123,False,gauntlet-v2.1.0
+861696e54ec6,Landscaping,449.63,762.8,489.88,0.351,False,gauntlet-v2.1.0
+d114c8199704,Handyman,202.62,503.2,262.97,0.047,False,gauntlet-v2.1.0
+7260fa0f8f1f,Exterior,367.37,883.4,589.98,0.117,False,gauntlet-v2.1.0
+ae77e4efc3d1,Plumbing,154.36,353.02,251.96,0.148,False,gauntlet-v2.1.0
+fac919549c4a,Flooring,154.8,353.86,240.4,0.138,False,gauntlet-v2.1.0
+a13d841d972f,Pest Control,118.62,154.25,140.65,0.841,True,gauntlet-v2.1.0
+a8f05c7b1238,Moving,324.57,415.1,373.53,0.45,True,gauntlet-v2.1.0
+286c897eba57,Handyman,237.35,537.42,345.73,0.146,False,gauntlet-v2.1.0
+89917e5c4aaa,General Contractor,600.87,1550.2,903.45,0.066,False,gauntlet-v2.1.0
+d64fe06e31bc,Handyman,109.63,258.71,190.83,0.177,False,gauntlet-v2.1.0
+96a99d3ea1df,Painting,187.74,437.9,357.87,0.172,False,gauntlet-v2.1.0
+74e31b3d3e49,Handyman,196.13,454.25,232.66,0.059,False,gauntlet-v2.1.0
+6a964aeb7a92,Remodeling,745.78,1139.2,745.78,0.258,False,gauntlet-v2.1.0
+98a561c5cb2f,General Contractor,3607.92,8994.91,4459.87,0.02,False,gauntlet-v2.1.0
+feff45bb830a,Handyman,194.47,443.27,252.38,0.111,False,gauntlet-v2.1.0
+2092dd52f8c2,General Contractor,502.25,1311.2,718.49,0.044,False,gauntlet-v2.1.0
+55215bd746ce,Handyman,156.38,294.32,248.16,0.293,False,gauntlet-v2.1.0
+20ffe9ac9284,Moving,481.09,641.11,547.75,0.45,True,gauntlet-v2.1.0
+2869acd96e48,Handyman,324.67,748.06,462.44,0.129,False,gauntlet-v2.1.0
+b71e3f939838,Handyman,256.35,603.44,281.93,0.022,False,gauntlet-v2.1.0
+d497cd4ba803,HVAC,222.45,316.36,264.76,0.75,True,gauntlet-v2.1.0
+82f1fc68c02f,Handyman,168.7,398.62,277.68,0.173,False,gauntlet-v2.1.0
+115572dcdb05,Landscaping,208.59,260.79,235.35,0.867,True,gauntlet-v2.1.0
+0f3c56b81d4a,Handyman,97.96,149.45,105.09,0.281,False,gauntlet-v2.1.0
+8141b3b75468,Roofing,167.22,383.8,245.12,0.159,False,gauntlet-v2.1.0
+36c8beae7821,Painting,438.38,680.91,528.93,0.243,False,gauntlet-v2.1.0
+c288691bf899,Plumbing,131.47,341.11,198.36,0.066,False,gauntlet-v2.1.0
+19febac2c341,Plumbing,309.2,816.06,445.64,0.042,False,gauntlet-v2.1.0
+51910c102d52,Pest Control,635.9,948.49,771.37,0.716,True,gauntlet-v2.1.0
+10e61d185ae6,Roofing,668.45,1533.13,894.0,0.125,False,gauntlet-v2.1.0
+f68a3bd7f273,HVAC,186.2,260.74,226.51,0.756,True,gauntlet-v2.1.0
+2fd71aea1370,Flooring,799.28,1299.08,945.95,0.23,False,gauntlet-v2.1.0
+956b610def69,Plumbing,101.79,228.38,147.92,0.127,False,gauntlet-v2.1.0
+6541e864a718,Handyman,507.46,1347.08,838.04,0.098,False,gauntlet-v2.1.0
+05a9a501204b,Moving,524.17,728.27,621.06,0.45,True,gauntlet-v2.1.0
+5755219dc6d3,Plumbing,119.31,277.31,208.76,0.157,False,gauntlet-v2.1.0
+75945fcc9600,HVAC,103.2,141.55,121.09,0.782,True,gauntlet-v2.1.0
+24c9d2a8bda9,HVAC,2364.86,3077.07,2482.15,0.45,True,gauntlet-v2.1.0
+9bc1fb3a89c9,Painting,134.22,324.66,232.44,0.136,False,gauntlet-v2.1.0
+0892c6a7aab4,Plumbing,67.98,113.31,81.4,0.218,False,gauntlet-v2.1.0
+33e36af0f998,Roofing,302.95,813.26,386.68,0.025,False,gauntlet-v2.1.0
+d29c1e30fc51,Appliance Repair,182.82,278.21,220.46,0.45,True,gauntlet-v2.1.0
+c522f84b7306,Handyman,274.77,581.53,357.01,0.149,False,gauntlet-v2.1.0
+13b92326aee4,Painting,206.37,375.42,308.85,0.217,False,gauntlet-v2.1.0
+04040718079c,Handyman,526.94,1168.57,612.96,0.082,False,gauntlet-v2.1.0
+d206553aab2d,Pest Control,273.34,627.84,389.18,0.15,False,gauntlet-v2.1.0
+6972c9253094,Electrical,116.34,189.99,146.9,0.231,False,gauntlet-v2.1.0
+56a51e205fee,Remodeling,1111.19,2571.94,1323.17,0.049,False,gauntlet-v2.1.0
+a879f98b2a6f,Handyman,243.44,526.16,321.46,0.149,False,gauntlet-v2.1.0
+d44f637a2008,Plumbing,145.33,359.14,226.95,0.101,False,gauntlet-v2.1.0
+a47e085a7d34,Electrical,140.84,214.01,156.4,0.241,False,gauntlet-v2.1.0
+cb0fa690e9ec,Moving,186.69,248.07,208.78,0.45,True,gauntlet-v2.1.0
+d7d5738a319c,Painting,164.3,256.71,228.89,0.26,False,gauntlet-v2.1.0
+b9f24b9a4aba,Painting,1868.31,4303.71,2962.07,0.135,False,gauntlet-v2.1.0
+ff2ff06d882c,Exterior,154.9,260.62,223.54,0.235,False,gauntlet-v2.1.0
+329cc1a2b077,Painting,223.94,339.85,284.2,0.259,False,gauntlet-v2.1.0
+6a6839f92b15,Handyman,141.89,335.28,244.39,0.173,False,gauntlet-v2.1.0
+1f9e36b85209,Handyman,309.41,693.93,384.04,0.098,True,gauntlet-v2.1.0
+e19a9ae5dcac,Plumbing,436.43,999.3,647.79,0.123,False,gauntlet-v2.1.0
+9c141384124b,Remodeling,1362.23,2387.31,1362.23,0.178,False,gauntlet-v2.1.0
+d97e1bd72e23,Plumbing,262.81,435.71,324.38,0.225,False,gauntlet-v2.1.0
+8ff40b10c09b,Handyman,222.67,557.12,276.73,0.025,False,gauntlet-v2.1.0
+cb91409e37b7,Handyman,193.25,460.66,250.81,0.075,False,gauntlet-v2.1.0
+33ee51f30154,Pest Control,777.58,1107.58,909.57,0.751,True,gauntlet-v2.1.0
+ee7e0264108d,Plumbing,287.67,681.17,395.99,0.085,False,gauntlet-v2.1.0
+1e472564c5e4,HVAC,291.93,394.15,334.12,0.613,True,gauntlet-v2.1.0
+54ef78ad6595,Pest Control,180.27,225.78,207.81,0.87,True,gauntlet-v2.1.0
+fabbffd97b39,Appliance Repair,170.7,252.13,209.58,0.45,True,gauntlet-v2.1.0
+4a1694ef8899,Remodeling,887.45,2255.27,1150.82,0.025,False,gauntlet-v2.1.0
+c2c2dc174fa9,Handyman,103.28,250.08,171.28,0.15,False,gauntlet-v2.1.0
+bd26cc4a8eba,Flooring,176.8,443.84,251.92,0.066,False,gauntlet-v2.1.0
+229be2d76fe8,Handyman,139.9,206.22,164.25,0.311,False,gauntlet-v2.1.0
+ba733a2bc3ef,Moving,191.99,265.57,240.35,0.45,True,gauntlet-v2.1.0
+e71b48da1302,Plumbing,139.67,298.19,194.06,0.139,False,gauntlet-v2.1.0
+1b75973dd6d4,Flooring,653.43,1626.9,877.99,0.051,False,gauntlet-v2.1.0
+5a39335b3529,Handyman,174.05,425.97,256.99,0.105,False,gauntlet-v2.1.0
+724e948bcf4a,HVAC,2459.37,3153.46,2552.82,0.45,True,gauntlet-v2.1.0
+0b0829e2c111,Handyman,666.67,1663.85,869.41,0.046,False,gauntlet-v2.1.0
+e4f30145497a,HVAC,81.06,187.07,118.34,0.172,False,gauntlet-v2.1.0
+4d389b03716a,Moving,253.54,375.6,321.62,0.45,True,gauntlet-v2.1.0
+0c613aee356d,Plumbing,160.13,268.53,210.09,0.23,False,gauntlet-v2.1.0
+55f96e4d0df9,Handyman,94.75,209.85,148.58,0.179,False,gauntlet-v2.1.0
+d755e6215485,Plumbing,97.8,233.03,132.27,0.077,False,gauntlet-v2.1.0
+f309ff5ddc25,Handyman,161.25,384.09,223.95,0.1,False,gauntlet-v2.1.0
+b070b87f821f,Cleaning,341.04,440.77,386.9,0.814,True,gauntlet-v2.1.0
+5c5388933de2,Electrical,1453.53,2205.23,1867.01,0.26,False,gauntlet-v2.1.0
+62d736746f20,Pest Control,239.74,306.41,265.7,0.843,True,gauntlet-v2.1.0
+6d193b90ef6c,Plumbing,173.78,297.85,218.7,0.215,False,gauntlet-v2.1.0
+6a618f6b82f9,Handyman,534.93,951.2,598.29,0.207,False,gauntlet-v2.1.0
+7aff63ddb403,Pest Control,148.64,209.48,184.53,0.767,True,gauntlet-v2.1.0
+40178c2ab799,Handyman,155.44,350.94,263.21,0.19,False,gauntlet-v2.1.0
+90c246a812e6,Handyman,67.48,157.32,106.21,0.153,False,gauntlet-v2.1.0
+df7fecd585f7,Handyman,202.72,480.23,308.47,0.134,False,gauntlet-v2.1.0
+757a956a85fe,Handyman,717.42,1766.59,1011.89,0.085,False,gauntlet-v2.1.0
+03f654824d01,Handyman,218.72,448.77,282.85,0.165,False,gauntlet-v2.1.0
+43662a57a9cd,Electrical,140.34,343.79,217.82,0.102,False,gauntlet-v2.1.0
+3cd1fcdea81a,Handyman,92.79,221.12,142.18,0.133,False,gauntlet-v2.1.0
+2f6a1b6f560a,Plumbing,104.58,252.09,156.32,0.101,False,gauntlet-v2.1.0
+f45d0df1d4e7,Handyman,248.04,493.48,324.95,0.202,False,gauntlet-v2.1.0
+423e03289170,Landscaping,114.14,265.75,194.4,0.273,False,gauntlet-v2.1.0
+1f76ff378fde,Handyman,453.07,1191.53,600.72,0.022,False,gauntlet-v2.1.0
+9a0d7cc9fe9c,Cleaning,123.38,302.39,222.49,0.194,False,gauntlet-v2.1.0
+240e1a3ff9a5,Handyman,161.0,252.26,206.37,0.314,False,gauntlet-v2.1.0
+41ac9f4b6edb,Handyman,54.75,126.56,73.35,0.114,False,gauntlet-v2.1.0
+5e6a68690ab4,Painting,221.06,345.77,282.06,0.248,False,gauntlet-v2.1.0
+1fb34678cd8a,Cleaning,295.72,717.08,471.23,0.16,False,gauntlet-v2.1.0
+abe60b93d50e,Handyman,90.76,164.29,124.62,0.254,False,gauntlet-v2.1.0
+3d21fff7f9c4,Flooring,166.37,387.06,243.0,0.113,False,gauntlet-v2.1.0
+fd11ed8d7fce,Plumbing,311.63,490.51,370.74,0.24,False,gauntlet-v2.1.0
+2083296bd79c,Handyman,207.65,345.36,226.66,0.239,False,gauntlet-v2.1.0
+9b275340b1a9,Handyman,486.31,1234.7,754.0,0.101,False,gauntlet-v2.1.0
+f4f9243ff816,Cleaning,291.55,366.81,325.53,0.86,True,gauntlet-v2.1.0
+d096e644f859,Handyman,235.65,630.68,346.89,0.049,False,gauntlet-v2.1.0
+9511fd971a09,Handyman,281.66,701.25,391.73,0.073,False,gauntlet-v2.1.0
+d846c370b515,Cleaning,284.82,373.67,326.93,0.826,True,gauntlet-v2.1.0
+6faeda436ddd,Flooring,64.98,161.68,90.86,0.065,False,gauntlet-v2.1.0
+7f5e1a328350,HVAC,3152.44,3932.07,3461.17,0.45,True,gauntlet-v2.1.0
+3e564617df5f,HVAC,280.74,432.58,321.75,0.511,True,gauntlet-v2.1.0
+1a50af63137c,Moving,382.02,509.05,437.41,0.45,True,gauntlet-v2.1.0
+4df4eebdeaa8,Pest Control,357.25,475.89,396.91,0.804,True,gauntlet-v2.1.0
+fd7aacebddf7,Remodeling,356.26,898.19,456.84,0.026,False,gauntlet-v2.1.0
+d4e5f572c02d,Painting,245.37,364.69,307.48,0.264,False,gauntlet-v2.1.0
+67d4a2b9f78d,Plumbing,182.96,428.68,275.31,0.116,False,gauntlet-v2.1.0
+98dc0608a3ae,Electrical,262.75,536.07,383.33,0.168,False,gauntlet-v2.1.0
+86f24e0a8f11,Painting,340.56,533.42,406.42,0.239,False,gauntlet-v2.1.0
+d079b341029f,Handyman,142.0,333.65,217.22,0.14,False,gauntlet-v2.1.0
+07c903ce6338,Electrical,133.38,225.45,173.42,0.222,False,gauntlet-v2.1.0
+b39f044e0dbc,Roofing,363.14,478.31,410.67,0.45,True,gauntlet-v2.1.0
+8433524328f7,Remodeling,751.7,1682.51,983.3,0.095,False,gauntlet-v2.1.0
+89d6aac5e0b9,Electrical,65.6,163.33,92.84,0.066,False,gauntlet-v2.1.0
+350c94d619f6,Flooring,144.06,231.99,179.09,0.242,False,gauntlet-v2.1.0
+f13049b287e2,Handyman,260.28,679.07,337.56,0.022,False,gauntlet-v2.1.0
+24d151e660d6,Handyman,158.77,395.34,239.24,0.105,False,gauntlet-v2.1.0
+f7b6ed3dc920,Cleaning,337.58,449.4,380.64,0.808,True,gauntlet-v2.1.0
+05cdf255a7a0,Landscaping,31.83,71.5,47.89,0.222,False,gauntlet-v2.1.0
+aa0786629d94,Painting,283.87,399.01,327.07,0.275,False,gauntlet-v2.1.0
+8c69eefde847,Plumbing,506.06,940.8,647.0,0.183,False,gauntlet-v2.1.0
+ebcb8c31389b,Cleaning,325.42,428.01,375.88,0.822,True,gauntlet-v2.1.0
+1bfae7fe9a16,Cleaning,137.7,168.33,153.68,0.785,True,gauntlet-v2.1.0
+2b7192e1021c,Appliance Repair,149.59,224.4,176.28,0.45,True,gauntlet-v2.1.0
+6995cc07f1bb,Plumbing,220.14,342.8,273.49,0.251,False,gauntlet-v2.1.0
+3c3702aa2639,Roofing,291.95,713.64,387.58,0.076,False,gauntlet-v2.1.0
+6786bcc91b97,Handyman,411.9,995.68,585.82,0.1,False,gauntlet-v2.1.0
+4aa3cdf14c97,HVAC,2925.33,3748.77,3200.52,0.45,True,gauntlet-v2.1.0
+6ac26f2592b5,Cleaning,488.73,1261.75,732.49,0.091,False,gauntlet-v2.1.0
+c71660b15c2f,HVAC,87.9,118.35,98.53,0.796,True,gauntlet-v2.1.0
+a597ab82b14c,Plumbing,562.22,1084.81,562.22,0.105,False,gauntlet-v2.1.0
+f463fefdbeab,Electrical,149.4,268.54,227.41,0.224,False,gauntlet-v2.1.0
+df4e0207f66e,Handyman,252.09,678.18,323.62,0.022,False,gauntlet-v2.1.0
+06ff66cfcfb7,Moving,277.96,364.37,330.77,0.45,True,gauntlet-v2.1.0
+7df0c14cb0d4,Landscaping,177.82,417.85,333.13,0.273,False,gauntlet-v2.1.0
+cab6ba48ec35,Handyman,261.16,630.51,366.91,0.096,False,gauntlet-v2.1.0
+b49fbad5b092,Flooring,1497.11,3679.81,1892.42,0.038,False,gauntlet-v2.1.0
+1503dad2817e,Handyman,160.37,375.28,280.3,0.182,False,gauntlet-v2.1.0
+31cff3b077a6,Painting,61.87,145.1,99.55,0.131,False,gauntlet-v2.1.0
+9ba1e2e9258f,Exterior,310.84,748.1,522.24,0.128,False,gauntlet-v2.1.0
+c53a4020a320,Handyman,336.2,905.96,437.08,0.022,False,gauntlet-v2.1.0
+e0606ae4e69c,Appliance Repair,210.24,454.45,281.7,0.206,False,gauntlet-v2.1.0
+6f744a3f8ec0,General Contractor,907.9,2131.16,1231.0,0.083,False,gauntlet-v2.1.0
+ca60f87ce4bb,Painting,226.96,483.71,362.63,0.169,False,gauntlet-v2.1.0
+bedc725da6f5,Handyman,56.97,129.51,87.84,0.174,False,gauntlet-v2.1.0
+186ae1f984bd,Electrical,107.17,252.97,158.87,0.107,False,gauntlet-v2.1.0
+efad9024b127,Pest Control,195.38,256.83,236.13,0.836,True,gauntlet-v2.1.0
+202f269c110d,Painting,208.93,466.35,304.52,0.128,False,gauntlet-v2.1.0
+277879fdcbcd,Handyman,472.62,979.3,539.95,0.12,False,gauntlet-v2.1.0
+2d22af13960a,Landscaping,686.98,942.82,748.87,0.613,True,gauntlet-v2.1.0
+2113d0c414c3,Roofing,186.7,459.75,256.47,0.086,False,gauntlet-v2.1.0
+02a269a5a89b,Appliance Repair,147.53,227.15,178.73,0.45,True,gauntlet-v2.1.0
+dca7ee6e1350,Plumbing,237.75,616.82,280.99,0.018,False,gauntlet-v2.1.0
+30185966d0c2,Plumbing,376.59,902.68,491.32,0.062,False,gauntlet-v2.1.0
+feca23e341ec,Cleaning,270.0,363.21,318.63,0.809,True,gauntlet-v2.1.0
+ad35e7efe14a,Landscaping,71.4,167.43,116.17,0.185,False,gauntlet-v2.1.0
+a2f4daa4e96b,Handyman,642.73,1061.76,738.27,0.253,False,gauntlet-v2.1.0
+2887c54571d7,Plumbing,280.17,758.07,336.34,0.018,False,gauntlet-v2.1.0
+57945cc3fe4c,Handyman,1588.25,2413.34,1710.18,0.283,False,gauntlet-v2.1.0
+7b3b4e5fed79,Handyman,181.25,290.11,219.94,0.279,False,gauntlet-v2.1.0
+a7388b612c71,Cleaning,301.52,382.98,351.24,0.859,True,gauntlet-v2.1.0
+79a90d80a490,Cleaning,86.39,196.85,141.5,0.204,False,gauntlet-v2.1.0
+c3163b2412df,Pest Control,154.75,210.9,183.5,0.786,True,gauntlet-v2.1.0
+f60dfcd2ab5b,Flooring,749.83,1235.03,754.81,0.195,False,gauntlet-v2.1.0
+23233b443043,Roofing,193.82,286.83,256.25,0.45,True,gauntlet-v2.1.0
+ec7dbd462739,Landscaping,167.07,212.84,187.61,0.849,True,gauntlet-v2.1.0
+6dadffb2c738,Electrical,60.37,139.97,96.16,0.133,False,gauntlet-v2.1.0
+9302d7bf731a,Cleaning,270.28,376.73,334.01,0.788,True,gauntlet-v2.1.0
+2f216e1c81eb,Handyman,39.55,95.97,61.41,0.127,False,gauntlet-v2.1.0
+23ff4e4a5fd5,Moving,484.41,660.88,579.02,0.45,True,gauntlet-v2.1.0
+05d6627dfb3d,Electrical,73.96,174.55,107.65,0.102,False,gauntlet-v2.1.0
+860930f33063,Electrical,224.22,517.62,342.85,0.125,False,gauntlet-v2.1.0
+d3bc7beb9545,Roofing,650.47,1635.45,876.43,0.062,False,gauntlet-v2.1.0
+97c9a732f11a,Appliance Repair,140.65,189.78,169.68,0.45,True,gauntlet-v2.1.0
+327ae4d79f59,Plumbing,218.9,535.16,305.54,0.073,False,gauntlet-v2.1.0
+dfccb4e91049,Cleaning,157.43,195.43,178.1,0.86,True,gauntlet-v2.1.0
+5b2e9cafaa50,Handyman,150.52,346.83,255.73,0.181,False,gauntlet-v2.1.0
+fb1263670c1d,Electrical,321.62,768.6,474.59,0.099,False,gauntlet-v2.1.0
+14384689e9aa,HVAC,2938.85,3657.54,3209.87,0.45,True,gauntlet-v2.1.0
+23293a9a3a7c,Handyman,68.85,151.56,95.8,0.147,True,gauntlet-v2.1.0
+88d1b3a43543,Pest Control,682.23,992.73,773.44,0.696,True,gauntlet-v2.1.0
+c0d785093a27,Flooring,736.95,1213.91,809.93,0.211,False,gauntlet-v2.1.0
+3b65412af818,Plumbing,220.98,512.22,257.74,0.044,False,gauntlet-v2.1.0
+e83faad6630f,Landscaping,275.39,657.24,384.51,0.155,False,gauntlet-v2.1.0
+993bd943d316,Handyman,169.88,397.6,216.58,0.081,False,gauntlet-v2.1.0
+2b8cee8a6071,Handyman,93.12,219.3,147.61,0.15,False,gauntlet-v2.1.0
+f3b8f36ceb1a,Handyman,241.85,516.41,365.27,0.19,False,gauntlet-v2.1.0
+1415989a4bec,Landscaping,200.98,253.54,231.65,0.863,True,gauntlet-v2.1.0
+73690a453acb,Handyman,227.54,510.82,356.27,0.172,False,gauntlet-v2.1.0
+0e07a8220f5c,Cleaning,245.96,305.19,270.18,0.85,True,gauntlet-v2.1.0
+49f0d18147fe,Flooring,1088.96,1745.34,1088.96,0.207,False,gauntlet-v2.1.0
+ce8e47d6923e,Handyman,196.65,427.07,302.25,0.183,False,gauntlet-v2.1.0
+e8ff748e5a93,Plumbing,122.58,283.56,209.13,0.153,False,gauntlet-v2.1.0
+f1f4b0e94999,Handyman,113.32,283.02,156.29,0.068,False,gauntlet-v2.1.0
+13b7994fae93,Handyman,109.83,270.4,146.61,0.064,False,gauntlet-v2.1.0
+bcbfc6e16423,Landscaping,219.67,510.46,304.45,0.134,False,gauntlet-v2.1.0
+14a7c340ed1f,Roofing,299.87,707.39,370.61,0.072,False,gauntlet-v2.1.0
+3c2a03e5d72d,Landscaping,1145.8,1463.2,1304.78,0.85,True,gauntlet-v2.1.0
+f14c5bb83d35,Painting,692.67,1637.41,1030.82,0.107,False,gauntlet-v2.1.0
+e998d857e563,HVAC,77.21,120.76,90.18,0.446,False,gauntlet-v2.1.0
+fa4adbac2f1b,HVAC,2319.18,3102.74,2470.78,0.45,True,gauntlet-v2.1.0
+f79fdc6a6127,HVAC,181.37,241.23,204.77,0.799,True,gauntlet-v2.1.0
+85f54c36cf25,Moving,295.4,398.58,344.88,0.45,True,gauntlet-v2.1.0
+58f93c9b846d,Handyman,85.49,193.78,106.08,0.091,False,gauntlet-v2.1.0
+c96094ff9f6c,General Contractor,1538.37,3419.85,1794.4,0.067,False,gauntlet-v2.1.0
+0029f4801cc2,Plumbing,173.24,293.98,219.41,0.22,False,gauntlet-v2.1.0
+b0644ea72871,Roofing,273.24,378.53,300.17,0.44,False,gauntlet-v2.1.0
+1390be8dcd7a,Handyman,236.62,395.06,255.4,0.234,False,gauntlet-v2.1.0
+51984e3434d2,Moving,51.94,114.31,83.69,0.255,False,gauntlet-v2.1.0
+9d9c69944190,Handyman,147.56,356.5,256.72,0.165,False,gauntlet-v2.1.0
+2a3f526984bd,Exterior,128.21,304.39,245.38,0.163,False,gauntlet-v2.1.0
+a8e0c3c8e84f,Handyman,325.88,522.16,325.88,0.241,False,gauntlet-v2.1.0
+c375aa63eff9,HVAC,87.08,114.15,95.15,0.793,True,gauntlet-v2.1.0
+ea6e74b671e3,Electrical,156.53,354.73,259.14,0.152,False,gauntlet-v2.1.0
+65439b2347e3,Painting,190.78,464.31,329.67,0.133,False,gauntlet-v2.1.0
+1936a8ab8211,Landscaping,50.67,72.31,57.49,0.724,True,gauntlet-v2.1.0
+3176eb05f92b,Plumbing,131.99,214.66,175.47,0.244,False,gauntlet-v2.1.0
+750feb5dd619,Handyman,792.49,1900.36,980.31,0.052,False,gauntlet-v2.1.0
+d6cc41651e14,Handyman,153.43,328.01,256.76,0.234,False,gauntlet-v2.1.0
+b1c3b0c97561,Moving,286.15,376.38,336.07,0.45,True,gauntlet-v2.1.0
+a338b57f6fb2,Pest Control,294.26,402.85,333.46,0.782,True,gauntlet-v2.1.0
+f346692204a7,Handyman,163.25,381.09,249.54,0.144,False,gauntlet-v2.1.0
+e25f201f9014,Handyman,203.32,500.96,250.8,0.032,False,gauntlet-v2.1.0
+8befd0ec2fd2,Pest Control,1069.59,1420.65,1281.18,0.762,True,gauntlet-v2.1.0
+1a5845aa07ab,Cleaning,141.19,336.21,257.19,0.213,False,gauntlet-v2.1.0
+ba486058e227,Handyman,535.38,1320.89,740.67,0.077,False,gauntlet-v2.1.0
+2fdf08aa4466,Handyman,343.69,868.87,514.93,0.091,False,gauntlet-v2.1.0
+1a4dcfaf42d5,General Contractor,796.04,1862.65,1007.58,0.064,False,gauntlet-v2.1.0
+1d559eb6a0ac,Plumbing,163.88,410.3,239.39,0.075,False,gauntlet-v2.1.0
+8b87536f8a2b,Painting,124.29,296.71,227.62,0.154,False,gauntlet-v2.1.0
+987e246b9830,Moving,270.69,341.68,313.95,0.45,True,gauntlet-v2.1.0
+1fe9d12c50bc,Plumbing,315.8,752.12,408.71,0.063,False,gauntlet-v2.1.0
+937554b0f5ce,Handyman,164.81,251.1,191.97,0.301,False,gauntlet-v2.1.0
+b6ba901368ea,Pest Control,336.47,455.54,376.47,0.79,True,gauntlet-v2.1.0
+c4bff5752195,Pest Control,271.77,402.16,305.98,0.687,True,gauntlet-v2.1.0
+da0844658335,Handyman,181.87,450.8,262.76,0.09,False,gauntlet-v2.1.0
+4d4c1c36c59d,Handyman,126.48,282.35,186.82,0.158,False,gauntlet-v2.1.0
+6c600dbc187c,Painting,670.02,1062.69,778.12,0.23,False,gauntlet-v2.1.0
+34e3f0694a87,Flooring,281.84,724.99,366.64,0.021,False,gauntlet-v2.1.0
+1cdfeccf1383,Plumbing,1046.78,1619.82,1316.91,0.255,False,gauntlet-v2.1.0
+037cce21f9d4,Handyman,173.28,406.7,292.36,0.17,False,gauntlet-v2.1.0
+e014c6a22e68,Cleaning,352.77,465.71,399.21,0.807,True,gauntlet-v2.1.0
+b1247fd1e7e6,Handyman,340.83,837.63,430.82,0.044,False,gauntlet-v2.1.0
+b006237ff33d,Handyman,293.34,455.27,304.04,0.265,False,gauntlet-v2.1.0
+07ec44475bdb,Moving,614.33,883.66,776.99,0.45,True,gauntlet-v2.1.0
+72dd9aefdf25,Cleaning,189.82,230.24,209.65,0.891,True,gauntlet-v2.1.0
+5dcfb72dacd7,Handyman,137.27,315.23,198.46,0.135,False,gauntlet-v2.1.0
+a1913ec75b7a,Electrical,95.89,159.34,122.27,0.225,False,gauntlet-v2.1.0
+5e369968aaca,Landscaping,178.24,220.07,194.55,0.873,True,gauntlet-v2.1.0
+a9723eadde9c,Pest Control,98.85,137.68,114.76,0.727,True,gauntlet-v2.1.0
+0d88d252ac07,Appliance Repair,170.75,230.25,195.34,0.45,True,gauntlet-v2.1.0
+232e4680e1c1,Handyman,181.53,263.64,202.47,0.311,False,gauntlet-v2.1.0
+7099deb610d2,Appliance Repair,182.55,253.24,205.92,0.45,True,gauntlet-v2.1.0
+b0b7697f8b78,Handyman,133.1,320.71,180.87,0.085,True,gauntlet-v2.1.0
+45d8f97a9507,Landscaping,52.77,72.81,58.3,0.759,True,gauntlet-v2.1.0
+cf115dcd0d1b,Handyman,707.53,1687.62,907.1,0.07,False,gauntlet-v2.1.0
+270651be075a,Handyman,905.67,1453.85,979.34,0.256,False,gauntlet-v2.1.0
+9987c7368aa3,HVAC,102.28,134.36,117.54,0.822,True,gauntlet-v2.1.0
+2063b5fdbe1a,Pest Control,413.2,567.4,464.06,0.776,True,gauntlet-v2.1.0
+eb7046437af1,Handyman,493.11,1224.07,725.06,0.096,False,gauntlet-v2.1.0
+5b659f95b9e9,Landscaping,413.1,586.13,498.63,0.76,True,gauntlet-v2.1.0
+4fa50ba878b3,Handyman,466.33,1198.4,622.18,0.035,False,gauntlet-v2.1.0
+baac73fe7ac3,Handyman,113.72,247.36,191.04,0.224,False,gauntlet-v2.1.0
+11882611a084,HVAC,2836.98,3697.95,3013.71,0.45,True,gauntlet-v2.1.0
+ac2c97f88219,Cleaning,316.37,408.51,363.9,0.842,True,gauntlet-v2.1.0
+4128c8de06ad,Landscaping,156.46,203.21,176.05,0.831,True,gauntlet-v2.1.0
+b019b5be015f,Plumbing,33.49,66.55,47.2,0.174,False,gauntlet-v2.1.0
+d45b49a5c408,Flooring,3320.15,7355.31,4127.96,0.092,False,gauntlet-v2.1.0
+f8b2b2b9fcbf,Cleaning,313.49,390.77,342.7,0.864,True,gauntlet-v2.1.0
+5876cdb8b0da,Handyman,88.11,145.16,101.3,0.255,False,gauntlet-v2.1.0
+527fda157ed0,Handyman,69.57,160.65,92.36,0.103,False,gauntlet-v2.1.0
+2c52230d64e3,Auto,539.57,1257.04,804.29,0.11,False,gauntlet-v2.1.0
+b35b29141698,Plumbing,140.36,345.01,246.95,0.135,False,gauntlet-v2.1.0
+a224e1753d55,Handyman,43.46,110.92,55.59,0.022,False,gauntlet-v2.1.0
+4fcb1596c197,Roofing,365.62,508.14,399.05,0.45,True,gauntlet-v2.1.0
+a95d67cec354,Painting,524.03,1279.66,807.1,0.101,False,gauntlet-v2.1.0
+0bbab6f2d470,Handyman,192.98,490.01,264.64,0.055,False,gauntlet-v2.1.0
+502815187fff,Appliance Repair,198.57,277.03,244.37,0.45,True,gauntlet-v2.1.0
+242d1f9ba9fb,Electrical,135.89,300.93,213.0,0.149,False,gauntlet-v2.1.0
+88500e2a216a,Flooring,251.15,399.95,276.07,0.227,False,gauntlet-v2.1.0
+7e162e2951e5,Electrical,113.3,236.72,189.18,0.186,True,gauntlet-v2.1.0
+ae53a424384a,Electrical,107.0,266.77,157.92,0.079,False,gauntlet-v2.1.0
+1a4050a4a05b,Handyman,478.65,1271.98,643.4,0.022,False,gauntlet-v2.1.0
+b1e9300609f0,Handyman,140.45,278.25,241.28,0.285,False,gauntlet-v2.1.0
+d34ac6357fc0,Cleaning,298.69,634.87,461.04,0.423,False,gauntlet-v2.1.0
+c25b19d4a1f6,Landscaping,58.13,77.92,64.89,0.799,True,gauntlet-v2.1.0
+d7224115a61a,Pest Control,89.35,121.46,103.15,0.771,True,gauntlet-v2.1.0
+b918aa98486b,Handyman,572.54,1473.07,835.91,0.071,False,gauntlet-v2.1.0
+62132bfbcd57,Appliance Repair,134.33,278.8,206.56,0.346,False,gauntlet-v2.1.0
+1ac4298c5a82,Cleaning,334.99,424.78,369.04,0.85,True,gauntlet-v2.1.0
+198827a292ed,Electrical,223.48,528.06,317.61,0.094,False,gauntlet-v2.1.0
+3d59b38a8d1d,Handyman,185.73,284.85,214.72,0.291,False,gauntlet-v2.1.0
+97425fb92d41,Exterior,1426.43,3083.12,2208.88,0.154,True,gauntlet-v2.1.0
+d5330200931a,Handyman,94.06,164.67,138.71,0.287,False,gauntlet-v2.1.0
+b69d122c8ac3,Plumbing,205.61,499.31,267.58,0.054,False,gauntlet-v2.1.0
+748ec7056089,Exterior,264.22,681.06,436.23,0.094,False,gauntlet-v2.1.0
+92e939f8447b,Electrical,149.62,368.92,237.13,0.105,False,gauntlet-v2.1.0
+d8e74bea7225,General Contractor,778.46,1697.17,1008.88,0.107,False,gauntlet-v2.1.0
+9fa1548e8bc1,Handyman,79.25,182.92,124.85,0.159,False,gauntlet-v2.1.0
+1dea2fcc947d,Painting,126.11,300.71,235.91,0.16,False,gauntlet-v2.1.0
+3d22c86ba2c9,Plumbing,281.55,733.14,313.97,0.018,False,gauntlet-v2.1.0
+64aead39fc11,Handyman,131.96,293.37,227.48,0.202,False,gauntlet-v2.1.0
+b3943f752703,HVAC,271.04,390.41,321.22,0.583,True,gauntlet-v2.1.0
+6ec4fc481372,Painting,286.7,694.33,428.38,0.097,False,gauntlet-v2.1.0
+62aff738e88d,Painting,827.63,1344.09,979.28,0.223,False,gauntlet-v2.1.0
+b560ed1c2603,Plumbing,236.82,493.18,287.26,0.116,False,gauntlet-v2.1.0
+17a88e3ed88e,Roofing,258.79,367.08,303.85,0.45,True,gauntlet-v2.1.0
+08c5844e3093,Landscaping,51.36,68.14,57.18,0.788,True,gauntlet-v2.1.0
+bf0d3c01d1f2,Handyman,137.73,314.54,191.15,0.125,False,gauntlet-v2.1.0
+1fcb898a0aaf,Handyman,264.64,608.4,315.88,0.067,False,gauntlet-v2.1.0
+d9f2386f3b18,Appliance Repair,179.38,267.84,222.5,0.45,True,gauntlet-v2.1.0
+2b910668f6f9,Handyman,78.5,173.59,127.86,0.19,False,gauntlet-v2.1.0
+cf786a4540d3,Landscaping,117.64,160.98,139.4,0.661,True,gauntlet-v2.1.0
+b85be080814b,General Contractor,226.28,532.96,330.55,0.102,False,gauntlet-v2.1.0
+3081bc7f2caf,Plumbing,100.32,254.8,149.81,0.074,False,gauntlet-v2.1.0
+b0d2a82945cb,Handyman,574.63,944.38,692.72,0.265,False,gauntlet-v2.1.0
+42b588efbd47,Exterior,276.48,472.45,355.01,0.212,False,gauntlet-v2.1.0
+2d7cd510bb3e,Flooring,612.58,1602.47,848.57,0.034,False,gauntlet-v2.1.0
+103006a34e0c,Handyman,223.91,596.26,344.07,0.069,False,gauntlet-v2.1.0
+c57aaae160fb,Moving,575.03,772.82,659.43,0.45,True,gauntlet-v2.1.0
+90aa5ce118ee,Plumbing,379.72,871.49,496.0,0.086,False,gauntlet-v2.1.0
+7fb852233b4c,Cleaning,256.77,326.3,282.81,0.848,True,gauntlet-v2.1.0
+e37e06e84a43,Handyman,250.08,619.15,351.97,0.081,False,gauntlet-v2.1.0
+41fd8bb687b8,Handyman,71.17,164.97,110.91,0.154,False,gauntlet-v2.1.0
+3b5ec9aa4fc9,Handyman,117.63,267.4,159.87,0.121,False,gauntlet-v2.1.0
+f6cdb47f84d8,Handyman,121.3,281.83,189.44,0.153,False,gauntlet-v2.1.0
+b3c5c183d11f,Painting,384.88,581.63,430.44,0.244,False,gauntlet-v2.1.0
+6aa7c5129d0d,Appliance Repair,96.3,129.66,105.29,0.45,False,gauntlet-v2.1.0
+8b3a462e0f18,Roofing,468.17,653.69,543.59,0.45,True,gauntlet-v2.1.0
+ab873c41518b,Electrical,156.43,256.24,201.23,0.232,False,gauntlet-v2.1.0
+c3867352aab6,Plumbing,169.88,416.04,215.55,0.04,False,gauntlet-v2.1.0
+d3a5200984de,Remodeling,581.53,1472.97,749.89,0.025,False,gauntlet-v2.1.0
+46e3af8acbf8,Handyman,116.91,267.68,155.96,0.11,False,gauntlet-v2.1.0
+1211b7861092,Flooring,154.01,400.74,234.28,0.068,False,gauntlet-v2.1.0
+599a18be4f4e,Plumbing,131.88,230.83,175.67,0.216,False,gauntlet-v2.1.0
+f52c1308a6e3,Painting,878.95,1432.82,1119.98,0.233,False,gauntlet-v2.1.0
+6550bd8d08aa,Roofing,84.8,193.86,139.6,0.201,False,gauntlet-v2.1.0
+af1b4ceb0da8,Flooring,748.69,1826.4,978.87,0.054,False,gauntlet-v2.1.0
+aa975599fa58,Pest Control,257.95,376.18,301.01,0.717,True,gauntlet-v2.1.0
+ade25c4b4274,Handyman,105.69,242.98,150.53,0.137,False,gauntlet-v2.1.0
+644053e42eae,Plumbing,150.7,234.29,190.81,0.254,False,gauntlet-v2.1.0
+9aed388c52d8,Pest Control,183.88,230.73,212.69,0.869,True,gauntlet-v2.1.0
+0f08b944773c,Moving,207.79,271.55,239.29,0.45,True,gauntlet-v2.1.0
+90bd13850c96,Appliance Repair,144.78,195.8,177.43,0.45,True,gauntlet-v2.1.0
+5041936c9c92,HVAC,116.75,272.6,177.22,0.163,False,gauntlet-v2.1.0
+4096d7e70459,Handyman,164.36,404.1,230.71,0.084,False,gauntlet-v2.1.0
+454f6d6b53d3,Plumbing,180.47,291.98,221.5,0.234,False,gauntlet-v2.1.0
+0723a52960a4,Cleaning,349.74,474.9,397.6,0.789,True,gauntlet-v2.1.0
+f7f9097ce919,Handyman,121.45,251.41,175.67,0.191,True,gauntlet-v2.1.0
+1f29cebdfed9,HVAC,126.79,296.75,203.33,0.181,False,gauntlet-v2.1.0
+3091ccda927c,Moving,332.88,435.46,379.18,0.45,True,gauntlet-v2.1.0
+6536030df473,HVAC,194.91,291.67,245.8,0.699,True,gauntlet-v2.1.0
+9b0f273c9034,HVAC,4918.25,6066.42,5240.09,0.45,True,gauntlet-v2.1.0
+971da1f0faed,Flooring,2926.87,7075.95,3701.2,0.048,False,gauntlet-v2.1.0
+f95f7435e283,Moving,285.3,388.66,336.44,0.45,True,gauntlet-v2.1.0
+98cb1ca82c66,Handyman,228.06,552.84,241.6,0.022,False,gauntlet-v2.1.0
+c09cfe233ee0,Landscaping,1175.09,1551.42,1391.08,0.781,True,gauntlet-v2.1.0
+90b0f243bfa2,Moving,227.68,286.54,263.13,0.45,True,gauntlet-v2.1.0
+8f61098bccb4,Plumbing,112.93,270.19,193.2,0.14,False,gauntlet-v2.1.0
+819a8ef31663,Plumbing,479.98,1194.71,612.21,0.033,False,gauntlet-v2.1.0
+197eb73ac8e7,Handyman,116.61,203.06,149.03,0.248,False,gauntlet-v2.1.0
+99c34d9d6932,Handyman,81.68,144.79,109.09,0.249,True,gauntlet-v2.1.0
+7078c7f8564e,Handyman,165.8,250.52,192.8,0.305,False,gauntlet-v2.1.0
+c8d0b5c84029,Handyman,156.13,382.43,257.78,0.142,True,gauntlet-v2.1.0
+2ccc4a0fe0c5,Remodeling,570.36,1379.31,762.63,0.062,False,gauntlet-v2.1.0
+8f70420c79b4,Landscaping,267.2,356.96,332.81,0.82,True,gauntlet-v2.1.0
+13848743748e,Handyman,230.09,333.97,269.91,0.318,False,gauntlet-v2.1.0
+d790bdfdba38,HVAC,181.33,277.36,231.36,0.708,True,gauntlet-v2.1.0
+c2f593c98b64,Electrical,175.69,421.96,272.82,0.111,False,gauntlet-v2.1.0
+2d59abad544c,Handyman,124.6,300.39,199.96,0.142,False,gauntlet-v2.1.0
+ec7b8098875c,General Contractor,140.32,332.33,219.99,0.118,False,gauntlet-v2.1.0
+7843013a79f1,Roofing,408.25,1108.9,534.1,0.025,False,gauntlet-v2.1.0
+207c2029b1d2,Pest Control,102.14,142.03,123.36,0.747,True,gauntlet-v2.1.0
+d4d6f524beb1,Handyman,212.04,507.32,284.75,0.085,False,gauntlet-v2.1.0
+9d623bed0510,Moving,275.0,386.38,341.36,0.45,True,gauntlet-v2.1.0
+68738fb192e8,Appliance Repair,138.79,180.5,156.05,0.45,True,gauntlet-v2.1.0
+39228ef89064,Roofing,561.44,1383.64,723.12,0.056,False,gauntlet-v2.1.0
+c74c3a407f05,Landscaping,89.34,198.7,136.89,0.219,False,gauntlet-v2.1.0
+3b43a62b3767,Handyman,200.11,497.81,268.82,0.06,False,gauntlet-v2.1.0
+8c1f99307c14,Cleaning,393.73,532.29,455.56,0.8,True,gauntlet-v2.1.0
+7c1b5e2043fb,Handyman,521.27,1245.25,679.41,0.075,False,gauntlet-v2.1.0
+a570c881b916,Cleaning,276.95,349.26,319.2,0.832,True,gauntlet-v2.1.0
+08af8411ea26,Electrical,160.5,403.0,271.9,0.114,False,gauntlet-v2.1.0
+f31662b4843f,Roofing,2107.72,4595.87,2623.69,0.133,False,gauntlet-v2.1.0
+04f8a05a3961,Exterior,1976.16,4550.91,3155.57,0.135,False,gauntlet-v2.1.0
+c40b15ca508f,Handyman,411.93,993.32,557.6,0.083,False,gauntlet-v2.1.0
+3269656aff28,Roofing,493.99,1318.39,669.69,0.025,False,gauntlet-v2.1.0
+7e66cb9f3e58,Plumbing,91.25,227.05,154.01,0.119,False,gauntlet-v2.1.0
+d4758ff40ebc,Handyman,158.89,394.94,257.84,0.129,False,gauntlet-v2.1.0
+b9ffefbd453c,Plumbing,195.4,419.35,303.85,0.163,False,gauntlet-v2.1.0
+bf0093b95526,HVAC,157.38,212.32,184.32,0.768,True,gauntlet-v2.1.0
+50bce88abd13,Handyman,284.35,650.11,384.39,0.116,False,gauntlet-v2.1.0
+e965313bb6d9,Handyman,108.69,270.25,164.49,0.105,False,gauntlet-v2.1.0
+8a14280db61f,Exterior,1264.38,2953.07,2037.63,0.131,False,gauntlet-v2.1.0
+acfad84f2d7d,Moving,435.5,596.96,501.51,0.45,True,gauntlet-v2.1.0
+d742ee1f8e8f,Handyman,257.07,660.04,393.74,0.09,False,gauntlet-v2.1.0
+377b01b6e33c,Roofing,224.73,599.77,287.74,0.025,False,gauntlet-v2.1.0
+4e14f5a91eda,Handyman,60.88,145.09,95.66,0.141,False,gauntlet-v2.1.0
+3507d94e5218,Moving,688.86,1060.35,902.86,0.45,True,gauntlet-v2.1.0
+98555bb44981,Moving,279.71,376.34,329.25,0.45,True,gauntlet-v2.1.0
+423460bac56d,Handyman,216.74,379.14,244.61,0.219,False,gauntlet-v2.1.0
+5ce5209e0015,Handyman,303.26,748.66,356.81,0.022,False,gauntlet-v2.1.0
+4e1027677989,Appliance Repair,192.65,286.79,236.7,0.45,False,gauntlet-v2.1.0
+e6c0d7b2e624,Plumbing,138.64,337.25,238.12,0.134,False,gauntlet-v2.1.0
+2ed6761ca5b3,Flooring,293.25,439.76,302.45,0.244,False,gauntlet-v2.1.0
+e7d86604a18f,Exterior,853.4,2008.32,1262.72,0.106,False,gauntlet-v2.1.0
+46eccb93587b,Roofing,4646.44,9312.85,5925.97,0.198,True,gauntlet-v2.1.0
+7114a0882e5d,Moving,153.98,310.03,275.21,0.45,False,gauntlet-v2.1.0
+7724913631ce,Pest Control,774.82,1101.05,905.24,0.753,True,gauntlet-v2.1.0
+c27ca1e58418,Exterior,910.98,1389.55,1044.22,0.239,False,gauntlet-v2.1.0
+0a175804c612,Landscaping,113.39,276.44,202.13,0.221,False,gauntlet-v2.1.0
+7e5502429bc8,Handyman,1035.62,1686.7,1035.62,0.231,False,gauntlet-v2.1.0
+0013fa1710b8,Handyman,375.38,928.19,430.73,0.022,False,gauntlet-v2.1.0
+30e9c9f71470,Handyman,431.55,917.58,550.69,0.14,True,gauntlet-v2.1.0
+e76033e8f5cf,Handyman,456.88,708.1,534.63,0.293,False,gauntlet-v2.1.0
+b09e923582e4,Cleaning,206.84,271.64,248.38,0.835,True,gauntlet-v2.1.0
+9b7c4f02b47b,Handyman,357.64,973.04,516.72,0.03,False,gauntlet-v2.1.0
+a0850240804a,Pest Control,743.38,1123.82,935.47,0.702,True,gauntlet-v2.1.0
+813a4bb39781,Moving,325.02,439.74,377.33,0.45,True,gauntlet-v2.1.0
+67458b594944,Handyman,296.69,461.48,377.82,0.3,False,gauntlet-v2.1.0
+f3694bc0de59,Plumbing,192.43,462.5,316.11,0.128,False,gauntlet-v2.1.0
+d2642c5b5a66,Appliance Repair,185.96,418.13,252.68,0.147,False,gauntlet-v2.1.0
+83041b282caf,Landscaping,675.68,995.89,800.25,0.585,True,gauntlet-v2.1.0
+8565ddc18539,Cleaning,318.48,417.09,366.51,0.829,True,gauntlet-v2.1.0
+a6ebcb693e61,Handyman,144.12,354.72,201.7,0.083,False,gauntlet-v2.1.0
+fdde962877d2,Pest Control,866.59,1282.63,1092.65,0.737,True,gauntlet-v2.1.0
+6881f2b0b609,Electrical,521.31,950.62,627.56,0.176,False,gauntlet-v2.1.0
+5007daee6eb5,Flooring,694.59,1746.3,915.1,0.039,False,gauntlet-v2.1.0
+fa2fd37dfe0f,Handyman,1521.62,2635.88,1575.78,0.203,False,gauntlet-v2.1.0
+bc7509624797,Appliance Repair,70.19,161.12,92.29,0.119,False,gauntlet-v2.1.0
+2b3baf9bf9df,Handyman,181.18,280.57,217.23,0.292,False,gauntlet-v2.1.0
+03ca1c3278cf,Handyman,363.84,849.69,483.71,0.097,False,gauntlet-v2.1.0
+6b24cff1a042,Electrical,142.65,211.11,161.35,0.254,False,gauntlet-v2.1.0
+0f07881e958c,Plumbing,331.03,794.63,381.76,0.019,False,gauntlet-v2.1.0
+39e4a54e684b,Pest Control,338.15,433.91,373.02,0.839,True,gauntlet-v2.1.0
+a0a626252c41,Electrical,373.44,802.11,527.82,0.138,False,gauntlet-v2.1.0
+b2ca4f93866d,Handyman,227.96,538.41,300.33,0.086,False,gauntlet-v2.1.0
+9384cecefec2,Roofing,277.4,360.0,296.5,0.45,True,gauntlet-v2.1.0
+44e081556e1a,Exterior,511.82,1262.37,885.82,0.125,False,gauntlet-v2.1.0
+d4bda8d4eab1,Plumbing,274.24,693.29,344.44,0.018,False,gauntlet-v2.1.0
+b19a1b29cf9e,Moving,423.57,549.36,491.2,0.45,True,gauntlet-v2.1.0
+0fa432b286df,Painting,60.44,143.28,94.82,0.12,False,gauntlet-v2.1.0
+8742da127856,Plumbing,167.44,343.35,265.46,0.186,False,gauntlet-v2.1.0
+f30c80f183c3,Handyman,146.81,222.81,182.67,0.307,False,gauntlet-v2.1.0
+feb03e374eba,Plumbing,166.33,407.89,241.92,0.084,False,gauntlet-v2.1.0
+06954b8a7f8d,Flooring,455.48,1092.89,613.43,0.073,False,gauntlet-v2.1.0
+d432d25303d8,Handyman,272.59,680.95,331.14,0.022,False,gauntlet-v2.1.0
+1ed518556c45,Electrical,163.79,413.21,256.65,0.091,False,gauntlet-v2.1.0
+1a8959698a9e,Landscaping,945.51,1391.96,1161.27,0.703,True,gauntlet-v2.1.0
+80e107ee3ba1,Handyman,1123.43,2558.67,1268.03,0.051,False,gauntlet-v2.1.0
+aee651be73c9,Roofing,144.16,342.52,277.02,0.228,False,gauntlet-v2.1.0
+3a5181a6f8e6,Handyman,687.98,1664.42,978.97,0.099,False,gauntlet-v2.1.0
+ad5f9478d603,Handyman,148.09,351.87,250.06,0.165,False,gauntlet-v2.1.0
+8be140392743,Handyman,231.48,539.76,271.83,0.051,False,gauntlet-v2.1.0
+7978a5cc6950,Handyman,1751.68,4314.29,2459.61,0.083,False,gauntlet-v2.1.0
+ca3b40e3f4a5,Plumbing,163.6,403.22,266.51,0.114,False,gauntlet-v2.1.0
+0ecddab3bf18,Handyman,91.81,214.9,148.65,0.16,False,gauntlet-v2.1.0
+1d0594666bff,Roofing,224.66,398.44,288.44,0.274,True,gauntlet-v2.1.0
+96cd0eaa2a4c,Handyman,52.63,127.78,70.82,0.077,False,gauntlet-v2.1.0
+72f14507304b,Pest Control,639.9,887.4,740.58,0.775,True,gauntlet-v2.1.0
+c0d8a9a230e1,Handyman,797.93,1940.03,1323.58,0.147,False,gauntlet-v2.1.0
+9c3a67317761,Handyman,466.14,764.92,534.96,0.256,False,gauntlet-v2.1.0
+b759ee249f22,Electrical,63.89,156.54,91.76,0.079,False,gauntlet-v2.1.0
+a190869298d6,Cleaning,273.33,368.07,329.46,0.813,True,gauntlet-v2.1.0
+1072aa7d027a,Handyman,201.11,461.07,265.36,0.106,False,gauntlet-v2.1.0
+bc7fe627d446,Handyman,440.36,844.04,583.81,0.209,False,gauntlet-v2.1.0
+0b59f34f597a,Handyman,113.61,275.17,187.58,0.148,False,gauntlet-v2.1.0
+cce19cc2cd21,Auto,202.99,435.1,306.3,0.149,False,gauntlet-v2.1.0
+9e54fa93dbad,Exterior,435.46,1126.95,679.05,0.075,False,gauntlet-v2.1.0
+5a8872eea42b,Remodeling,325.32,746.03,432.59,0.097,False,gauntlet-v2.1.0
+5db05db82489,Pest Control,346.87,478.75,383.21,0.767,True,gauntlet-v2.1.0
+dbbcd3ff0292,Flooring,291.17,798.69,381.51,0.019,False,gauntlet-v2.1.0
+a621ebebd148,Moving,197.9,254.72,219.02,0.45,True,gauntlet-v2.1.0
+715fcf6424d0,Handyman,228.59,501.02,290.91,0.121,False,gauntlet-v2.1.0
+d8c07d144665,Pest Control,275.97,364.16,325.94,0.827,True,gauntlet-v2.1.0
+9cb4b00d0189,Landscaping,3294.82,7204.3,4753.33,0.186,False,gauntlet-v2.1.0
+5636ef939535,Flooring,1199.85,2628.33,1439.24,0.087,False,gauntlet-v2.1.0
+7dcb20be5354,HVAC,87.54,122.88,99.69,0.702,True,gauntlet-v2.1.0
+794085b394b2,General Contractor,2107.73,5106.77,2498.92,0.022,False,gauntlet-v2.1.0
+662ac33770aa,Handyman,128.05,286.32,195.75,0.167,False,gauntlet-v2.1.0
+75230bbdfffa,Landscaping,405.25,577.63,467.99,0.743,True,gauntlet-v2.1.0
+fb2f73f87c88,Painting,70.61,165.06,113.6,0.132,False,gauntlet-v2.1.0
+1eef748f055a,Painting,1060.46,1595.64,1184.44,0.245,False,gauntlet-v2.1.0
+7266cf837de9,Appliance Repair,143.34,214.67,173.17,0.45,True,gauntlet-v2.1.0
+91f80f3e9861,Handyman,278.26,409.16,315.29,0.307,False,gauntlet-v2.1.0
+6b106b195b8d,Handyman,397.03,692.73,467.52,0.23,False,gauntlet-v2.1.0
+2b49bbd05b42,Plumbing,108.54,273.32,162.62,0.079,False,gauntlet-v2.1.0
+941977983c84,Handyman,127.04,312.24,190.51,0.108,False,gauntlet-v2.1.0
+c851c78a5599,Plumbing,463.01,827.9,617.82,0.207,False,gauntlet-v2.1.0
+14efe7909cbc,General Contractor,200.65,312.0,241.84,0.239,False,gauntlet-v2.1.0
+b5aeff8acc69,Handyman,611.39,1557.18,794.58,0.03,False,gauntlet-v2.1.0
+c8f3716c3e5e,Handyman,287.97,756.0,373.89,0.022,False,gauntlet-v2.1.0
+8589066e9cca,Pest Control,959.7,1348.98,1177.52,0.778,True,gauntlet-v2.1.0
+bb5df7e3650e,Handyman,372.42,823.35,506.05,0.137,False,gauntlet-v2.1.0
+929ef36da5ca,Pest Control,284.8,403.11,324.07,0.749,True,gauntlet-v2.1.0
+998fc5dfb867,Roofing,241.45,323.99,274.44,0.45,True,gauntlet-v2.1.0
+3d873a035196,Plumbing,131.99,214.66,175.47,0.244,False,gauntlet-v2.1.0
+172a7c9e0e37,Painting,499.26,1270.94,771.92,0.082,False,gauntlet-v2.1.0
+cd6ace28cdbf,Flooring,204.3,344.36,251.19,0.221,False,gauntlet-v2.1.0
+728f1a293713,Handyman,186.69,281.85,231.35,0.324,False,gauntlet-v2.1.0
+77c916090633,Pest Control,239.63,299.5,259.66,0.86,True,gauntlet-v2.1.0
+4986dc5d949f,Pest Control,87.89,109.33,96.13,0.804,True,gauntlet-v2.1.0
+a73d4e70d064,Cleaning,248.54,310.76,288.53,0.872,True,gauntlet-v2.1.0
+b9c69107fa2b,Landscaping,333.54,464.62,378.38,0.765,True,gauntlet-v2.1.0
+2c546f720c93,Handyman,286.18,695.25,397.5,0.088,False,gauntlet-v2.1.0
+b8d4d60e7f9c,Handyman,94.97,206.4,158.87,0.205,False,gauntlet-v2.1.0
+b7b593cb8ec2,Handyman,250.99,475.92,255.75,0.142,False,gauntlet-v2.1.0
+accceffe127e,Handyman,160.69,382.59,221.86,0.098,False,gauntlet-v2.1.0
+4d24bf25aea8,Handyman,274.92,633.9,363.74,0.103,False,gauntlet-v2.1.0
+bf038251c59b,Painting,98.52,146.46,117.67,0.259,False,gauntlet-v2.1.0
+6bfc25cc7df5,Cleaning,93.85,217.01,148.9,0.185,False,gauntlet-v2.1.0
+0c943b6adf66,Exterior,210.17,476.6,335.18,0.141,False,gauntlet-v2.1.0
+e2a8e0bfa1ed,Exterior,960.34,1785.2,1356.6,0.196,False,gauntlet-v2.1.0
+cea3bd05d426,General Contractor,68.97,159.62,89.36,0.077,False,gauntlet-v2.1.0
+2fcb7918c598,Handyman,143.63,339.18,248.08,0.186,False,gauntlet-v2.1.0
+b49249ccbb3a,Handyman,87.34,194.93,122.55,0.145,False,gauntlet-v2.1.0
+4bc8836bf6cc,Cleaning,263.1,360.16,320.59,0.801,True,gauntlet-v2.1.0
+49be3d65743d,Handyman,80.48,132.41,97.64,0.266,False,gauntlet-v2.1.0
+1d6f777772c6,Landscaping,78.43,135.63,112.03,0.538,False,gauntlet-v2.1.0
+0bf85f8f318b,Handyman,151.79,379.92,276.12,0.161,False,gauntlet-v2.1.0
+a3c8e75f74a9,Landscaping,31.86,70.63,47.77,0.217,False,gauntlet-v2.1.0
+73ad3dfef061,Handyman,235.52,584.43,288.99,0.024,False,gauntlet-v2.1.0
+deb4666a7556,Plumbing,309.29,734.46,437.61,0.092,False,gauntlet-v2.1.0
+5eedba76cb71,Landscaping,223.06,286.19,252.17,0.844,True,gauntlet-v2.1.0
+749592143713,Cleaning,258.4,333.59,300.42,0.844,True,gauntlet-v2.1.0
+db6b1352e51c,Handyman,344.69,723.07,420.88,0.135,False,gauntlet-v2.1.0
+87ba97ed9475,Handyman,220.79,515.74,325.98,0.132,False,gauntlet-v2.1.0
+de540e6ab33a,Moving,229.72,540.21,381.26,0.19,False,gauntlet-v2.1.0
+645202596b68,HVAC,153.65,223.09,188.76,0.713,True,gauntlet-v2.1.0
+44f1bbc5b4c9,Painting,223.85,455.26,289.06,0.142,False,gauntlet-v2.1.0
+94bcfe105ad5,Plumbing,390.66,878.3,525.96,0.106,False,gauntlet-v2.1.0
+fe94789a48da,Handyman,147.23,298.98,196.23,0.181,False,gauntlet-v2.1.0
+c09582dcf542,Painting,518.55,1207.03,828.74,0.133,False,gauntlet-v2.1.0
+5b5804ed59d9,Flooring,71.86,111.74,76.68,0.233,False,gauntlet-v2.1.0
+8e950708da83,Roofing,382.15,910.22,579.61,0.148,False,gauntlet-v2.1.0
+ec622897b2df,Plumbing,2063.28,3279.73,2239.68,0.222,False,gauntlet-v2.1.0
+8cce10345c5e,Electrical,347.28,747.27,459.41,0.121,False,gauntlet-v2.1.0
+4effa88a956a,Cleaning,199.85,240.45,219.06,0.897,True,gauntlet-v2.1.0
+36b581c7df84,Appliance Repair,415.78,864.02,532.97,0.179,False,gauntlet-v2.1.0
+b67e21816864,Handyman,384.82,894.89,484.68,0.08,False,gauntlet-v2.1.0
+453afb3d310d,Exterior,444.94,1046.35,688.09,0.118,False,gauntlet-v2.1.0
+a24808ec8338,Plumbing,280.27,644.48,313.85,0.035,False,gauntlet-v2.1.0
+2539b1fe79ac,Handyman,190.59,452.58,285.31,0.139,False,gauntlet-v2.1.0
+6f84d745efab,Painting,108.02,251.61,185.29,0.149,False,gauntlet-v2.1.0
+a1c8028fdb70,Electrical,258.5,509.24,304.52,0.135,False,gauntlet-v2.1.0
+05a4cd585799,Handyman,238.08,529.27,278.54,0.082,False,gauntlet-v2.1.0
+658a39f88a25,Handyman,202.27,458.25,299.23,0.15,False,gauntlet-v2.1.0
+8f7d517865d6,Handyman,326.68,521.24,360.67,0.263,False,gauntlet-v2.1.0
+5f79fb022120,Handyman,139.44,214.16,161.29,0.29,False,gauntlet-v2.1.0
+69ec3b9cea2c,HVAC,3889.96,4900.23,4206.24,0.45,True,gauntlet-v2.1.0
+a37d09d34a7c,Moving,407.56,547.67,477.88,0.45,True,gauntlet-v2.1.0
+0df941cb1536,Painting,1607.0,3362.36,2361.31,0.159,False,gauntlet-v2.1.0
+b94422c62a30,Cleaning,203.59,421.44,305.82,0.271,True,gauntlet-v2.1.0
+179cf283f9f5,Appliance Repair,169.43,254.32,204.84,0.45,False,gauntlet-v2.1.0
+6a287a1078c0,Flooring,432.15,811.89,518.27,0.167,False,gauntlet-v2.1.0
+cb2cf4bf26a8,Handyman,140.29,314.44,229.62,0.185,False,gauntlet-v2.1.0
+632cc2a9bf8e,Electrical,137.39,212.43,164.95,0.245,False,gauntlet-v2.1.0
+292538a65fd7,Handyman,68.4,153.26,105.62,0.169,False,gauntlet-v2.1.0
+338b4dea5367,Painting,131.01,319.34,249.21,0.155,False,gauntlet-v2.1.0
+a41e38b702f4,Landscaping,429.16,615.42,523.55,0.757,True,gauntlet-v2.1.0
+ec12198047ad,Plumbing,92.87,213.11,148.65,0.141,False,gauntlet-v2.1.0
+0287240ca63d,Handyman,200.64,449.47,257.32,0.12,False,gauntlet-v2.1.0
+b513a7ff5978,Plumbing,180.34,439.01,247.31,0.07,True,gauntlet-v2.1.0
+bbb925608218,Exterior,1719.19,4025.39,2499.54,0.103,False,gauntlet-v2.1.0
+559465212fb5,Cleaning,262.49,354.05,307.49,0.805,True,gauntlet-v2.1.0
+fafc2732a41f,Landscaping,466.14,636.02,559.69,0.789,True,gauntlet-v2.1.0
+d2c3f7d7309a,Handyman,154.89,365.53,239.17,0.141,False,gauntlet-v2.1.0
+467ab99dbaa3,Moving,178.64,223.09,200.0,0.45,True,gauntlet-v2.1.0
+2d0d1a2c4841,Handyman,165.73,407.88,243.29,0.1,False,gauntlet-v2.1.0
+d44082a1f10c,HVAC,229.78,309.93,274.86,0.801,True,gauntlet-v2.1.0
+35913fbeb515,HVAC,100.77,137.5,115.89,0.789,True,gauntlet-v2.1.0
+136e34f998a6,Electrical,108.4,264.93,170.47,0.106,False,gauntlet-v2.1.0
+eaa26b14ca25,Handyman,295.34,764.08,357.17,0.022,False,gauntlet-v2.1.0
+4e212c279732,Landscaping,158.54,205.46,186.03,0.842,True,gauntlet-v2.1.0
+75502538c3e8,HVAC,2824.62,3741.44,3004.76,0.45,True,gauntlet-v2.1.0
+7f7af6137ce9,Plumbing,555.45,899.74,604.47,0.214,False,gauntlet-v2.1.0
+93994319c450,Plumbing,155.92,363.92,234.2,0.117,False,gauntlet-v2.1.0
+2016478d9492,Flooring,1621.0,3502.81,2223.94,0.132,False,gauntlet-v2.1.0
+a6e0f1a76758,Handyman,327.61,749.4,433.08,0.108,False,gauntlet-v2.1.0
+14bc33c0f01c,Plumbing,309.29,730.47,404.97,0.071,False,gauntlet-v2.1.0
+f0dc74b0f498,Appliance Repair,221.96,531.35,280.13,0.075,True,gauntlet-v2.1.0
+54d639e084af,Flooring,604.75,1064.62,681.86,0.185,False,gauntlet-v2.1.0
+22191a921526,Handyman,222.9,344.59,262.27,0.309,False,gauntlet-v2.1.0
+09a9e7cbaba5,Moving,308.53,418.14,370.35,0.45,True,gauntlet-v2.1.0
+631f58a3d20f,HVAC,2556.64,3426.46,2727.49,0.45,True,gauntlet-v2.1.0
+392ed6711025,Handyman,158.56,384.98,221.2,0.09,False,gauntlet-v2.1.0
+23ca67ce89b1,Plumbing,111.88,275.22,193.56,0.131,False,gauntlet-v2.1.0
+7e245b947ebe,Handyman,71.66,161.91,109.63,0.162,False,gauntlet-v2.1.0
+34fbd3ead861,Painting,385.32,937.99,658.34,0.13,False,gauntlet-v2.1.0
+6b931c5c8238,Cleaning,296.61,390.57,325.74,0.813,True,gauntlet-v2.1.0
+644214df316c,Landscaping,129.05,162.58,147.45,0.863,True,gauntlet-v2.1.0
+f15d449e81e8,Handyman,598.88,1489.28,889.15,0.098,False,gauntlet-v2.1.0
+fc0f55df7549,Handyman,309.69,684.45,422.53,0.139,False,gauntlet-v2.1.0
+12207c2973e1,Cleaning,229.16,290.46,260.64,0.832,True,gauntlet-v2.1.0
+0c5791cea66c,Handyman,147.45,337.45,201.47,0.119,False,gauntlet-v2.1.0
+54a91e5d8874,Painting,452.02,700.59,504.69,0.233,False,gauntlet-v2.1.0
+d78d11b8bac2,Landscaping,168.63,219.23,196.73,0.838,True,gauntlet-v2.1.0
+d0b572559570,Exterior,365.75,878.28,612.57,0.129,False,gauntlet-v2.1.0
+91bca017d067,Handyman,171.05,406.61,240.87,0.106,False,gauntlet-v2.1.0
+ef80e37bb1d4,Painting,586.22,1361.11,985.41,0.146,False,gauntlet-v2.1.0
+8dfe95b048b9,Landscaping,196.14,256.97,227.67,0.83,True,gauntlet-v2.1.0
+d9ae4cc82326,Plumbing,192.35,439.69,261.02,0.099,False,gauntlet-v2.1.0
+d9eac2f7abef,Roofing,430.7,716.12,439.09,0.28,False,gauntlet-v2.1.0
+bc8bb8f5ff7a,Flooring,330.03,927.23,454.62,0.019,False,gauntlet-v2.1.0
+884486e0e1e2,Handyman,325.25,750.61,454.53,0.121,False,gauntlet-v2.1.0
+7dd047c5c133,Handyman,230.83,532.09,272.77,0.061,False,gauntlet-v2.1.0
+02be6761f02f,General Contractor,4049.34,10219.36,5330.35,0.035,False,gauntlet-v2.1.0
+cf4f201c3c0e,Handyman,121.57,291.58,166.23,0.09,False,gauntlet-v2.1.0
+37d192634861,Cleaning,229.1,290.02,260.24,0.857,True,gauntlet-v2.1.0
+7a0b3a11bb6a,Flooring,837.8,1721.45,995.75,0.119,False,gauntlet-v2.1.0
+360a93c2ff75,Handyman,270.7,555.57,340.85,0.157,False,gauntlet-v2.1.0
+a08d9ea8d19b,Pest Control,161.89,229.9,191.55,0.758,True,gauntlet-v2.1.0
+d492b3655ccb,General Contractor,1850.74,4335.48,2335.25,0.062,False,gauntlet-v2.1.0
+b8c090fa07e2,Handyman,69.83,165.47,93.69,0.091,False,gauntlet-v2.1.0
+ca0d9e7273c9,Handyman,141.59,271.22,200.19,0.224,False,gauntlet-v2.1.0
+a3c171bc7313,Handyman,403.31,979.36,473.88,0.022,False,gauntlet-v2.1.0
+4ec586ca911a,Plumbing,122.08,283.14,183.87,0.121,False,gauntlet-v2.1.0
+0a7e9ae0aab0,Handyman,255.23,599.68,323.61,0.075,False,gauntlet-v2.1.0
+6f6a856b1c71,Plumbing,132.81,289.35,211.8,0.163,False,gauntlet-v2.1.0
+6c1ec2ad4dff,Handyman,70.56,165.13,103.85,0.13,False,gauntlet-v2.1.0
+af07b922bd67,Moving,703.42,1062.91,902.06,0.45,True,gauntlet-v2.1.0
+40b39ea6c215,Electrical,99.6,164.07,122.55,0.223,False,gauntlet-v2.1.0
+9d47a3e8133d,Electrical,123.6,287.78,216.47,0.154,False,gauntlet-v2.1.0
+c20ce41196f9,Cleaning,329.05,445.3,365.77,0.788,True,gauntlet-v2.1.0
+76f7ead6cbad,Roofing,429.3,638.82,481.69,0.45,True,gauntlet-v2.1.0
+d86b9ad06464,Electrical,89.97,217.52,147.43,0.122,False,gauntlet-v2.1.0
+e8322f8887bb,Handyman,393.6,659.99,461.69,0.25,False,gauntlet-v2.1.0
+9cd32ad1ae4c,HVAC,89.82,122.83,102.55,0.785,True,gauntlet-v2.1.0
+27089c9c58a6,Cleaning,394.98,514.47,438.25,0.826,True,gauntlet-v2.1.0
+357733bfb85f,HVAC,206.73,279.93,255.59,0.774,True,gauntlet-v2.1.0
+5ce9c3c03b9f,Handyman,511.32,1213.84,612.89,0.046,False,gauntlet-v2.1.0
+4944657a6893,HVAC,91.55,124.67,103.7,0.787,True,gauntlet-v2.1.0
+08e484b5055a,Handyman,130.78,313.8,175.71,0.084,False,gauntlet-v2.1.0
+61ebc0c467ee,Handyman,156.81,349.62,233.0,0.177,False,gauntlet-v2.1.0
+e512622688bb,Pest Control,969.49,1471.79,1206.45,0.665,True,gauntlet-v2.1.0
+fa5b4360fb10,Handyman,78.44,179.09,120.82,0.158,False,gauntlet-v2.1.0
+67021fcf60c7,Painting,286.17,634.5,423.86,0.135,False,gauntlet-v2.1.0
+34a221bb96e2,Handyman,291.05,721.87,419.25,0.092,False,gauntlet-v2.1.0
+d2fea184642c,Handyman,563.62,1321.13,677.3,0.056,False,gauntlet-v2.1.0
+6751a76cc8fc,Handyman,348.14,894.91,428.05,0.022,False,gauntlet-v2.1.0
+e4ece3f01c9c,Landscaping,201.27,269.16,241.13,0.818,True,gauntlet-v2.1.0
+17ef79385673,Landscaping,45.2,63.17,51.13,0.737,True,gauntlet-v2.1.0
+294aaa607a8b,Flooring,237.31,549.39,333.08,0.104,False,gauntlet-v2.1.0
+16669e323565,Appliance Repair,131.31,193.58,156.21,0.45,True,gauntlet-v2.1.0
+6f6d5739a0a2,Handyman,277.78,721.95,421.9,0.08,False,gauntlet-v2.1.0
+c8ed3f94ccaf,Handyman,151.6,349.47,251.37,0.178,False,gauntlet-v2.1.0
+0abd8f27551d,HVAC,238.32,376.52,318.89,0.492,True,gauntlet-v2.1.0
+42e544025f96,Handyman,148.65,338.17,255.63,0.191,False,gauntlet-v2.1.0
+ce23dd4bac24,Moving,170.28,216.15,190.12,0.45,True,gauntlet-v2.1.0
+4edd2dea18c7,Handyman,589.36,1371.04,780.36,0.098,False,gauntlet-v2.1.0
+6440e6a91202,Handyman,379.42,913.09,494.15,0.07,False,gauntlet-v2.1.0
+a3548d64df7d,Plumbing,135.61,320.46,239.79,0.153,False,gauntlet-v2.1.0
+ef5d8ffaf54c,HVAC,229.04,336.1,282.91,0.716,True,gauntlet-v2.1.0
+4987ed252a87,Handyman,165.46,338.26,205.2,0.155,False,gauntlet-v2.1.0
+bdd5cc691bd2,HVAC,2769.26,3503.76,3026.57,0.45,True,gauntlet-v2.1.0
+4cbb69ea6883,Handyman,435.44,1212.67,514.22,0.022,False,gauntlet-v2.1.0
+6cce069177cd,Plumbing,167.74,387.82,271.7,0.141,False,gauntlet-v2.1.0
+d0d1ec183968,Plumbing,272.99,662.75,360.64,0.059,False,gauntlet-v2.1.0
+cc4996f23b12,Electrical,107.35,269.18,165.14,0.088,False,gauntlet-v2.1.0
+d88439bd85ec,Plumbing,124.97,297.93,223.29,0.152,False,gauntlet-v2.1.0
+daabc5d7dd36,Electrical,165.75,386.87,257.76,0.124,True,gauntlet-v2.1.0
+af3b9d6b5cbb,Handyman,46.93,106.51,71.74,0.159,False,gauntlet-v2.1.0
+577f11e5831c,Handyman,288.98,489.23,345.68,0.249,False,gauntlet-v2.1.0
+5408f1f9a1d9,Cleaning,270.43,343.93,308.32,0.854,True,gauntlet-v2.1.0
+e8425b784fa8,Electrical,225.72,417.84,298.57,0.188,False,gauntlet-v2.1.0
+36486ce645c1,Landscaping,27.77,64.61,42.1,0.172,False,gauntlet-v2.1.0
+2ac5b691fa27,Flooring,1167.51,2824.32,1493.64,0.051,False,gauntlet-v2.1.0
+23267fc99b7a,Handyman,97.99,164.37,128.8,0.272,True,gauntlet-v2.1.0
+da9d2b79c84b,Handyman,90.75,201.28,137.7,0.169,False,gauntlet-v2.1.0
+dd790261c9e6,Moving,259.3,383.63,322.1,0.45,True,gauntlet-v2.1.0
+3a5554022e2d,Flooring,230.58,612.55,296.88,0.019,False,gauntlet-v2.1.0
+fda4abb9e204,Pest Control,348.28,466.67,388.76,0.799,True,gauntlet-v2.1.0
+5f76c46b3071,Appliance Repair,150.22,224.03,176.29,0.45,True,gauntlet-v2.1.0
+f2bf58e54f66,Landscaping,430.52,1046.75,601.89,0.129,False,gauntlet-v2.1.0
+e789d441b19d,Electrical,75.83,152.87,106.68,0.165,False,gauntlet-v2.1.0
+d06801a50c6a,Moving,208.41,258.74,234.24,0.45,True,gauntlet-v2.1.0
+949f32c20a1f,Cleaning,176.81,229.33,204.41,0.838,True,gauntlet-v2.1.0
+0e3803a9c736,Electrical,702.59,1608.21,937.94,0.092,False,gauntlet-v2.1.0
+3728423e108f,Painting,210.69,483.47,349.16,0.147,False,gauntlet-v2.1.0
+cbde8b191f38,Plumbing,146.5,336.91,225.08,0.13,False,gauntlet-v2.1.0
+ebafc7f8530e,Electrical,75.31,176.28,120.31,0.13,False,gauntlet-v2.1.0
+b0060cf30679,Landscaping,123.48,147.7,139.84,0.907,True,gauntlet-v2.1.0
+d0da1af52e98,Appliance Repair,636.64,1533.61,742.23,0.028,False,gauntlet-v2.1.0
+999845778842,Pest Control,105.29,136.29,119.53,0.796,True,gauntlet-v2.1.0
+3742b6ed0958,Handyman,1789.02,3295.15,1789.02,0.155,False,gauntlet-v2.1.0
+9c7b18861f0d,Pest Control,592.4,867.44,714.36,0.725,True,gauntlet-v2.1.0
+98224c72c0fa,Electrical,137.87,322.18,214.29,0.124,False,gauntlet-v2.1.0
+56a70082d635,Plumbing,149.7,357.49,255.36,0.14,False,gauntlet-v2.1.0
+7c71a47fc941,Roofing,195.28,294.95,249.25,0.45,True,gauntlet-v2.1.0
+e14704c2e089,Flooring,106.25,255.99,164.65,0.113,False,gauntlet-v2.1.0
+706ebbff90f1,Handyman,240.76,539.25,371.1,0.168,False,gauntlet-v2.1.0
+c898b3c4675e,Handyman,130.91,304.85,219.91,0.173,True,gauntlet-v2.1.0
+0d4836d1aea3,Plumbing,190.64,452.89,272.82,0.095,False,gauntlet-v2.1.0
+f93e32613589,Landscaping,117.48,144.12,134.28,0.887,True,gauntlet-v2.1.0
+fb44b1f22339,Exterior,564.27,1408.62,828.25,0.075,False,gauntlet-v2.1.0
+4926b6652dda,Handyman,257.27,561.98,305.83,0.1,False,gauntlet-v2.1.0
+2e7dff63ee8d,Plumbing,212.08,341.88,245.61,0.226,False,gauntlet-v2.1.0
+257d53b79883,Cleaning,266.87,332.58,310.34,0.876,True,gauntlet-v2.1.0
+af07603d4da4,Handyman,385.53,627.1,431.18,0.256,False,gauntlet-v2.1.0
+19c378fd0186,Handyman,635.8,1667.16,876.09,0.035,False,gauntlet-v2.1.0
+2ec1d8373835,Painting,506.01,758.05,598.63,0.255,False,gauntlet-v2.1.0
+265b0b21beda,Plumbing,168.65,408.32,302.32,0.146,False,gauntlet-v2.1.0
+c8a3fdb7844b,Painting,415.16,1072.33,692.06,0.097,False,gauntlet-v2.1.0
+dd448e206610,Handyman,218.55,371.99,256.21,0.242,False,gauntlet-v2.1.0
+f47dc630419b,Landscaping,160.46,367.22,290.16,0.307,False,gauntlet-v2.1.0
+d9f3e0597d97,Electrical,351.56,911.3,480.96,0.033,False,gauntlet-v2.1.0
+89cfcea2d815,Handyman,131.96,315.04,234.62,0.197,False,gauntlet-v2.1.0
+26bf531b790f,Moving,213.76,266.67,248.95,0.45,True,gauntlet-v2.1.0
+00e6b8493611,Flooring,357.15,921.05,423.69,0.019,False,gauntlet-v2.1.0
+760ba124c267,Appliance Repair,250.98,555.19,387.96,0.216,False,gauntlet-v2.1.0
+0f253dd3265b,Pest Control,180.08,241.71,215.68,0.815,True,gauntlet-v2.1.0
+3c2de561e6c6,Handyman,178.7,312.38,203.79,0.221,False,gauntlet-v2.1.0
+eca38a52423a,Appliance Repair,159.7,226.95,196.2,0.45,False,gauntlet-v2.1.0
+e50d31b7a144,Handyman,134.98,345.34,230.33,0.129,False,gauntlet-v2.1.0
+0619aa53c71c,Cleaning,295.72,396.87,333.7,0.753,True,gauntlet-v2.1.0
+e52abc1f308c,Moving,337.34,434.32,374.63,0.45,True,gauntlet-v2.1.0
+52e76efe6b15,Electrical,126.97,317.02,223.79,0.127,False,gauntlet-v2.1.0
+3a9707340d69,Handyman,648.06,1437.54,972.34,0.166,False,gauntlet-v2.1.0
+600cb180b5f3,Flooring,1732.62,4007.18,2433.98,0.105,False,gauntlet-v2.1.0
+ed9253c2fe83,Handyman,267.46,674.81,335.16,0.022,False,gauntlet-v2.1.0
+ffb8a68d5b41,Painting,570.28,1419.3,875.01,0.091,False,gauntlet-v2.1.0
+b5866a9c2c79,Electrical,189.68,459.24,267.09,0.079,False,gauntlet-v2.1.0
+0e5275f34e63,Plumbing,603.79,1486.84,879.84,0.082,False,gauntlet-v2.1.0
+c5b30f849ed9,Appliance Repair,135.64,177.31,155.38,0.45,True,gauntlet-v2.1.0
+036f3a96a435,Plumbing,334.14,761.91,438.7,0.091,False,gauntlet-v2.1.0
+92703ed2691b,HVAC,241.2,350.9,302.16,0.751,True,gauntlet-v2.1.0
+eb84c0688c3a,Plumbing,227.03,514.13,282.55,0.079,False,gauntlet-v2.1.0
+494f8b426e85,Electrical,117.28,301.13,186.47,0.086,False,gauntlet-v2.1.0
+deca4a03814c,Handyman,111.08,203.5,170.61,0.262,False,gauntlet-v2.1.0
+38ad933e6369,Cleaning,333.03,437.11,377.12,0.823,True,gauntlet-v2.1.0
+0c49468f854e,Handyman,675.39,1460.03,966.23,0.166,False,gauntlet-v2.1.0
+54d3fd385463,Handyman,277.29,698.84,359.04,0.036,False,gauntlet-v2.1.0
+2d6ee4442604,Electrical,249.85,522.35,343.97,0.144,False,gauntlet-v2.1.0
+353c5f2735d3,Handyman,66.7,138.96,94.54,0.183,False,gauntlet-v2.1.0
+e8f4e8455a29,Flooring,237.74,646.07,309.29,0.019,False,gauntlet-v2.1.0
+279959931918,Electrical,630.28,1638.86,926.18,0.056,False,gauntlet-v2.1.0
+e2a5e91a50be,Exterior,456.76,1110.76,790.04,0.131,False,gauntlet-v2.1.0
+9c3a1022a13f,Exterior,364.9,599.01,442.49,0.219,False,gauntlet-v2.1.0
+55dff9e8f484,Plumbing,126.97,198.73,165.38,0.255,False,gauntlet-v2.1.0
+7a0fc5c7060a,Handyman,122.74,279.14,211.0,0.197,False,gauntlet-v2.1.0
+f7a13fbd11a5,Electrical,130.96,209.86,161.64,0.235,False,gauntlet-v2.1.0
+72bb964e3544,Cleaning,128.82,154.83,142.58,0.869,True,gauntlet-v2.1.0
+16d0382287d4,Remodeling,393.11,707.1,405.09,0.176,False,gauntlet-v2.1.0
+e91cb79d468c,Appliance Repair,94.24,210.69,125.27,0.177,False,gauntlet-v2.1.0
+bd84d98e1bd8,Handyman,263.86,398.86,325.38,0.307,False,gauntlet-v2.1.0
+c027dd7b42f4,Handyman,108.08,249.53,157.07,0.134,False,gauntlet-v2.1.0
+0fc0fe578480,General Contractor,1662.86,3917.81,2336.69,0.091,False,gauntlet-v2.1.0
+e07862314826,Plumbing,143.09,274.83,234.37,0.216,False,gauntlet-v2.1.0
+1f329cb02948,Painting,259.18,391.78,324.58,0.258,False,gauntlet-v2.1.0
+12077533594a,Handyman,163.6,383.82,223.13,0.103,False,gauntlet-v2.1.0
+85f018871cac,Roofing,636.57,1566.65,814.22,0.054,False,gauntlet-v2.1.0
+1f82c684af8b,Moving,294.34,387.81,341.13,0.45,True,gauntlet-v2.1.0
+a9feb4e42c25,Electrical,126.66,317.34,199.31,0.095,False,gauntlet-v2.1.0
+5fa75ee2c538,Painting,84.52,166.17,126.17,0.187,True,gauntlet-v2.1.0
+6d2d7450bcc1,Handyman,465.24,994.18,579.59,0.13,False,gauntlet-v2.1.0
+e4a01106d28d,Exterior,348.56,875.59,580.61,0.108,False,gauntlet-v2.1.0
+79c56d57697d,Chimney,287.56,513.55,341.89,0.238,False,gauntlet-v2.1.0
+f9cd07ab4047,Painting,678.61,1653.35,1137.26,0.125,False,gauntlet-v2.1.0
+fcca49b31f72,Moving,192.3,270.35,226.12,0.45,True,gauntlet-v2.1.0
+530d7b94c62e,Moving,176.05,234.84,198.89,0.45,True,gauntlet-v2.1.0
+b42debe01f11,Handyman,338.23,907.67,448.72,0.022,False,gauntlet-v2.1.0
+2e8dc7a001a1,Landscaping,41.31,69.66,53.74,0.423,False,gauntlet-v2.1.0
+e43aee96619b,Flooring,184.55,471.47,278.57,0.076,False,gauntlet-v2.1.0
+c39cb2c540b6,Handyman,217.34,408.47,261.67,0.195,False,gauntlet-v2.1.0
+abb29e3b1f19,Flooring,172.32,444.21,241.16,0.046,False,gauntlet-v2.1.0
+0e8b0de5cc47,Appliance Repair,217.85,309.15,283.1,0.45,True,gauntlet-v2.1.0
+1f6ebd8f0036,Handyman,72.35,169.66,117.05,0.159,False,gauntlet-v2.1.0
+31552e25b8d7,Handyman,93.08,219.33,153.0,0.161,False,gauntlet-v2.1.0
+4b06b9094858,Flooring,3134.02,7960.82,3877.88,0.019,False,gauntlet-v2.1.0
+6592e596d7db,Appliance Repair,160.72,295.3,199.88,0.417,False,gauntlet-v2.1.0
+29938b66ee9c,Roofing,1880.68,2790.02,1958.3,0.33,False,gauntlet-v2.1.0
+3011be4c1d6f,Plumbing,109.32,155.22,128.53,0.278,False,gauntlet-v2.1.0
+a78d7dfbce12,Landscaping,146.86,191.77,168.73,0.831,True,gauntlet-v2.1.0
+97f72eb0197b,Handyman,99.1,246.13,142.71,0.088,False,gauntlet-v2.1.0
+fd309e77693e,Plumbing,940.3,1571.13,940.3,0.183,False,gauntlet-v2.1.0
+e68259a977d8,Handyman,129.03,279.64,194.13,0.197,False,gauntlet-v2.1.0
+61f4a24677e0,Handyman,481.81,820.65,509.31,0.218,False,gauntlet-v2.1.0
+5c14031abafc,Appliance Repair,115.17,181.87,146.49,0.45,True,gauntlet-v2.1.0
+81551c065e76,Cleaning,309.42,411.51,361.76,0.818,True,gauntlet-v2.1.0
+5492ab4af482,Painting,693.28,1562.12,1143.98,0.154,False,gauntlet-v2.1.0
+d947226be629,Handyman,171.69,318.78,245.79,0.247,False,gauntlet-v2.1.0
+28f3e6542bac,Cleaning,276.99,358.48,299.67,0.826,True,gauntlet-v2.1.0
+ee0015c94a62,Electrical,115.46,277.97,205.37,0.144,False,gauntlet-v2.1.0
+419c7883627b,Moving,441.2,601.11,517.06,0.45,True,gauntlet-v2.1.0
+627a3cc348cc,Painting,231.17,512.33,358.29,0.146,False,gauntlet-v2.1.0
+01f8667f50d5,Handyman,136.06,326.7,243.84,0.176,False,gauntlet-v2.1.0
+7c704ac6d22a,Electrical,185.88,455.07,269.12,0.082,False,gauntlet-v2.1.0
+f3d024eaab13,Roofing,220.84,302.44,253.26,0.45,True,gauntlet-v2.1.0
+3517a0cd78de,Painting,255.46,663.91,391.88,0.07,False,gauntlet-v2.1.0
+81e649b6fcfd,Handyman,212.14,531.31,252.71,0.022,False,gauntlet-v2.1.0
+a69a7896a1cb,Exterior,280.87,635.34,415.21,0.124,False,gauntlet-v2.1.0
+8a5f0afcff31,Flooring,357.55,936.33,509.93,0.043,False,gauntlet-v2.1.0
+9ab895dfe43b,HVAC,4365.71,5290.45,4712.67,0.45,True,gauntlet-v2.1.0
+cf830153793c,Handyman,78.65,122.72,80.74,0.261,False,gauntlet-v2.1.0
+a69b8b1151fd,Handyman,721.5,1689.7,828.75,0.038,False,gauntlet-v2.1.0
+747edaa66dec,Handyman,1471.44,3456.64,1707.34,0.04,False,gauntlet-v2.1.0
+112a779faa0d,Roofing,304.35,429.0,318.4,0.421,False,gauntlet-v2.1.0
+2a891a20f59a,Painting,282.39,404.52,322.29,0.267,False,gauntlet-v2.1.0
+231c10e69d17,Painting,369.73,571.22,419.95,0.237,False,gauntlet-v2.1.0
+a4d21738de83,Moving,422.61,560.45,494.82,0.45,True,gauntlet-v2.1.0
+856aca9a7224,Handyman,226.6,533.7,332.64,0.126,False,gauntlet-v2.1.0
+5d10801e95a0,Painting,282.97,727.24,412.67,0.059,False,gauntlet-v2.1.0
+0920e5e9bc02,Handyman,187.01,441.8,290.11,0.142,False,gauntlet-v2.1.0
+d781b0a14cf4,Moving,280.81,372.05,325.82,0.45,True,gauntlet-v2.1.0
+9e0420315282,Roofing,255.35,530.45,352.66,0.303,False,gauntlet-v2.1.0
+c6721d0f62d0,Landscaping,174.32,218.11,192.25,0.849,True,gauntlet-v2.1.0
+8813ec7c7912,Electrical,325.25,749.59,467.49,0.11,False,gauntlet-v2.1.0
+d20da8dc1ed5,Plumbing,171.87,409.28,269.86,0.12,False,gauntlet-v2.1.0
+03c3ee4bc24a,Painting,409.22,722.74,568.91,0.216,False,gauntlet-v2.1.0
+fd26a5c9a5ff,HVAC,291.07,417.21,352.95,0.743,True,gauntlet-v2.1.0
+754d9f8cf05b,Plumbing,157.67,249.99,185.95,0.236,False,gauntlet-v2.1.0
+c1a30a81ad5a,Electrical,189.71,463.07,269.01,0.077,False,gauntlet-v2.1.0
+53d01535e87a,Pest Control,357.6,469.93,400.69,0.819,True,gauntlet-v2.1.0
+80519d785465,Roofing,276.95,451.68,346.72,0.314,True,gauntlet-v2.1.0
+5820260936ca,Handyman,79.84,171.93,131.62,0.227,False,gauntlet-v2.1.0
+65df7a55f2ef,Handyman,713.29,1725.33,1053.73,0.113,False,gauntlet-v2.1.0
+251162b16155,Electrical,140.84,214.01,156.4,0.241,False,gauntlet-v2.1.0
+e420ff479117,Appliance Repair,151.03,222.78,180.47,0.45,False,gauntlet-v2.1.0
+fbc2df761a47,Painting,282.08,398.02,322.96,0.273,False,gauntlet-v2.1.0
+5f595938b3b9,Pest Control,358.45,766.33,471.64,0.237,False,gauntlet-v2.1.0
+1076c5957d3e,Electrical,185.86,280.35,213.2,0.248,False,gauntlet-v2.1.0
+188ee5431101,Plumbing,199.46,468.8,263.86,0.077,False,gauntlet-v2.1.0
+d8fe6b9b76a0,Handyman,362.12,848.42,447.45,0.067,False,gauntlet-v2.1.0
+004c5505872f,Remodeling,3133.59,7637.26,4253.59,0.062,False,gauntlet-v2.1.0
+2dc585881693,Plumbing,266.99,650.6,343.89,0.048,False,gauntlet-v2.1.0
+0a729a9062c5,Appliance Repair,112.95,201.97,162.97,0.45,False,gauntlet-v2.1.0
+b3ce9f4027b8,Electrical,95.04,224.45,139.83,0.104,False,gauntlet-v2.1.0
+25a9381b133c,Landscaping,1171.16,1550.63,1370.26,0.822,True,gauntlet-v2.1.0
+e23257cbba69,HVAC,3154.53,3796.82,3468.56,0.874,True,gauntlet-v2.1.0
+a7c24c0bcfee,Plumbing,95.86,163.18,122.1,0.219,False,gauntlet-v2.1.0
+356d93f4db4e,Exterior,298.47,743.84,492.66,0.109,False,gauntlet-v2.1.0
+8e026249d6e1,Handyman,291.06,408.68,327.83,0.328,False,gauntlet-v2.1.0
+3c2d5b95c74e,Landscaping,198.42,271.0,239.28,0.8,True,gauntlet-v2.1.0
+ec9b8e7a0da6,Electrical,115.53,268.28,173.88,0.118,False,gauntlet-v2.1.0
+526c34f80d9f,Handyman,389.11,1050.7,494.9,0.022,False,gauntlet-v2.1.0
+0a8c5e4aa487,Handyman,388.27,797.37,455.3,0.135,False,gauntlet-v2.1.0
+3522b2bbc051,Landscaping,383.91,515.27,461.78,0.816,True,gauntlet-v2.1.0
+b1696e9ea0a5,Handyman,103.2,260.18,159.52,0.104,False,gauntlet-v2.1.0
+7207683d060b,Remodeling,1455.4,3472.14,1745.87,0.035,False,gauntlet-v2.1.0
+baf61a035cd0,Handyman,71.16,162.9,95.84,0.121,False,gauntlet-v2.1.0
+2740f81654ac,Handyman,786.08,1888.34,961.62,0.046,False,gauntlet-v2.1.0
+95af88b45680,Painting,87.97,162.6,126.77,0.205,False,gauntlet-v2.1.0
+42b1b4115810,Moving,330.24,430.61,389.69,0.45,True,gauntlet-v2.1.0
+27eee8b40fb9,Painting,120.86,279.16,221.27,0.167,False,gauntlet-v2.1.0
+6fe79ab1802c,Electrical,67.43,164.67,99.65,0.089,False,gauntlet-v2.1.0
+c2c358e9dd15,Flooring,1114.2,2785.24,1451.37,0.038,False,gauntlet-v2.1.0
+ac107bbb4738,Cleaning,191.51,237.55,211.32,0.871,True,gauntlet-v2.1.0
+279eaa5879b9,HVAC,170.66,232.18,201.68,0.747,True,gauntlet-v2.1.0
+b96f5620fcbf,Appliance Repair,130.15,181.23,162.16,0.45,True,gauntlet-v2.1.0
+25bbeb94bf57,Cleaning,228.33,286.0,264.22,0.87,True,gauntlet-v2.1.0
+f9c20a138d37,Moving,327.38,444.93,395.82,0.45,True,gauntlet-v2.1.0
+67159986a69b,Landscaping,563.61,1333.28,815.84,0.144,False,gauntlet-v2.1.0
+0c4ac4431905,Handyman,39.86,91.77,53.87,0.111,False,gauntlet-v2.1.0
+097f274cf69e,Painting,433.57,1074.77,727.62,0.117,False,gauntlet-v2.1.0
+f26c02155dfc,Landscaping,220.88,298.19,261.65,0.807,True,gauntlet-v2.1.0
+895bd4a53771,Flooring,165.04,277.4,212.92,0.23,True,gauntlet-v2.1.0
+0a29216969e8,Appliance Repair,149.16,192.31,183.19,0.45,True,gauntlet-v2.1.0
+a416fca77880,Painting,206.82,463.58,312.8,0.135,False,gauntlet-v2.1.0
+a1a9a25355e5,Handyman,177.91,286.88,227.58,0.307,False,gauntlet-v2.1.0
+bff039ee06ba,Landscaping,179.98,366.28,304.93,0.501,False,gauntlet-v2.1.0
+067eb10bda23,Handyman,319.96,857.56,368.34,0.022,False,gauntlet-v2.1.0
+103330f9cca6,Handyman,106.38,153.59,122.81,0.32,False,gauntlet-v2.1.0
+313338607707,Painting,666.77,1521.9,1075.02,0.143,False,gauntlet-v2.1.0
+63adeada6605,Handyman,343.54,832.24,446.71,0.065,False,gauntlet-v2.1.0
+ebafcf01f985,Handyman,61.57,141.13,97.11,0.163,False,gauntlet-v2.1.0
+bcd5b886c246,Pest Control,340.1,435.78,374.94,0.84,True,gauntlet-v2.1.0
+38b3642ecec1,HVAC,77.64,159.75,119.94,0.378,False,gauntlet-v2.1.0
+6468e2292180,Roofing,157.55,399.71,251.72,0.127,False,gauntlet-v2.1.0
+cc53fd82eb6b,Handyman,692.46,1779.96,851.02,0.022,False,gauntlet-v2.1.0
+725e32f5b5c2,Moving,288.43,392.22,349.7,0.45,True,gauntlet-v2.1.0
+869561ecab75,Roofing,112.54,159.68,144.77,0.45,True,gauntlet-v2.1.0
+461463fb54c2,Plumbing,95.02,149.36,103.85,0.228,False,gauntlet-v2.1.0
+29c10fe6eae3,Landscaping,470.23,1133.07,716.34,0.144,False,gauntlet-v2.1.0
+e6ded773c1c2,Handyman,219.5,497.91,336.06,0.16,True,gauntlet-v2.1.0
+3be426e88ba6,Landscaping,149.23,340.58,248.55,0.274,False,gauntlet-v2.1.0
+b5bf10f0b7d2,Handyman,219.63,323.44,258.65,0.312,False,gauntlet-v2.1.0
+002abd21b8e9,General Contractor,1981.65,4942.66,2665.9,0.048,False,gauntlet-v2.1.0
+cc80e5682a1d,Plumbing,652.17,1502.84,925.96,0.108,False,gauntlet-v2.1.0
+7385e90f8a18,Roofing,496.74,1283.91,658.67,0.033,False,gauntlet-v2.1.0
+1f4c90a452f1,Plumbing,149.04,345.95,262.61,0.159,False,gauntlet-v2.1.0
+f78b07004e55,Appliance Repair,202.93,266.66,222.17,0.45,True,gauntlet-v2.1.0
+41cf091084d6,Painting,459.86,1204.96,720.05,0.072,False,gauntlet-v2.1.0
+d604696d6ff7,HVAC,63.76,158.31,99.06,0.132,False,gauntlet-v2.1.0
+16251c20d0ef,Landscaping,39.36,89.77,60.98,0.222,False,gauntlet-v2.1.0
+9e3185c10091,Painting,457.57,1139.42,795.66,0.125,False,gauntlet-v2.1.0
+0d9fb18c9aa3,Painting,472.19,1190.98,742.31,0.092,False,gauntlet-v2.1.0
+023bb9717cad,Handyman,214.08,522.6,238.76,0.022,False,gauntlet-v2.1.0
+38cb8e3d07ad,Landscaping,1017.9,1425.52,1258.78,0.749,True,gauntlet-v2.1.0
+7b721c50ff02,Handyman,141.99,332.62,244.07,0.185,False,gauntlet-v2.1.0
+98ee81c41d70,Electrical,329.05,739.55,458.62,0.113,False,gauntlet-v2.1.0
+08954bc816e5,Pest Control,284.59,379.32,315.66,0.803,True,gauntlet-v2.1.0
+7f0d36d4dede,HVAC,297.35,425.31,332.85,0.554,True,gauntlet-v2.1.0
+48fb307e0ee9,Handyman,138.74,329.29,181.23,0.081,False,gauntlet-v2.1.0
+fba075b9d90e,Handyman,94.09,215.65,148.96,0.164,False,gauntlet-v2.1.0
+42f168c63b8d,Plumbing,88.73,213.78,143.2,0.122,False,gauntlet-v2.1.0
+0efb4e0fb40a,Handyman,574.27,1374.97,869.95,0.127,False,gauntlet-v2.1.0
+0c957eac7ed9,Plumbing,106.83,166.77,131.53,0.248,False,gauntlet-v2.1.0
+b902936750d5,Handyman,208.18,475.39,295.35,0.132,False,gauntlet-v2.1.0
+24ffe36e5b0b,HVAC,2974.13,3570.77,3199.38,0.896,True,gauntlet-v2.1.0
+cd4dc3be2592,Electrical,244.06,370.63,268.63,0.24,False,gauntlet-v2.1.0
+30afd706f8e0,Exterior,260.85,692.67,425.94,0.077,False,gauntlet-v2.1.0
+5c0093474e04,HVAC,95.56,125.23,108.32,0.825,True,gauntlet-v2.1.0
+709de818a575,Remodeling,171.99,423.48,225.68,0.046,False,gauntlet-v2.1.0
+06b9fe7fa146,Remodeling,2141.76,4804.31,2877.12,0.101,False,gauntlet-v2.1.0
+4fe7e6f1705d,Flooring,461.49,968.97,581.15,0.124,True,gauntlet-v2.1.0
+ef60277e7dff,Handyman,120.67,186.49,154.54,0.304,False,gauntlet-v2.1.0
+4315201c26dc,Handyman,66.64,147.22,90.79,0.14,False,gauntlet-v2.1.0
+81ef440003f4,Landscaping,210.73,462.39,314.37,0.196,False,gauntlet-v2.1.0
+0364c0e99a36,Handyman,318.67,756.84,426.73,0.089,False,gauntlet-v2.1.0
+f580428217dc,Electrical,848.21,1445.73,1070.16,0.214,False,gauntlet-v2.1.0
+8a1a476bf28e,Landscaping,236.41,558.03,335.83,0.131,False,gauntlet-v2.1.0
+f443a4be8be4,Handyman,544.96,1462.84,649.07,0.022,False,gauntlet-v2.1.0
+575247f7b834,General Contractor,1604.69,3819.89,1858.48,0.024,False,gauntlet-v2.1.0
+da4da809fe2b,Handyman,254.19,390.92,271.19,0.276,False,gauntlet-v2.1.0
+0193d52e5b14,Plumbing,118.51,221.68,169.87,0.202,True,gauntlet-v2.1.0
+f27a6c4a43c8,Remodeling,1828.2,4276.81,2342.29,0.066,False,gauntlet-v2.1.0
+2bc164b383ec,Handyman,259.12,581.21,336.67,0.115,False,gauntlet-v2.1.0
+93bad48c1cec,Exterior,444.16,1031.14,773.85,0.152,False,gauntlet-v2.1.0
+d74c216d2abf,Electrical,146.68,248.46,198.76,0.228,False,gauntlet-v2.1.0
+8e54c1a1f0c1,Plumbing,115.99,240.69,159.38,0.149,False,gauntlet-v2.1.0
+1d87b9e88ee8,Electrical,154.43,377.12,234.5,0.097,False,gauntlet-v2.1.0
+7e497af4e7da,Roofing,4201.41,8660.42,5322.62,0.178,True,gauntlet-v2.1.0
+479ef404e9ca,Plumbing,224.25,407.19,275.03,0.185,False,gauntlet-v2.1.0
+b5d1f1b6d16f,Moving,190.25,268.51,229.02,0.45,True,gauntlet-v2.1.0
+be180d34dddf,Roofing,186.75,434.98,251.2,0.141,False,gauntlet-v2.1.0
+eb982d2b777a,Flooring,255.13,612.97,298.27,0.023,False,gauntlet-v2.1.0
+221da9692579,Appliance Repair,118.33,168.88,147.51,0.45,True,gauntlet-v2.1.0
+1f117ea9f26c,Appliance Repair,190.84,276.33,235.38,0.45,True,gauntlet-v2.1.0
+e1d07bb09232,Pest Control,339.85,734.88,478.03,0.302,False,gauntlet-v2.1.0
+a59be0418c6d,Electrical,82.39,188.36,140.09,0.155,False,gauntlet-v2.1.0
+7e69b13d445e,Remodeling,384.41,906.93,489.15,0.06,False,gauntlet-v2.1.0
+cdf127f8110c,Landscaping,147.25,183.42,165.8,0.87,True,gauntlet-v2.1.0
+bb9d66043f7c,Plumbing,208.15,467.42,274.71,0.1,False,gauntlet-v2.1.0
+fdba2719a972,Painting,540.57,1267.89,802.03,0.11,False,gauntlet-v2.1.0
+ba0c479ffa28,Handyman,231.34,355.56,246.42,0.276,False,gauntlet-v2.1.0
+67bf76baa415,Painting,212.71,471.51,334.99,0.15,False,gauntlet-v2.1.0
+225e15bcc17f,Painting,1825.31,3019.67,2180.59,0.217,False,gauntlet-v2.1.0
+e37d4b8af9e7,Handyman,83.37,184.6,138.97,0.195,False,gauntlet-v2.1.0
+7f5951d4c711,Landscaping,1243.29,1662.72,1452.45,0.812,True,gauntlet-v2.1.0
+0fbc82708360,Pest Control,382.54,500.79,415.95,0.816,True,gauntlet-v2.1.0
+213f367b1af0,Handyman,200.3,456.13,259.49,0.103,False,gauntlet-v2.1.0
+bd7997353a3a,Appliance Repair,131.21,328.34,174.63,0.06,False,gauntlet-v2.1.0
+cacbfe2218b2,Electrical,319.13,824.62,408.7,0.018,False,gauntlet-v2.1.0
+1b070f32e667,Handyman,439.87,1153.12,580.13,0.022,False,gauntlet-v2.1.0
+9151e5d13d55,Moving,165.3,217.51,186.8,0.45,True,gauntlet-v2.1.0
+c3f2b5c9a97f,Moving,258.94,385.24,320.1,0.45,True,gauntlet-v2.1.0
+5393f44a4c0c,Landscaping,348.7,806.31,552.78,0.257,False,gauntlet-v2.1.0
+322d1ee172dc,Handyman,173.67,284.78,241.52,0.291,False,gauntlet-v2.1.0
+ed12ac689968,Pest Control,120.37,158.61,141.82,0.828,True,gauntlet-v2.1.0
+4d01a3dbd011,Handyman,357.03,930.85,535.48,0.073,False,gauntlet-v2.1.0
+dac8af8ab319,Handyman,374.54,696.51,416.91,0.18,False,gauntlet-v2.1.0
+6e229d195594,Cleaning,318.4,418.14,349.27,0.815,True,gauntlet-v2.1.0
+c19edfa3f6a2,Cleaning,276.13,379.05,322.11,0.749,True,gauntlet-v2.1.0
+d30b6ecd5d6e,Pest Control,384.04,529.53,432.22,0.773,True,gauntlet-v2.1.0
+6058ce19ef73,Flooring,474.51,1265.95,588.13,0.019,False,gauntlet-v2.1.0
+ddf87428c63d,Handyman,732.34,1829.03,1050.07,0.083,False,gauntlet-v2.1.0
+6cbb65e4607f,Flooring,182.33,416.92,278.71,0.134,False,gauntlet-v2.1.0
+9e558a7dc777,Handyman,200.82,479.06,317.96,0.143,False,gauntlet-v2.1.0
+dcd6b4f7cc05,Exterior,285.96,730.56,460.32,0.091,False,gauntlet-v2.1.0
+f1d3942db084,Moving,327.35,444.49,370.43,0.45,True,gauntlet-v2.1.0
+643cd2e0dc27,Cleaning,277.72,376.75,326.09,0.8,True,gauntlet-v2.1.0
+ffd57a1da62c,Landscaping,202.78,263.61,237.57,0.839,True,gauntlet-v2.1.0
+71c23d9658cc,Handyman,175.56,314.72,267.85,0.3,False,gauntlet-v2.1.0
+419487a66d85,Electrical,135.89,300.93,213.0,0.149,False,gauntlet-v2.1.0
+303a4d32b748,HVAC,226.25,338.69,288.54,0.673,True,gauntlet-v2.1.0
+bccc187b9613,Plumbing,148.13,224.64,174.12,0.253,False,gauntlet-v2.1.0
+f86cb6f7591d,Handyman,210.16,313.91,260.47,0.314,False,gauntlet-v2.1.0
+f22dcf4d1dd4,Pest Control,1006.71,1383.4,1207.8,0.775,True,gauntlet-v2.1.0
+1fda00bb3e47,Electrical,424.87,992.73,569.69,0.083,False,gauntlet-v2.1.0
+8e0c3b8faa09,Pest Control,388.74,534.0,442.65,0.78,True,gauntlet-v2.1.0
+d886a46e106f,Painting,395.61,872.38,541.23,0.118,False,gauntlet-v2.1.0
+802e31135377,Painting,289.39,729.47,444.12,0.085,False,gauntlet-v2.1.0
+8fb95456f71e,Handyman,47.6,110.51,58.09,0.069,False,gauntlet-v2.1.0
+a31b00d9c6a5,Landscaping,38.21,84.74,57.15,0.236,False,gauntlet-v2.1.0
+4eef6101e21b,Plumbing,129.03,298.49,204.13,0.135,False,gauntlet-v2.1.0
+9b65c00f518f,Cleaning,329.5,443.05,369.64,0.797,True,gauntlet-v2.1.0
+69769ab78b2e,Handyman,3269.75,8302.27,3842.56,0.022,False,gauntlet-v2.1.0
+e8728d690d15,Landscaping,323.63,431.26,349.72,0.797,True,gauntlet-v2.1.0
+ae600b4ed00a,Handyman,282.06,707.39,393.53,0.072,False,gauntlet-v2.1.0
+934b7e8be96b,Painting,1298.97,3117.17,2141.97,0.127,False,gauntlet-v2.1.0
+dd9aeb023009,Electrical,145.15,285.89,186.73,0.155,False,gauntlet-v2.1.0
+4cf826dd75e4,Handyman,42.09,99.43,53.13,0.07,False,gauntlet-v2.1.0
+8eff417a0ed7,Handyman,72.9,165.58,98.15,0.121,False,gauntlet-v2.1.0
+abdc52326182,Landscaping,127.37,294.82,221.79,0.288,False,gauntlet-v2.1.0
+9303f7d9cfd9,Handyman,61.24,143.73,96.47,0.15,False,gauntlet-v2.1.0
+2cafe232be9a,Handyman,74.96,148.68,108.2,0.217,False,gauntlet-v2.1.0
+8aab8fb5f1a9,Painting,198.13,466.63,269.42,0.083,False,gauntlet-v2.1.0
+da162cc722f9,Handyman,109.03,263.42,193.02,0.17,False,gauntlet-v2.1.0
+0e3c11fafad9,Plumbing,87.54,218.33,112.29,0.034,False,gauntlet-v2.1.0
+da0176b4c76b,Painting,797.87,1434.87,959.72,0.182,False,gauntlet-v2.1.0
+e781b2c55b7d,Landscaping,117.97,229.08,194.66,0.52,False,gauntlet-v2.1.0
+f2a184e7e0f1,Landscaping,326.84,466.81,378.18,0.745,True,gauntlet-v2.1.0
+840d98e504dd,Appliance Repair,183.27,261.43,224.6,0.45,True,gauntlet-v2.1.0
+9cff26cc9bc9,HVAC,3158.67,3870.82,3480.28,0.45,True,gauntlet-v2.1.0
+13b19ec2fb5d,Pest Control,176.54,232.66,209.41,0.829,True,gauntlet-v2.1.0
+73410b280868,Electrical,107.91,159.67,119.23,0.251,False,gauntlet-v2.1.0
+05a721545ecd,Flooring,170.32,407.58,242.46,0.091,False,gauntlet-v2.1.0
+4ab5f50373ff,Plumbing,132.45,293.68,239.24,0.182,False,gauntlet-v2.1.0
+3aaf7d14678d,Handyman,331.27,903.66,433.84,0.022,False,gauntlet-v2.1.0
+7160a20005ff,Plumbing,142.48,342.04,185.34,0.06,False,gauntlet-v2.1.0
+5139103f771d,Handyman,130.23,296.1,220.67,0.187,False,gauntlet-v2.1.0
+979db23475e1,Exterior,370.94,938.27,633.7,0.111,False,gauntlet-v2.1.0
+e8b6df3d77ba,Pest Control,668.77,929.09,767.7,0.771,True,gauntlet-v2.1.0
+618b67dbb3a8,Handyman,105.53,248.36,174.71,0.164,False,gauntlet-v2.1.0
+1dcf6954b231,HVAC,220.37,329.24,270.65,0.712,True,gauntlet-v2.1.0
+fe75d80ac540,Handyman,152.17,356.3,274.71,0.205,False,gauntlet-v2.1.0
+59f2e08b9480,HVAC,100.8,134.25,114.14,0.809,True,gauntlet-v2.1.0
+18b2b9dc9406,Painting,346.4,736.12,506.44,0.151,False,gauntlet-v2.1.0
+37c39c93d0e2,General Contractor,419.83,1069.41,580.05,0.046,True,gauntlet-v2.1.0
+342bb53dc968,Pest Control,82.44,126.36,99.27,0.621,True,gauntlet-v2.1.0
+e74d3069d3a0,Electrical,305.81,796.96,408.2,0.022,False,gauntlet-v2.1.0
+ea587af64f69,Cleaning,266.06,365.36,315.58,0.791,True,gauntlet-v2.1.0
+19b9e26203c0,Roofing,340.38,831.88,413.75,0.036,False,gauntlet-v2.1.0
+f034286a668c,HVAC,206.12,269.68,246.03,0.788,True,gauntlet-v2.1.0
+bd2079738bf1,Handyman,151.06,368.32,234.49,0.125,False,gauntlet-v2.1.0
+8252e1d5fe9e,Painting,449.16,723.59,558.77,0.234,False,gauntlet-v2.1.0
+70693321a54a,Moving,459.38,644.65,534.86,0.45,True,gauntlet-v2.1.0
+3fe9924209db,Painting,507.58,1174.31,790.32,0.129,False,gauntlet-v2.1.0
+0f13b329aacb,General Contractor,678.64,1735.1,900.78,0.03,False,gauntlet-v2.1.0
+eef2f9329531,Pest Control,125.38,172.72,151.49,0.745,True,gauntlet-v2.1.0
+f432f3b7c5f6,Landscaping,147.93,360.5,265.28,0.195,False,gauntlet-v2.1.0
+024e63e143c4,Plumbing,478.25,890.23,519.16,0.146,False,gauntlet-v2.1.0
+7bf97288f7ac,Moving,452.8,618.73,541.91,0.45,True,gauntlet-v2.1.0
+337e00526bf9,Handyman,128.23,258.66,206.59,0.254,False,gauntlet-v2.1.0
+3b29bbd4908a,Painting,263.85,425.24,325.17,0.232,False,gauntlet-v2.1.0
+281b13e30538,Painting,73.1,157.74,109.64,0.15,False,gauntlet-v2.1.0
+53adbfe094b8,Plumbing,137.56,214.78,173.47,0.252,False,gauntlet-v2.1.0
+abc1ff388270,Handyman,322.62,745.69,380.11,0.058,False,gauntlet-v2.1.0
+532d79cc5e85,Roofing,252.21,664.73,335.12,0.025,False,gauntlet-v2.1.0
+28581d531e43,Electrical,91.12,227.1,151.82,0.113,False,gauntlet-v2.1.0
+820acd0d5a58,Plumbing,202.8,316.53,253.86,0.251,False,gauntlet-v2.1.0
+b4eed30197a0,Handyman,715.04,1566.38,1005.15,0.153,False,gauntlet-v2.1.0
+1c753160f146,Appliance Repair,326.52,752.86,437.47,0.152,False,gauntlet-v2.1.0
+595ccd2fce27,Handyman,529.66,1323.11,736.31,0.071,False,gauntlet-v2.1.0
+455b1009a8a7,Pest Control,614.16,878.5,733.14,0.708,True,gauntlet-v2.1.0
+dcad6daef1d1,Moving,296.73,381.87,338.12,0.45,True,gauntlet-v2.1.0
+5076c7de3c66,Handyman,219.43,527.64,262.91,0.037,False,gauntlet-v2.1.0
+0e74f3e37a16,Handyman,159.21,390.61,202.67,0.048,False,gauntlet-v2.1.0
+40550d2be84e,Moving,182.68,232.73,210.72,0.45,True,gauntlet-v2.1.0
+19eeffc3c1eb,Electrical,213.22,333.82,259.5,0.242,False,gauntlet-v2.1.0
+e9d00659d61a,Painting,267.12,661.38,385.76,0.076,False,gauntlet-v2.1.0
+8b1b880d1dca,Roofing,770.35,1356.4,830.94,0.232,False,gauntlet-v2.1.0
+5d4384250644,Handyman,90.3,224.17,143.94,0.123,False,gauntlet-v2.1.0
+2c56403fcffb,Handyman,289.49,627.49,443.34,0.183,False,gauntlet-v2.1.0
+17582f51a0f6,Handyman,146.28,355.23,200.86,0.084,False,gauntlet-v2.1.0
+f6d6279d84be,Landscaping,318.89,739.64,512.41,0.235,False,gauntlet-v2.1.0
+6edf4aafcf3d,Handyman,143.6,350.48,215.59,0.113,False,gauntlet-v2.1.0
+d53f1777a7a1,Landscaping,1059.91,1432.37,1269.3,0.808,True,gauntlet-v2.1.0
+b23d8b6a2424,Plumbing,124.57,235.77,167.0,0.185,False,gauntlet-v2.1.0
+e2a7c0cee253,Painting,434.59,1120.02,684.62,0.082,False,gauntlet-v2.1.0
+07816df1ab98,Electrical,220.29,346.32,277.54,0.245,False,gauntlet-v2.1.0
+92f2eca62b6d,Plumbing,155.02,314.9,240.55,0.185,True,gauntlet-v2.1.0
+3ee51d047159,Handyman,68.59,160.17,94.06,0.108,False,gauntlet-v2.1.0
+fb3e2c0015ad,Plumbing,287.64,725.71,370.55,0.028,False,gauntlet-v2.1.0
+ff339a9bc988,Cleaning,227.73,301.2,263.9,0.821,True,gauntlet-v2.1.0
+66e475018f5f,Landscaping,175.17,218.43,194.7,0.847,True,gauntlet-v2.1.0
+3af2c389bcab,Moving,653.31,947.04,804.59,0.45,True,gauntlet-v2.1.0
+04850bba0fdd,Roofing,288.37,439.02,347.32,0.342,True,gauntlet-v2.1.0
+d66d71c37254,Handyman,164.6,413.77,212.54,0.037,False,gauntlet-v2.1.0
+e5f957560a7e,Plumbing,131.05,220.23,161.09,0.219,False,gauntlet-v2.1.0
+c08a1a268495,Handyman,164.93,403.32,209.61,0.049,False,gauntlet-v2.1.0
+10f40939e637,Handyman,101.57,154.25,118.41,0.297,False,gauntlet-v2.1.0
+b185e9bbd82d,Electrical,84.89,139.74,102.59,0.221,False,gauntlet-v2.1.0
+35a6c93873ac,Landscaping,246.66,383.09,310.53,0.511,False,gauntlet-v2.1.0
+213fc33d8f2d,Painting,238.13,402.76,327.25,0.23,False,gauntlet-v2.1.0
+08cb25d5338e,Pest Control,268.32,371.91,307.45,0.773,True,gauntlet-v2.1.0
+30654f8da855,Pest Control,992.14,1445.68,1233.27,0.747,True,gauntlet-v2.1.0
+fd458a3e9330,General Contractor,590.61,1586.61,813.89,0.018,False,gauntlet-v2.1.0
+862c605c3e62,Handyman,479.34,1241.51,585.28,0.022,False,gauntlet-v2.1.0
+b4bcbc5dbbef,Plumbing,156.34,368.19,247.95,0.128,False,gauntlet-v2.1.0
+cbe52a3141e6,Handyman,140.08,332.02,200.88,0.128,False,gauntlet-v2.1.0
+e15ebcc90b82,Plumbing,105.47,250.26,155.99,0.105,False,gauntlet-v2.1.0
+a6ea08cf9c70,Electrical,127.56,283.32,193.81,0.141,False,gauntlet-v2.1.0
+079adbe0749b,Moving,274.33,367.81,328.83,0.45,True,gauntlet-v2.1.0
+cad6ddf10c7f,Handyman,338.45,782.82,489.79,0.132,False,gauntlet-v2.1.0
+7bebc18820aa,HVAC,289.22,415.95,333.98,0.584,True,gauntlet-v2.1.0
+b946d24a0770,Pest Control,178.98,222.71,204.23,0.874,True,gauntlet-v2.1.0
+e538262935f7,Remodeling,898.59,1977.77,1087.11,0.081,False,gauntlet-v2.1.0
+2a7185fd600e,Painting,283.23,401.68,323.98,0.271,False,gauntlet-v2.1.0
+4c4d1c64b58e,Handyman,75.44,171.24,110.12,0.15,False,gauntlet-v2.1.0
+e78dcd2ab23b,Handyman,168.12,385.83,239.76,0.131,False,gauntlet-v2.1.0
+9223a8bb0049,Handyman,665.57,1469.37,817.51,0.104,True,gauntlet-v2.1.0
+1de5495d95a1,General Contractor,2030.9,4711.06,2651.79,0.078,False,gauntlet-v2.1.0
+21cce305b20c,Painting,105.58,229.0,190.72,0.187,False,gauntlet-v2.1.0
+e58a1066468c,Handyman,131.95,197.75,166.35,0.314,False,gauntlet-v2.1.0
+a7365b763653,Landscaping,324.52,448.07,363.71,0.77,True,gauntlet-v2.1.0
+e209f7b7bfe0,Painting,212.59,458.33,308.01,0.142,False,gauntlet-v2.1.0
+e69e7a34617f,Moving,265.73,383.73,326.2,0.45,True,gauntlet-v2.1.0
+6782b928b930,Handyman,285.49,537.79,390.38,0.225,True,gauntlet-v2.1.0
+881c7eeb306d,Handyman,109.35,248.67,183.37,0.197,False,gauntlet-v2.1.0
+4d378dec1f63,Appliance Repair,58.52,121.08,80.28,0.3,False,gauntlet-v2.1.0
+d342fcf35246,Landscaping,221.14,278.15,252.03,0.864,True,gauntlet-v2.1.0
+972023c1a613,Cleaning,256.36,310.39,291.12,0.897,True,gauntlet-v2.1.0
+34a2b99c0241,Handyman,482.19,797.84,537.02,0.246,False,gauntlet-v2.1.0
+33cdd7617963,Handyman,161.58,400.05,263.41,0.132,False,gauntlet-v2.1.0
+e3649c5af355,Pest Control,137.22,186.3,172.66,0.816,True,gauntlet-v2.1.0
+6785481828c6,Plumbing,151.45,232.19,194.02,0.26,False,gauntlet-v2.1.0
+c7e17652d255,Electrical,89.02,204.35,152.94,0.155,False,gauntlet-v2.1.0
+338d9ecfd128,Appliance Repair,131.11,281.39,201.53,0.234,False,gauntlet-v2.1.0
+3810958e93e8,Handyman,277.21,675.66,401.79,0.101,False,gauntlet-v2.1.0
+fa7c73f19c30,Plumbing,166.96,261.42,219.92,0.256,False,gauntlet-v2.1.0
+ce332c83a236,Handyman,58.4,89.51,68.28,0.293,False,gauntlet-v2.1.0
+4572a6e276ac,Exterior,298.47,743.84,492.66,0.109,False,gauntlet-v2.1.0
+35450dd5d167,Plumbing,246.84,641.79,318.69,0.018,False,gauntlet-v2.1.0
+651cd1351782,Painting,295.71,495.35,343.3,0.207,False,gauntlet-v2.1.0
+9775a97df5fa,Flooring,814.69,1868.52,1044.05,0.082,False,gauntlet-v2.1.0
+514cfacbe557,Painting,263.21,472.94,345.4,0.199,False,gauntlet-v2.1.0
+690b0ff208b0,Handyman,135.8,329.79,235.21,0.161,False,gauntlet-v2.1.0
+fcb55bd7a875,Handyman,41.94,97.33,56.25,0.104,False,gauntlet-v2.1.0
+4f360d2e245c,Plumbing,157.2,368.84,227.01,0.104,False,gauntlet-v2.1.0
+0f7300765b0e,Roofing,108.07,244.47,153.08,0.175,False,gauntlet-v2.1.0
