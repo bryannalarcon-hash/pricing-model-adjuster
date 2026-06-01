@@ -42,7 +42,25 @@ Three clean layers with no cross-layer coupling:
 
 ## Quickstart
 
-These five steps take a freshly cloned repository to a working local endpoint.
+### Fastest: one command
+
+```bash
+./scripts/up.sh
+```
+
+Brings up the entire local stack with a single command. **It will:**
+
+- install Python deps + Rails gems if they're missing, and create `.env` from `.env.example` if absent
+- start the Python model **sidecar** on `http://127.0.0.1:8011`
+- start the **Rails API + dashboard** on `http://127.0.0.1:3007` (dashboard at `/`)
+
+**Safety:** `BOOKING_LIVE` is force-unset, so bookings are **simulated** — nothing is posted to the real staging endpoint. **Press Ctrl-C to stop both services.** The first run installs dependencies (~a minute); later runs start in seconds.
+
+> Prerequisites: Python 3.10+, and Ruby 3.0.2 with bundler. If `bundle` isn't on your `PATH`, the script falls back to the `~/.gem` convention used in the manual steps below.
+
+### Manual / step-by-step
+
+The same bring-up by hand — useful for understanding the moving parts or debugging. These five steps take a freshly cloned repository to a working local endpoint.
 
 **1. Install Python dependencies**
 
@@ -158,7 +176,7 @@ The same endpoint is aliased at `POST /.netlify/functions/pricing-estimate`.
 .
 ├── api/                          Rails 7.1.6 API-only app
 │   ├── app/controllers/          PricingEstimateController
-│   └── spec/requests/            21 RSpec request specs
+│   └── spec/requests/            42 RSpec request specs
 ├── data/
 │   └── raw/houseaccount_pricing_sample.csv   source data (1,432 rows, 411 labeled)
 ├── docs/
@@ -185,7 +203,7 @@ The same endpoint is aliased at `POST /.netlify/functions/pricing-estimate`.
 │   ├── predict_cli.py            batch predict CLI
 │   ├── train.py                  full training pipeline
 │   └── infer_service.py          FastAPI sidecar (POST /infer, GET /health)
-├── tests/                        15 pytest tests (model logic, eval, confidence)
+├── tests/                        21 pytest tests + 14 Playwright e2e (model logic, eval, confidence)
 ├── .env.example                  env var template
 ├── requirements.txt              Python dependencies
 └── ASSUMPTIONS.md                modeling assumptions and data notes
@@ -216,18 +234,19 @@ python3 -m pytest tests/ -q
 Rails request specs (API contract, auth, errors, rate limiting, dashboard proxy/metrics/predictions; the sidecar is stubbed via WebMock — no running sidecar needed):
 
 ```bash
-cd api && bundle exec rspec      # 31 examples
+cd api && bundle exec rspec      # 42 examples
 ```
 
 End-to-end browser tests (Playwright; cover every dashboard path — predict, batch, results, error handling). Requires the stack running locally:
 
 ```bash
-python3 -m pytest tests/e2e/ -q  # 8 examples
+python3 -m pytest tests/e2e/ -q  # 14 examples
 ```
 
 ## Further reading
 
-- `docs/MODELING.md` — feature engineering details, leakage protocol, model card
+- `MODELING.md` — model card: feature engineering, leakage protocol, confidence design (root copy of `docs/MODELING.md`)
+- `JOURNAL.md` — the research journal: every experiment run and why it was kept or rejected (root copy of `experiments/JOURNAL.md`)
 - `docs/DEPLOYMENT.md` — full three-terminal bring-up, env vars, staging integration, troubleshooting
 - `ASSUMPTIONS.md` — data assumptions, real-only subset definition, design choices
 - `AI_USAGE.md` — how AI tools were used in this project
