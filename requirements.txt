@@ -1,8 +1,11 @@
-pandas
-numpy
-scikit-learn
-lightgbm
-xgboost
+# Python deps. ML libs are PINNED to the versions that created model/bundle.pkl —
+# a scikit-learn / lightgbm / numpy skew would break unpickling at inference time.
+pandas==2.3.3
+numpy==2.2.6
+scipy==1.15.3
+scikit-learn==1.7.2
+lightgbm==4.6.0
+xgboost==3.2.0
 fastapi
 uvicorn[standard]
 requests
