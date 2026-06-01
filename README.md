@@ -2,6 +2,8 @@
 
 An AI-powered pricing engine for home-service bookings. Given a booking request (service category, ZIP code, job description, and an optional existing estimate), the model returns a calibrated price interval (`estimate_lo` / `estimate_hi`), a midpoint, and a confidence score in [0, 1]. The model beats both MAPE baselines using leakage-free out-of-fold evaluation on 411 labeled rows from the HouseAccount dataset.
 
+**▶ 5-minute demo video:** <https://youtu.be/2FHjLjmG8Q4>
+
 ## Model performance
 
 Model version: `gauntlet-v2.1.0`.
@@ -176,7 +178,7 @@ The same endpoint is aliased at `POST /.netlify/functions/pricing-estimate`.
 |---|---|
 | **Source code** | **Model** — `src/houseprice/` (`train.py`, `model_v2.py`, `confidence.py`, `predict.py`, `infer_service.py`, `data_load.py`, `features.py`, `scope.py`, …) + `model/bundle.pkl`. **Rails API + dashboard** — `api/app/**` (controllers, services, concerns), `api/config/**`, `api/public/dashboard/{index.html,app.js,styles.css}`. **Integration** — `integration/sign_and_post.py`. **Build** — `Dockerfile`, `api/Dockerfile`, `requirements.txt`. **Research/experiments** — `experiments/*.py` |
 | **Technical documentation** | `MODELING.md` (model card: data, training, confidence) · `JOURNAL.md` (research journal) · `ASSUMPTIONS.md` · `docs/BUILD_PLAN.md` · `docs/design/` (brief + screenshots) · this `README.md` |
-| **Demo video** | Recorded separately — not in the repo |
+| **Demo video** | [youtu.be/2FHjLjmG8Q4](https://youtu.be/2FHjLjmG8Q4) — 5-minute walkthrough |
 | **Deployment guide** | `docs/DEPLOYMENT.md` · `scripts/up.sh` (one-command bring-up) · the [Quickstart](#quickstart) above · `Dockerfile` / `api/Dockerfile` · `.env.example` |
 | **Test results** | **Tests** — `tests/` (21 pytest + 14 Playwright e2e), `api/spec/requests/` (42 RSpec). **Outputs** — `reports/eval_report.md`, `reports/eval_metrics.json`, `predictions/predictions.csv` (leakage-free OOF) |
 | **AI usage log** | `AI_USAGE.md` (logging tooling: `scripts/prompt_logger.py`) |
