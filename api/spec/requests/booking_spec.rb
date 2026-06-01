@@ -205,6 +205,19 @@ RSpec.describe "Booking routes", type: :request do
       expect(api_entry["live"]).to be false   # live OFF -> programmatic send simulated
     end
 
+    it "records a 'website' conversion when website_auto_send is on (X-Pricing-Source: website)" do
+      BookingConfig.update("website_auto_send" => true)
+
+      post "/pricing-estimate", params: estimate_payload.to_json,
+           headers: auth_headers.merge("X-Pricing-Source" => "website")
+
+      get "/dashboard/conversions"
+      entry = JSON.parse(response.body).find { |e| e["source"] == "website" }
+      expect(entry).not_to be_nil
+      expect(entry["job_id"]).to eq("api-001")
+      expect(entry["live"]).to be false   # live off -> website auto-send simulated
+    end
+
     it "sends the programmatic auto-send LIVE when live mode is on" do
       stub_const("ENV", ENV.to_h.merge(
         "GAUNTLET_PRICING_SECRET" => auth_secret, "HOUSEACCOUNT_SIGNING_KEY" => "test-key",

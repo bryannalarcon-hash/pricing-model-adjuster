@@ -33,7 +33,7 @@ class BookingController < ApplicationController
   # @return [void]
   def config_update
     raw = JSON.parse(request.raw_post)
-    BookingConfig.update(raw.slice("api_auto_send", "live"))
+    BookingConfig.update(raw.slice("api_auto_send", "website_auto_send", "live"))
     render json: config_state
   rescue JSON::ParserError
     render json: { error: "Malformed JSON" }, status: :bad_request
@@ -42,6 +42,7 @@ class BookingController < ApplicationController
   private
 
   def config_state
-    { api_auto_send: BookingConfig.api_auto_send?, live: BookingConfig.live? }
+    { api_auto_send: BookingConfig.api_auto_send?,
+      website_auto_send: BookingConfig.website_auto_send?, live: BookingConfig.live? }
   end
 end

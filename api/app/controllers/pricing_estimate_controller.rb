@@ -28,14 +28,17 @@ class PricingEstimateController < ApplicationController
 
   private
 
-  # Fires a fire-and-forget booking send when api_auto_send is enabled.
-  # Runs in a background thread so it never blocks the <2s response.
+  # Fires a fire-and-forget booking send when auto-send is enabled for this request's
+  # source: website requests (proxied from /dashboard/predict via X-Pricing-Source) use
+  # website_auto_send; direct API calls use api_auto_send. Threaded; never blocks the response.
   # @param result [Hash] sidecar inference result (symbol keys)
   # @return [void]
   def auto_send_to_booking(result)
-    return unless BookingConfig.api_auto_send?
+    website = request.headers["X-Pricing-Source"] == "website"
+    return unless website ? BookingConfig.website_auto_send? : BookingConfig.api_auto_send?
 
-    params_snapshot = booking_params.dup
-    Thread.new { BookingClient.auto_send(params_snapshot, result) rescue nil }
+    src    = website ? "website" : "api"
+    params = booking_params.dup
+    Thread.new { BookingClient.auto_send(params, result, source: src) rescue nil }
   end
 end

@@ -1,27 +1,25 @@
 # frozen_string_literal: true
 
 # BookingConfig — persists booking toggles to data/booking_config.json:
-#   api_auto_send (auto-send programmatic /pricing-estimate calls) and
-#   live (really POST to staging vs simulate). ENV["BOOKING_CONFIG_PATH"]
-#   overrides the path for tests. Reads rescue to false; a missing file is never fatal.
+#   api_auto_send (auto-send direct /pricing-estimate API calls), website_auto_send
+#   (auto-send /dashboard/predict website requests), and live (really POST to staging
+#   vs simulate). ENV["BOOKING_CONFIG_PATH"] overrides the path for tests. Reads rescue
+#   to false; a missing file is never fatal.
 require "json"
 require "fileutils"
 
 module BookingConfig
   DEFAULT_PATH = Rails.root.join("..", "data", "booking_config.json")
 
-  # @return [Boolean] whether programmatic /pricing-estimate calls auto-send
-  def self.api_auto_send?
-    flag "api_auto_send"
-  end
-
-  # @return [Boolean] whether sends really POST to staging (vs simulate)
-  def self.live?
-    flag "live"
-  end
+  # @return [Boolean] auto-send direct /pricing-estimate (API) calls
+  def self.api_auto_send? = flag("api_auto_send")
+  # @return [Boolean] auto-send website requests hitting /dashboard/predict
+  def self.website_auto_send? = flag("website_auto_send")
+  # @return [Boolean] sends really POST to staging (vs simulate)
+  def self.live? = flag("live")
 
   # Merges the given flags into the stored config, preserving the others.
-  # @param attrs [Hash] any of "api_auto_send" / "live" => Boolean
+  # @param attrs [Hash] any of api_auto_send / website_auto_send / live => Boolean
   # @return [void]
   def self.update(attrs)
     clean = attrs.transform_keys(&:to_s).transform_values { |value| value == true }
@@ -31,9 +29,7 @@ module BookingConfig
     nil
   end
 
-  def self.flag(key)
-    read.fetch(key, false) == true
-  end
+  def self.flag(key) = read.fetch(key, false) == true
   private_class_method :flag
 
   def self.read

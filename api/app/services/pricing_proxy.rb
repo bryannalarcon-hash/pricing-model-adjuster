@@ -22,9 +22,10 @@ module PricingProxy
     http.read_timeout = TIMEOUT_SECONDS
 
     req = Net::HTTP::Post.new(uri.request_uri)
-    req["Authorization"]  = "Bearer #{secret}"
-    req["Content-Type"]   = "application/json"
-    req.body              = payload.to_json
+    req["Authorization"]    = "Bearer #{secret}"
+    req["Content-Type"]     = "application/json"
+    req["X-Pricing-Source"] = "website" # marks this as a dashboard request for auto-send gating
+    req.body                = payload.to_json
 
     resp = http.request(req)
     { status: resp.code.to_i, body: JSON.parse(resp.body) }

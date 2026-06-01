@@ -41,10 +41,10 @@ module BookingClient
     { live: true, status: 0, body: "send failed: #{err.message}" }
   end
 
-  # Build + send + record a conversion (source "api") for auto-send wiring.
-  def self.auto_send(payload, result)
+  # Build + send + record a conversion (source "api"/"website") for auto-send wiring.
+  def self.auto_send(payload, result, source: "api")
     sent = send_booking BookingBuilder.build(payload, result)
-    ConversionStore.record_send(source: "api", payload: payload, result: result, sent: sent)
+    ConversionStore.record_send(source: source, payload: payload, result: result, sent: sent)
     sent
   end
 end

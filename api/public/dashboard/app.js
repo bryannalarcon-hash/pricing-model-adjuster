@@ -549,10 +549,8 @@ function runPredict() {
         showPredictState('empty');
       } else {
         renderResultCard(resp.body, payload);
-        // Control 1: if website auto-send is ON, automatically POST to booking flow
-        if (websiteAutosendOn) {
-          sendToBookingFlow({ source: 'website', payload: payload, result: resp.body });
-        }
+        // Website auto-send is handled SERVER-SIDE now (DashboardController#predict honors the
+        // persisted website_auto_send flag), so no client send here — both would double-record.
       }
     })
     .catch(function(err) {
@@ -947,10 +945,7 @@ function runBatch() {
           b.estimate_hi        = Number(b.estimate_hi);
           b.confidence         = Number(b.confidence);
           entry = { row: row, result: b };
-          // Control 1: auto-send each scored row when website auto-send is ON
-          if (websiteAutosendOn) {
-            sendToBookingFlow({ source: 'website', payload: rowToPayload(row), result: b });
-          }
+          // Website auto-send is server-side now — each /dashboard/predict honors the flag.
         }
         accum[i] = entry;
         appendRow(entry, i);
@@ -1548,16 +1543,23 @@ function initWebsiteAutosend() {
   if (!toggle) return;
 
   toggle.addEventListener('click', function() {
-    websiteAutosendOn = !websiteAutosendOn;
-    toggle.setAttribute('aria-checked', String(websiteAutosendOn));
-    if (websiteAutosendOn) {
-      toggle.classList.add('on');
-    } else {
-      toggle.classList.remove('on');
-    }
-    // The manual send buttons are decoupled from this toggle — they stay visible after a
-    // prediction/scoring regardless. This toggle only controls whether NEW predictions also
-    // auto-send. (Avoids the button getting stuck hidden across toggles.)
+    // Persist server-side so ANY /dashboard/predict (browser or curl) auto-sends when on.
+    var next = !(toggle.getAttribute('aria-checked') === 'true');
+    setSwitch(toggle, next);                      // optimistic; server response is authoritative
+    fetch('/dashboard/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ website_auto_send: next })
+    })
+      .then(function(res) { return res.json(); })
+      .then(function(cfg) {
+        websiteAutosendOn = !!cfg.website_auto_send;
+        setSwitch(toggle, websiteAutosendOn);
+      })
+      .catch(function() {
+        setSwitch(toggle, !next);                 // revert on failure
+        pushToast({ tone: 'bad', title: 'Could not update', body: 'Website auto-send change failed.' });
+      });
   });
 }
 
@@ -1596,6 +1598,8 @@ function initSettings() {
       setSwitch(apiToggle, !!cfg.api_auto_send);
       setSwitch(liveToggle, !!cfg.live);
       reflectLiveIndicator(!!cfg.live);
+      setSwitch(el('website-autosend-toggle'), !!cfg.website_auto_send);
+      websiteAutosendOn = !!cfg.website_auto_send;
     })
     .catch(function() { /* best-effort */ });
 
