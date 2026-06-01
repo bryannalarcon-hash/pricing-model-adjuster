@@ -6,6 +6,8 @@
 // Booking flow: Control 1 (#website-autosend-toggle) for dashboard sends;
 //               Control 2 (#api-autosend-toggle in #settings-popover) for API calls;
 //               Control 3 (#live-mode-toggle) real vs simulated sends + #live-indicator badge.
+// Results charts are tap-to-enlarge: initChartExpand clones #compare-chart /
+// #scatter-svg into #chart-modal-scrim (Esc / scrim-click / × to close).
 
 'use strict';
 
@@ -1144,6 +1146,41 @@ function closeJsonModal() {
   hide(el('json-modal-scrim'));
 }
 
+/* ---- Chart expand modal: clone a results chart into an enlarged overlay ---- */
+
+function initChartExpand() {
+  document.querySelectorAll('.ha-chart-expand-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      openChartModal(btn.dataset.chart, btn.dataset.chartTitle);
+    });
+  });
+  el('chart-modal-close').addEventListener('click', closeChartModal);
+  el('chart-modal-scrim').addEventListener('click', function(e) {
+    if (e.target === el('chart-modal-scrim')) closeChartModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeChartModal(); closeJsonModal(); closeDrawer(); }
+  });
+}
+
+function openChartModal(which, title) {
+  var src = el(which === 'scatter' ? 'scatter-svg' : 'compare-chart');
+  if (!src) return;
+  var body = el('chart-modal-body');
+  body.innerHTML = '';
+  var clone = src.cloneNode(true);
+  clone.removeAttribute('id');
+  if (which === 'scatter') clone.setAttribute('style', 'display:block;width:100%;height:auto');
+  body.appendChild(clone);
+  el('chart-modal-title').textContent = title || 'Chart';
+  show(el('chart-modal-scrim'));
+}
+
+function closeChartModal() {
+  hide(el('chart-modal-scrim'));
+  el('chart-modal-body').innerHTML = '';
+}
+
 /* ---- Export CSV ---- */
 
 function exportBatchCsv() {
@@ -1820,5 +1857,6 @@ document.addEventListener('DOMContentLoaded', function() {
   initWebsiteAutosend();
   initSettings();
   initBatchSendAll();
+  initChartExpand();
   probeApiStatus();
 });

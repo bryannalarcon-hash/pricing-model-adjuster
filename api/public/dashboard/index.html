@@ -4,7 +4,8 @@
      all tokens/components in styles.css. No framework, no build step.
      Panels: Predict / Batch / Results / Conversions.
      Header controls: #website-autosend-toggle (website sends) + #settings-btn gear
-     (API config + #live-mode-toggle); #live-indicator badge shows when live mode is ON. -->
+     (API config + #live-mode-toggle); #live-indicator badge shows when live mode is ON.
+     Results charts have .ha-chart-expand-btn → #chart-modal-scrim (tap-to-enlarge). -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -494,9 +495,15 @@
             <div class="ha-card" style="padding:20px" id="compare-chart-card">
               <div class="ha-chart-header">
                 <span class="ha-eyebrow" style="white-space:nowrap">Model vs Baseline · MAPE</span>
-                <div class="ha-chart-legend">
-                  <span class="ha-legend-item"><span class="ha-legend-dot" style="background:var(--amber)"></span>Model</span>
-                  <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:#c6d0d8"></span>Baseline</span>
+                <div class="ha-chart-header-right">
+                  <div class="ha-chart-legend">
+                    <span class="ha-legend-item"><span class="ha-legend-dot" style="background:var(--amber)"></span>Model</span>
+                    <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:#c6d0d8"></span>Baseline</span>
+                  </div>
+                  <button class="ha-chart-expand-btn" data-chart="compare" data-chart-title="Model vs Baseline · MAPE" aria-label="Expand chart">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2H2v4M10 14h4v-4M2 10v4h4M14 6V2h-4"/></svg>
+                    <span class="ha-chart-expand-label">Expand</span>
+                  </button>
                 </div>
               </div>
               <div class="ha-chart-caption">Lower is better</div>
@@ -507,10 +514,16 @@
             <div class="ha-card" style="padding:20px;position:relative" id="scatter-card">
               <div class="ha-chart-header">
                 <span class="ha-eyebrow" style="white-space:nowrap">Predicted midpoint by confidence</span>
-                <div class="ha-chart-legend">
-                  <span class="ha-legend-item"><span class="ha-legend-dot" style="background:var(--ok)"></span>High</span>
-                  <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:var(--warn)"></span>Mid</span>
-                  <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:var(--bad)"></span>Low</span>
+                <div class="ha-chart-header-right">
+                  <div class="ha-chart-legend">
+                    <span class="ha-legend-item"><span class="ha-legend-dot" style="background:var(--ok)"></span>High</span>
+                    <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:var(--warn)"></span>Mid</span>
+                    <span class="ha-legend-item ha-muted"><span class="ha-legend-dot" style="background:var(--bad)"></span>Low</span>
+                  </div>
+                  <button class="ha-chart-expand-btn" data-chart="scatter" data-chart-title="Predicted midpoint by confidence" aria-label="Expand chart">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2H2v4M10 14h4v-4M2 10v4h4M14 6V2h-4"/></svg>
+                    <span class="ha-chart-expand-label">Expand</span>
+                  </button>
                 </div>
               </div>
               <div class="ha-chart-caption">From /dashboard/predictions — x = midpoint (log scale), color = confidence band</div>
@@ -623,6 +636,19 @@
         </button>
       </div>
       <pre class="ha-mono ha-modal-pre" id="json-modal-pre"></pre>
+    </div>
+  </div>
+
+  <!-- Chart expand modal (portal, filled by JS with an enlarged chart clone) -->
+  <div class="ha-scrim hidden" id="chart-modal-scrim">
+    <div class="ha-card ha-chart-modal" id="chart-modal" role="dialog" aria-modal="true" aria-label="Expanded chart">
+      <div class="ha-modal-hdr">
+        <div class="ha-modal-title" id="chart-modal-title">Chart</div>
+        <button class="ha-btn ha-btn--ghost ha-btn--sm" id="chart-modal-close" aria-label="Close expanded chart">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+        </button>
+      </div>
+      <div class="ha-chart-modal-body" id="chart-modal-body"></div>
     </div>
   </div>
 
