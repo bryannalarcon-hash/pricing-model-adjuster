@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # scripts/up.sh — one-command local bring-up of the HouseAccount pricing stack.
 # Starts the Python inference sidecar (:8011) and the Rails API + dashboard (:3007),
-# installs any missing deps, waits for the sidecar to be healthy, then runs Rails in
-# the foreground. Ctrl-C tears BOTH down. BOOKING_LIVE is force-unset so bookings stay
-# SIMULATED and nothing is posted to real staging.
+# installs any missing deps (including the Bundler version Gemfile.lock pins), waits
+# for the sidecar to be healthy, then runs Rails in the foreground. Ctrl-C tears BOTH
+# down. BOOKING_LIVE is force-unset so bookings stay SIMULATED — nothing posts to staging.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -38,6 +38,18 @@ if ! command -v bundle >/dev/null 2>&1; then
   echo "✗ 'bundle' not found — install Ruby 3.0.2 + bundler (see README Quickstart)." >&2
   exit 1
 fi
+
+# Ensure the Bundler version Gemfile.lock was created with. Ruby 3.0's default Bundler
+# (shipped with RubyGems 3.2.x) mis-resolves the tsort gem and breaks `bundle exec`;
+# installing the locked Bundler makes `bundle` auto-switch to it (BUNDLED WITH).
+LOCKED_BUNDLER="$(awk '/BUNDLED WITH/{getline; gsub(/[^0-9.]/,""); print; exit}' api/Gemfile.lock 2>/dev/null || true)"
+LOCKED_BUNDLER="${LOCKED_BUNDLER:-2.5.23}"
+if command -v gem >/dev/null 2>&1 && ! gem list -i -v "$LOCKED_BUNDLER" bundler >/dev/null 2>&1; then
+  echo "→ installing Bundler $LOCKED_BUNDLER (matches Gemfile.lock)…"
+  gem install bundler -v "$LOCKED_BUNDLER" --no-document \
+    || echo "⚠ could not install Bundler $LOCKED_BUNDLER; continuing with the available Bundler" >&2
+fi
+
 ( cd api && { bundle check >/dev/null 2>&1 || bundle install --quiet; } )
 
 # --- env, demo secret, and the live-booking safety latch ---
