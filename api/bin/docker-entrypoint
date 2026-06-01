@@ -1,3 +1,14 @@
 #!/bin/bash -e
+#
+# Container entrypoint. Runs as root only to hand the Railway-mounted /data
+# volume (root-owned by default) to the non-root rails user, then drops
+# privileges with setpriv so the server itself never runs as root.
+# /data holds the persistent ConversionStore + BookingConfig files.
+
+if [ "$(id -u)" = "0" ]; then
+  mkdir -p /data
+  chown -R rails:rails /data
+  exec setpriv --reuid=rails --regid=rails --init-groups "${@}"
+fi
 
 exec "${@}"

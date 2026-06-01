@@ -59,19 +59,18 @@ RUN apt-get update -qq && \
 COPY --from=build /usr/local/bundle /usr/local/bundle
 COPY --from=build /rails /rails
 
-# Run and own only the runtime files as a non-root user for security.
-# Create log/ and tmp/ first: `railway up` uploads only git-tracked files, and the
-# empty log/.keep + tmp/.keep dirs aren't tracked, so they're absent from the build
-# context. mkdir keeps the chown (and puma's pidfile writes) working everywhere.
-# Also create /data (= Rails.root/../data) owned by rails: ConversionStore +
-# BookingConfig write there, and the non-root user can't mkdir it at / otherwise
-# (booking sends 500'd with EACCES). Ephemeral — resets on redeploy.
+# Create the non-root rails user that the server runs as. Pre-own log/ and tmp/
+# (`railway up` ships only git-tracked files, so the empty log/.keep + tmp/.keep
+# dirs are absent from the build context — mkdir keeps the chown and puma's
+# pidfile writes working). /data holds the ConversionStore + BookingConfig files;
+# a Railway volume mounts there for persistence. We do NOT set USER here: the
+# entrypoint runs as root only to chown that (root-owned) volume mount, then
+# drops to rails via setpriv so the server never runs as root.
 RUN useradd rails --create-home --shell /bin/bash && \
     mkdir -p log tmp tmp/pids /data && \
     chown -R rails:rails log tmp /data
-USER rails:rails
 
-# Entrypoint prepares the database.
+# Entrypoint chowns the /data volume then drops privileges to rails.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
