@@ -14,30 +14,30 @@ const CONCURRENCY_CAP = 4;
 const REQUIRED_FIELDS = ['job_id', 'service_category', 'zip_code', 'job_description'];
 
 const SAMPLES = {
-  plumbing: {
-    name: 'Plumbing · water heater',
+  cleaning: {
+    name: 'Cleaning · standard (high confidence)',
     payload: {
-      job_id: 'wh-90b3f1',
-      service_category: 'Plumbing',
-      service_subtype: 'Water Heater Replacement',
-      zip_code: '78704',
-      job_description: '50-gal gas water heater won\'t stay lit — needs replacement.',
-      deadline: 'Within 1-2 weeks',
+      job_id: 'cl-7a21c4',
+      service_category: 'Cleaning',
+      service_subtype: 'House cleaning',
+      zip_code: '75062',
+      job_description: 'Standard 2 bedroom apartment cleaning',
+      deadline: 'I\'m flexible',
       booking_month: '2026-05',
-      original_estimate: 1850
+      original_estimate: 160
     }
   },
-  small: {
-    name: 'Plumbing · small fix',
+  hvac: {
+    name: 'HVAC · tune-up',
     payload: {
-      job_id: 'pl-2271aa',
-      service_category: 'Plumbing',
-      service_subtype: 'Plumbing',
-      zip_code: '33484',
-      job_description: 'Replace kitchen sink shutoff valve (you supply valve)',
-      deadline: 'As soon as possible',
-      booking_month: '2026-04',
-      original_estimate: 150
+      job_id: 'hv-3c0822',
+      service_category: 'HVAC',
+      service_subtype: 'Maintenance',
+      zip_code: '33324',
+      job_description: 'AC tune-up and filter replacement',
+      deadline: 'Within 1-2 weeks',
+      booking_month: '2026-05',
+      original_estimate: 200
     }
   },
   remodel: {

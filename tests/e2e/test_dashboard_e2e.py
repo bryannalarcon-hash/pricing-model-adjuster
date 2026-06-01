@@ -139,13 +139,13 @@ def test_page_load_header_status_and_tabs(page: Page):
 def test_predict_happy_path(page: Page):
     """Load sample → Predict → result card shows lo/midpoint/hi, confidence, uncertainties."""
     page.click("#load-sample-btn")
-    # Load sample opens a 4-item dropdown; pick the first (Plumbing · water heater)
-    page.click(".ha-sample-item[data-sample='plumbing']")
+    # Load sample opens a 4-item dropdown; pick the first (Cleaning · standard)
+    page.click(".ha-sample-item[data-sample='cleaning']")
 
     # Verify textarea is populated
     raw = page.eval_on_selector("#booking-input", "el => el.value")
     booking = json.loads(raw)
-    assert booking.get("service_category") == "Plumbing"
+    assert booking.get("service_category") == "Cleaning"
 
     # No request fired yet — intercept the next one
     with page.expect_response(lambda r: "/dashboard/predict" in r.url) as resp_info:
